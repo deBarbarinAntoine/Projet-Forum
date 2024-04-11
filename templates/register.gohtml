@@ -1,0 +1,28 @@
+{{define "register"}}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+    </head>
+    <body>
+    <form action="/register" method="post">
+        {{.}}
+        <label for="username">Username
+            <input type="text" name="username" id="username" required autofocus>
+        </label>
+        <label for="email">Email
+            <input type="email" name="email" id="email" required>
+        </label>
+        <label for="password1">Password
+            <input type="password" name="password1" id="password1" required>
+        </label>
+        <label for="password2">Confirm password
+            <input type="password" name="password2" id="password2" required>
+        </label>
+        <button>Register</button>
+    </form>
+    <a href="/login">Login</a>
+    </body>
+    </html>
+{{end}}

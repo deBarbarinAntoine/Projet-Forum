@@ -1,0 +1,22 @@
+{{define "login"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<form action="/login" method="post">
+    {{.}}
+    <label for="username">Username
+        <input type="text" name="username" id="username" required autofocus>
+    </label>
+    <label for="password">
+        <input type="password" name="password" id="password" required>
+    </label>
+    <button>Login</button>
+</form>
+<a href="/register">Register</a>
+</body>
+</html>
+{{end}}

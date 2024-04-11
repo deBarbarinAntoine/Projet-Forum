@@ -1,0 +1,19 @@
+{{define "index"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<body>
+<p>Index</p>
+<a href="/">Index page</a>
+<a href="/login">Login</a>
+<a href="/register">Register</a>
+<form action="/add" method="post"><button>Add (require login)</button></form>
+<a href="/logout">Logout</a>
+<a href="/logs">Logs</a>
+<p>{{.}}</p>
+</body>
+</html>
+{{end}}
