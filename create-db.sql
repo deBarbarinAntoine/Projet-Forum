@@ -12,8 +12,8 @@ CREATE TABLE users(
                       Avatar_path VARCHAR(125),
                       Role VARCHAR(20),
                       Birth_date DATETIME,
-                      Created_at DATETIME,
-                      Updated_at DATETIME,
+                      Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                      Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       Visited_at DATETIME,
                       Bio VARCHAR(255) unicode,
                       Signature VARCHAR(255) unicode,
@@ -21,117 +21,135 @@ CREATE TABLE users(
                       PRIMARY KEY(Id_users),
                       UNIQUE(Username),
                       UNIQUE(Email)
-);
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories(
-                           Id_categories INT unsigned not null auto_increment unique,
+                           Id_categories INT unsigned auto_increment,
                            Name VARCHAR(50) NOT NULL,
-                           Created_at DATETIME,
-                           Updated_at DATETIME,
+                           Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                           Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                            Id_author INT unsigned NOT NULL,
-                           Id_parent_categories INT unsigned NOT NULL,
+                           Id_parent_categories INT unsigned,
                            PRIMARY KEY(Id_categories),
-                           UNIQUE(Name),
-                           FOREIGN KEY(Id_author) REFERENCES users(Id_users),
-                           FOREIGN KEY(Id_parent_categories) REFERENCES categories(Id_categories)
-);
+                           UNIQUE(Name)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS tags;
 CREATE TABLE tags(
-                     Id_tags INT unsigned not null auto_increment unique,
+                     Id_tags INT unsigned auto_increment,
                      Name VARCHAR(50) unique NOT NULL,
-                     Created_at DATETIME,
-                     Updated_at DATETIME,
+                     Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                     Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                      Id_author INT unsigned NOT NULL,
                      PRIMARY KEY(Id_tags),
-                     UNIQUE(Name),
-                     FOREIGN KEY(Id_author) REFERENCES users(Id_users)
-);
+                     UNIQUE(Name)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS threads;
 CREATE TABLE threads(
-                        Id_threads INT unsigned not null auto_increment unique,
+                        Id_threads INT unsigned auto_increment,
                         Title VARCHAR(62) unicode NOT NULL,
                         Description VARCHAR(255) unicode,
                         Is_public boolean NOT NULL,
-                        Created_at DATETIME,
-                        Updated_at DATETIME,
+                        Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         Status VARCHAR(20) NOT NULL,
                         Id_author INT unsigned NOT NULL,
                         Id_categories INT unsigned NOT NULL,
                         PRIMARY KEY(Id_threads),
-                        UNIQUE(Title),
-                        FOREIGN KEY(Id_author) REFERENCES users(Id_users),
-                        FOREIGN KEY(Id_categories) REFERENCES categories(Id_categories)
-);
+                        UNIQUE(Title)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS posts;
 CREATE TABLE posts(
-                      Id_posts INT unsigned not null auto_increment unique,
+                      Id_posts INT unsigned auto_increment,
                       Content VARCHAR(1020) unicode NOT NULL,
-                      Created_at DATETIME,
-                      Updated_at DATETIME,
+                      Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                      Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       Id_authors INT unsigned NOT NULL,
-                      Id_parent_posts INT unsigned NOT NULL,
+                      Id_parent_posts INT unsigned,
                       Id_threads INT unsigned NOT NULL,
-                      PRIMARY KEY(Id_parent_posts),
-                      FOREIGN KEY(Id_authors) REFERENCES users(Id_users),
-                      FOREIGN KEY(Id_parent_posts) REFERENCES posts(Id_posts),
-                      FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads)
-);
+                      PRIMARY KEY(Id_posts)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS follow;
 CREATE TABLE follow(
                        Id_users INT unsigned NOT NULL,
                        Id_threads INT unsigned NOT NULL,
-                       Created_at DATETIME,
-                       Updated_at DATETIME,
-                       PRIMARY KEY(Id_users, Id_threads),
-                       FOREIGN KEY(Id_users) REFERENCES users(Id_users),
-                       FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads)
-);
+                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                       Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                       PRIMARY KEY(Id_users, Id_threads)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS favorite;
 CREATE TABLE favorite(
                          Id_users INT unsigned NOT NULL,
                          Id_tags INT unsigned NOT NULL,
-                         Created_at DATETIME,
-                         Updated_at DATETIME,
-                         PRIMARY KEY(Id_users, Id_tags),
-                         FOREIGN KEY(Id_users) REFERENCES users(Id_users),
-                         FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags)
-);
+                         Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                         Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         PRIMARY KEY(Id_users, Id_tags)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS react;
 CREATE TABLE react(
                       Id_users INT unsigned NOT NULL,
                       Id_posts INT unsigned NOT NULL,
-                      Created_at DATETIME,
-                      Updated_at DATETIME,
+                      Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                      Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       Emoji CHAR(1) unicode NOT NULL,
-                      PRIMARY KEY(Id_users, Id_posts),
-                      FOREIGN KEY(Id_users) REFERENCES users(Id_users),
-                      FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts)
-);
+                      PRIMARY KEY(Id_users, Id_posts)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS befriend;
 CREATE TABLE befriend(
                          Id_users_1 INT unsigned NOT NULL,
                          Id_users_2 INT unsigned NOT NULL,
-                         Created_at DATETIME,
-                         Updated_at DATETIME,
+                         Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                         Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                          Status VARCHAR(20) NOT NULL,
-                         PRIMARY KEY(Id_users_1, Id_users_2),
-                         FOREIGN KEY(Id_users_1) REFERENCES users(Id_users),
-                         FOREIGN KEY(Id_users_2) REFERENCES users(Id_users)
-);
+                         PRIMARY KEY(Id_users_1, Id_users_2)
+)ENGINE = INNODB;
 
 DROP TABLE IF EXISTS have;
 CREATE TABLE have(
                      Id_tags INT unsigned NOT NULL,
                      Id_posts INT unsigned NOT NULL,
-                     PRIMARY KEY(Id_tags, Id_posts),
-                     FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags),
-                     FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts)
-);
+                     PRIMARY KEY(Id_tags, Id_posts)
+)ENGINE = INNODB;
+
+ALTER TABLE categories
+    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_parent_categories) REFERENCES categories(Id_categories);
+
+ALTER TABLE tags
+    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users);
+
+ALTER TABLE threads
+    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_categories) REFERENCES categories(Id_categories);
+
+ALTER TABLE posts
+    ADD CONSTRAINT FOREIGN KEY(Id_authors) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_parent_posts) REFERENCES posts(Id_posts),
+    ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
+
+ALTER TABLE follow
+    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
+
+ALTER TABLE favorite
+    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags);
+
+ALTER TABLE react
+    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
+
+ALTER TABLE befriend
+    ADD CONSTRAINT FOREIGN KEY(Id_users_1) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_users_2) REFERENCES users(Id_users);
+
+ALTER TABLE have
+    ADD CONSTRAINT FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags),
+    ADD CONSTRAINT FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
