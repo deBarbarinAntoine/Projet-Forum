@@ -1,4 +1,6 @@
-CREATE DATABASE if not exists forum;
+DROP DATABASE IF EXISTS forum;
+
+CREATE DATABASE IF NOT EXISTS forum;
 
 USE forum;
 
@@ -11,7 +13,7 @@ CREATE TABLE users(
                       Salt CHAR(88),
                       Avatar_path VARCHAR(125),
                       Role VARCHAR(20),
-                      Birth_date DATETIME,
+                      Birth_date DATE,
                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       Visited_at DATETIME,
@@ -73,8 +75,8 @@ CREATE TABLE posts(
                       PRIMARY KEY(Id_posts)
 )ENGINE = INNODB;
 
-DROP TABLE IF EXISTS follow;
-CREATE TABLE follow(
+DROP TABLE IF EXISTS threads_users;
+CREATE TABLE threads_users(
                        Id_users INT unsigned NOT NULL,
                        Id_threads INT unsigned NOT NULL,
                        Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -82,8 +84,8 @@ CREATE TABLE follow(
                        PRIMARY KEY(Id_users, Id_threads)
 )ENGINE = INNODB;
 
-DROP TABLE IF EXISTS favorite;
-CREATE TABLE favorite(
+DROP TABLE IF EXISTS tags_users;
+CREATE TABLE tags_users(
                          Id_users INT unsigned NOT NULL,
                          Id_tags INT unsigned NOT NULL,
                          Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -91,8 +93,8 @@ CREATE TABLE favorite(
                          PRIMARY KEY(Id_users, Id_tags)
 )ENGINE = INNODB;
 
-DROP TABLE IF EXISTS react;
-CREATE TABLE react(
+DROP TABLE IF EXISTS posts_users;
+CREATE TABLE posts_users(
                       Id_users INT unsigned NOT NULL,
                       Id_posts INT unsigned NOT NULL,
                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -101,8 +103,8 @@ CREATE TABLE react(
                       PRIMARY KEY(Id_users, Id_posts)
 )ENGINE = INNODB;
 
-DROP TABLE IF EXISTS befriend;
-CREATE TABLE befriend(
+DROP TABLE IF EXISTS friends;
+CREATE TABLE friends(
                          Id_users_1 INT unsigned NOT NULL,
                          Id_users_2 INT unsigned NOT NULL,
                          Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -111,8 +113,8 @@ CREATE TABLE befriend(
                          PRIMARY KEY(Id_users_1, Id_users_2)
 )ENGINE = INNODB;
 
-DROP TABLE IF EXISTS have;
-CREATE TABLE have(
+DROP TABLE IF EXISTS posts_tags;
+CREATE TABLE posts_tags(
                      Id_tags INT unsigned NOT NULL,
                      Id_posts INT unsigned NOT NULL,
                      PRIMARY KEY(Id_tags, Id_posts)
@@ -134,22 +136,22 @@ ALTER TABLE posts
     ADD CONSTRAINT FOREIGN KEY(Id_parent_posts) REFERENCES posts(Id_posts),
     ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
 
-ALTER TABLE follow
+ALTER TABLE threads_users
     ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
     ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
 
-ALTER TABLE favorite
+ALTER TABLE tags_users
     ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
     ADD CONSTRAINT FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags);
 
-ALTER TABLE react
+ALTER TABLE posts_users
     ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
     ADD CONSTRAINT FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
 
-ALTER TABLE befriend
+ALTER TABLE friends
     ADD CONSTRAINT FOREIGN KEY(Id_users_1) REFERENCES users(Id_users),
     ADD CONSTRAINT FOREIGN KEY(Id_users_2) REFERENCES users(Id_users);
 
-ALTER TABLE have
+ALTER TABLE posts_tags
     ADD CONSTRAINT FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags),
     ADD CONSTRAINT FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
