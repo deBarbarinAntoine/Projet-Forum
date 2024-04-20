@@ -220,8 +220,8 @@ func PushTempUser(id string) {
 	for _, temp := range TempUsers {
 		if temp.ConfirmID == id {
 			temp.User.Id = GetIdNewUser()
-			temp.User.CreationTime = time.Now()
-			temp.User.Avatar = "profile-avatar-059.jpg"
+			temp.User.CreatedAt = time.Now()
+			temp.User.AvatarPath.String = "profile-avatar-059.jpg"
 			CreateUser(temp.User)
 			deleteTempUser(temp)
 		}

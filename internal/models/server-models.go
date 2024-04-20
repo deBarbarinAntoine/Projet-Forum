@@ -20,14 +20,6 @@ type Credentials struct {
 	Password string
 }
 
-type User struct {
-	Id        int    `json:"id"`
-	Username  string `json:"username"`
-	HashedPwd string `json:"hash"`
-	Salt      string `json:"salt"`
-	Email     string `json:"email"`
-}
-
 type TempUser struct {
 	ConfirmID    string
 	CreationTime time.Time

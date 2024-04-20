@@ -1,0 +1,11 @@
+{"time":"2024-04-20T19:17:18.245737273+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T19:17:28.252826253+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.ManageTempUsers","goroutine":"ManageTempUsers"}
+{"time":"2024-04-20T19:18:47.010697604+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T19:22:31.509245244+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T19:23:37.389718571+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T20:54:26.912050171+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T21:01:41.973133051+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T21:02:11.277130517+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T22:00:25.809592889+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T23:04:56.666622061+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}
+{"time":"2024-04-20T23:19:32.163885761+02:00","level":"INFO","msg":"Projet-Forum/internal/utils.LogInit","goroutine":"LogInit"}

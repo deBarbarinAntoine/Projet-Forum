@@ -15,7 +15,7 @@ CREATE TABLE users(
                       Role VARCHAR(20),
                       Birth_date DATE,
                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                      Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                      Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Visited_at DATETIME,
                       Bio VARCHAR(255) unicode,
                       Signature VARCHAR(255) unicode,

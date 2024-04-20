@@ -62,9 +62,9 @@ func CheckPwd(cred models.Credentials) bool {
 	if !ok {
 		return false
 	}
-	salt, err := base64.StdEncoding.DecodeString(user.Salt)
+	salt, err := base64.StdEncoding.DecodeString(user.Salt.String)
 	if err != nil {
 		return false
 	}
-	return user.HashedPwd == hash(cred.Password, salt)
+	return user.HashedPwd.String == hash(cred.Password, salt)
 }

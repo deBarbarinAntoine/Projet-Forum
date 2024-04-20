@@ -1,13 +1,28 @@
 package server
 
 import (
+	"Projet-Forum/internal/db"
 	"Projet-Forum/internal/utils"
 	"Projet-Forum/router"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
+	"os"
 )
 
 func Run() {
+	// Loading environment variables
+	err := godotenv.Load(utils.Path + ".env")
+	if err != nil {
+		log.Println("Error loading .env file", err)
+	}
+
+	// Connecting to MySQL database
+	err = db.Connect()
+	if err != nil {
+		log.Println("Error connecting to MySQL database", err)
+	}
+
 	// Initializing the routes
 	router.Init()
 
@@ -24,6 +39,9 @@ func Run() {
 	// Running the goroutine to automatically remove old TempUsers
 	go utils.ManageTempUsers()
 
+	// retrieving port from .env file
+	port := os.Getenv("PORT")
+
 	// Running the server
-	log.Fatalln(http.ListenAndServe(":8080", router.Mux))
+	log.Fatalln(http.ListenAndServe(port, router.Mux))
 }

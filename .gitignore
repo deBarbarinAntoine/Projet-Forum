@@ -4,3 +4,7 @@ config/
 data/
 
 .idea/
+
+.env
+
+devtest/

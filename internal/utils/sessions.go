@@ -95,7 +95,7 @@ func OpenSession(w *http.ResponseWriter, username string, r *http.Request) {
 	user, _ := SelectUser(username)
 
 	// Update the last connection time in `users.json`.
-	user.LastConnection = time.Now()
+	user.VisitedAt.Time = time.Now()
 	UpdateUser(user)
 
 	// Create Session data in memory

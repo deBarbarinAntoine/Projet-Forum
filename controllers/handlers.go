@@ -4,6 +4,7 @@ import (
 	"Projet-Forum/internal/middlewares"
 	"Projet-Forum/internal/models"
 	"Projet-Forum/internal/utils"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -127,11 +128,17 @@ func registerHandlerPost(w http.ResponseWriter, r *http.Request) {
 		ConfirmID:    "",
 		CreationTime: time.Now(),
 		User: models.User{
-			Id:        0,
-			Username:  formValues.username,
-			HashedPwd: hash,
-			Salt:      salt,
-			Email:     formValues.email,
+			Id:       0,
+			Username: formValues.username,
+			HashedPwd: sql.NullString{
+				String: hash,
+				Valid:  true,
+			},
+			Salt: sql.NullString{
+				String: salt,
+				Valid:  true,
+			},
+			Email: formValues.email,
 		},
 	}
 	utils.SendMail(&newTempUser, "creation")
