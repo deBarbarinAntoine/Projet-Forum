@@ -12,7 +12,7 @@ import (
 func main() {
 	go server.Run()
 
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 1)
 
 	users, err := db.GetAllUsers()
 	if err != nil {

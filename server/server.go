@@ -22,6 +22,7 @@ func Run() {
 	if err != nil {
 		log.Println("Error connecting to MySQL database", err)
 	}
+	defer db.Close()
 
 	// Initializing the routes
 	router.Init()

@@ -39,3 +39,10 @@ func Connect() error {
 
 	return nil
 }
+
+func Close() {
+	err := db.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
