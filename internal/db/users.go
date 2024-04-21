@@ -13,6 +13,7 @@ func GetAllUsers() ([]models.User, error) {
 	// A users slice to hold data from returned rows.
 	var users []models.User
 
+	// Making the query for multiple rows output to get all users
 	rows, err := db.Query(getAllUsersQuery)
 	if err != nil {
 		return nil, fmt.Errorf("GetAllUsers: %v", err)
@@ -30,6 +31,7 @@ func GetAllUsers() ([]models.User, error) {
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("GetAllUsers: %v", err)
 	}
+
 	return users, nil
 }
 
