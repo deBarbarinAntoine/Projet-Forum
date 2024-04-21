@@ -7,7 +7,3 @@ func (user *User) GetSqlRows() []any {
 func (user *User) CreateSqlRow() []any {
 	return []any{user.Username, user.Email, user.HashedPwd.String, user.Salt.String, user.AvatarPath.String, user.BirthDate.Time, user.Bio.String, user.Signature.String}
 }
-
-//func (user *User) UpdateTo(updatedFields map[string]any) {
-//
-//}

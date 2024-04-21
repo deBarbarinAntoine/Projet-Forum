@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// The database connection variable
 var db *sql.DB
 
 func Connect() error {
@@ -28,10 +29,13 @@ func Connect() error {
 		return err
 	}
 
+	// Checking if the connection is OK
 	err = db.Ping()
 	if err != nil {
 		return err
 	}
-	log.Println("Connected to MySQL database!")
+
+	log.Println("Connected to MySQL database!") // logging
+
 	return nil
 }
