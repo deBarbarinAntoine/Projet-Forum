@@ -38,29 +38,29 @@ VALUES ('FPS', 2);
 
 
 INSERT INTO threads (Title, Description, Is_public, Id_author, Id_categories)
-VALUES ('Welcome message!', 'A warm welcome to all new users!', 1, 1, 1);
+VALUES ('Welcome message!', 'A warm welcome to all new users!', true, 1, 1);
 
 INSERT INTO threads (Title, Description, Is_public, Id_author, Id_categories)
-VALUES ('Learning PHP', 'Need help getting started with PHP?', 1, 4, 4);
+VALUES ('Learning PHP', 'Need help getting started with PHP?', true, 4, 4);
 
 INSERT INTO threads (Title, Description, Is_public, Id_author, Id_categories)
-VALUES ('Best MMORPGs 2024', 'Share your favorite MMORPGs!', 2, 3, 3);
+VALUES ('Best MMORPGs 2024', 'Share your favorite MMORPGs!', true, 3, 3);
 
 INSERT INTO threads(Title, Description, Is_public, Status, Id_author, Id_categories)
 VALUES ('How to handle a MySQL database in web development', 'This is a thread to discuss about MySQL database\'s integration into a backend code.', true, 'active', 1, 4);
 
 
-INSERT INTO posts (Content, Id_authors, Id_parent_posts, Id_threads)
-VALUES ('Glad to be here!', 2, NULL, 2);
+INSERT INTO posts (Content, Id_authors, Id_threads)
+VALUES ('Glad to be here!', 2, 1);
 
-INSERT INTO posts (Content, Id_authors, Id_parent_posts, Id_threads)
-VALUES ('I recommend checking out official documentation!', 1, NULL, 2);
+INSERT INTO posts (Content, Id_authors, Id_threads)
+VALUES ('I recommend checking out official documentation!', 1, 2);
 
-INSERT INTO posts (Content, Id_authors, Id_parent_posts, Id_threads)
-VALUES ('World of Warcraft is a classic!', 3, NULL, 3);
+INSERT INTO posts (Content, Id_authors, Id_threads)
+VALUES ('World of Warcraft is a classic!', 3, 3);
 
 INSERT INTO posts(Content, Id_authors, Id_threads)
 VALUES ('Hey guys, I\'m struggling to create and link my database with my backend in Go, have you any advice on this subject?', 2, 4);
 
-INSERT INTO posts(Content, Id_authors, Id_threads)
-VALUES ('Just look for an online tutorial if you don\'t listen during classes.', 4, 4);
+INSERT INTO posts(Content, Id_authors, Id_parent_posts, Id_threads)
+VALUES ('Just look for an online tutorial if you don\'t listen during classes.', 4, 4, 4);

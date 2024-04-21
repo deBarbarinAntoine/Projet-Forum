@@ -12,14 +12,14 @@ CREATE TABLE users(
                       Password CHAR(128),
                       Salt CHAR(88),
                       Avatar_path VARCHAR(125),
-                      Role VARCHAR(20),
+                      Role VARCHAR(20) NOT NULL DEFAULT 'normal',
                       Birth_date DATE,
                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Visited_at DATETIME,
                       Bio VARCHAR(255) unicode,
                       Signature VARCHAR(255) unicode,
-                      Status VARCHAR(20),
+                      Status VARCHAR(20) NOT NULL DEFAULT 'to-confirm',
                       PRIMARY KEY(Id_users),
                       UNIQUE(Username),
                       UNIQUE(Email)
@@ -31,7 +31,7 @@ CREATE TABLE categories(
                            Name VARCHAR(50) NOT NULL,
                            Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                            Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                           Id_author INT unsigned NOT NULL,
+                           Id_author INT unsigned,
                            Id_parent_categories INT unsigned,
                            PRIMARY KEY(Id_categories),
                            UNIQUE(Name)
@@ -43,7 +43,7 @@ CREATE TABLE tags(
                      Name VARCHAR(50) unique NOT NULL,
                      Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                      Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                     Id_author INT unsigned NOT NULL,
+                     Id_author INT unsigned,
                      PRIMARY KEY(Id_tags),
                      UNIQUE(Name)
 )ENGINE = INNODB;
@@ -56,8 +56,8 @@ CREATE TABLE threads(
                         Is_public boolean NOT NULL,
                         Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        Status VARCHAR(20) NOT NULL,
-                        Id_author INT unsigned NOT NULL,
+                        Status VARCHAR(20) NOT NULL DEFAULT 'active',
+                        Id_author INT unsigned,
                         Id_categories INT unsigned NOT NULL,
                         PRIMARY KEY(Id_threads),
                         UNIQUE(Title)
@@ -69,7 +69,7 @@ CREATE TABLE posts(
                       Content VARCHAR(1020) unicode NOT NULL,
                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                      Id_authors INT unsigned NOT NULL,
+                      Id_authors INT unsigned,
                       Id_parent_posts INT unsigned,
                       Id_threads INT unsigned NOT NULL,
                       PRIMARY KEY(Id_posts)
@@ -77,7 +77,7 @@ CREATE TABLE posts(
 
 DROP TABLE IF EXISTS threads_users;
 CREATE TABLE threads_users(
-                       Id_users INT unsigned NOT NULL,
+                       Id_users INT unsigned,
                        Id_threads INT unsigned NOT NULL,
                        Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                        Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -86,7 +86,7 @@ CREATE TABLE threads_users(
 
 DROP TABLE IF EXISTS tags_users;
 CREATE TABLE tags_users(
-                         Id_users INT unsigned NOT NULL,
+                         Id_users INT unsigned,
                          Id_tags INT unsigned NOT NULL,
                          Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                          Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -95,7 +95,7 @@ CREATE TABLE tags_users(
 
 DROP TABLE IF EXISTS posts_users;
 CREATE TABLE posts_users(
-                      Id_users INT unsigned NOT NULL,
+                      Id_users INT unsigned,
                       Id_posts INT unsigned NOT NULL,
                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -121,31 +121,31 @@ CREATE TABLE posts_tags(
 )ENGINE = INNODB;
 
 ALTER TABLE categories
-    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL,
     ADD CONSTRAINT FOREIGN KEY(Id_parent_categories) REFERENCES categories(Id_categories);
 
 ALTER TABLE tags
-    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users);
+    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL;
 
 ALTER TABLE threads
-    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL,
     ADD CONSTRAINT FOREIGN KEY(Id_categories) REFERENCES categories(Id_categories);
 
 ALTER TABLE posts
-    ADD CONSTRAINT FOREIGN KEY(Id_authors) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_authors) REFERENCES users(Id_users) ON DELETE SET NULL,
     ADD CONSTRAINT FOREIGN KEY(Id_parent_posts) REFERENCES posts(Id_posts),
     ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
 
 ALTER TABLE threads_users
-    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
     ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
 
 ALTER TABLE tags_users
-    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
     ADD CONSTRAINT FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags);
 
 ALTER TABLE posts_users
-    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users),
+    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
     ADD CONSTRAINT FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
 
 ALTER TABLE friends

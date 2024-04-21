@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 )
 
 func GetAllUsers() ([]models.User, error) {
@@ -70,10 +71,16 @@ func UpdateUser(user models.User, updatedFields map[string]any) error {
 		args = append(args, value)
 	}
 	setClause += "Updated_at = CURRENT_TIMESTAMP"
+	log.Printf("setClause: %s\n", setClause)
 	query := fmt.Sprintf(updateUserQuery, setClause)
 	args = append(args, user.Id)
+	log.Printf("query: %s\nargs: %v\n", query, args)
 	_, err := db.Exec(query, args...)
-	return err
+	if err != nil {
+		return fmt.Errorf("UpdateUser: %v", err)
+	}
+	log.Printf("Updated user with id: %d\n", user.Id)
+	return nil
 }
 
 func CreateUser(user models.User) error {
@@ -81,5 +88,29 @@ func CreateUser(user models.User) error {
 	if err != nil {
 		return fmt.Errorf("CreateUser: %v", err)
 	}
+	log.Printf("Created user with username: %s\n", user.Username)
 	return nil
+}
+
+func DeleteUser(user models.User) error {
+	id := user.Id
+	_, err := db.Exec(deleteUserQuery, id)
+	if err != nil {
+		return fmt.Errorf("DeleteUser: %v", err)
+	}
+	log.Printf("Deleted user with id: %d\n", id)
+	return nil
+}
+
+func IsLogin(login string) (bool, error) {
+	var result int
+	row := db.QueryRow(isLoginQuery, login, login)
+	if err := row.Scan(&result); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, fmt.Errorf("IsLogin: %v", err)
+	}
+	log.Printf("Found %d users with %s as login\n", result, login)
+	return result > 0, nil
 }

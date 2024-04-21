@@ -34,7 +34,8 @@ UPDATE
 SET 
     Visited_at = CURRENT_TIMESTAMP 
 WHERE 
-    Id_users = ?;`
+    Id_users = ?
+LIMIT 1;`
 
 // update user matching an id (params: fields and values in SQL format [%s], id).
 var updateUserQuery = `
@@ -43,7 +44,8 @@ UPDATE
 SET 
     %s
 WHERE 
-    Id_users = ?;`
+    Id_users = ?
+LIMIT 1;`
 
 // create user (params: username, email, password, salt, avatarPath, BirthDate, Bio, Signature).
 var createUserQuery = `
@@ -60,3 +62,20 @@ INSERT INTO
 	       )
 VALUES 
     (?, ?, ?, ?, ?, ?, ?, ?);`
+
+// delete user matching an id (param: id).
+var deleteUserQuery = `
+DELETE FROM
+           users
+WHERE
+    Id_users = ?
+LIMIT 1;`
+
+// check if a username or email exists (param: username or email).
+var isLoginQuery = `
+SELECT
+	COUNT(*)
+FROM
+    users
+WHERE
+    Username = ? OR Email = ?;`
