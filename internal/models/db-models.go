@@ -5,6 +5,14 @@ import (
 	"time"
 )
 
+type DbData interface {
+	Create()
+	Fetch(any)
+	GetId(any) int
+	Exists(any) bool
+	Update(any)
+}
+
 var UserFields = struct {
 	Id         string
 	Username   string
@@ -52,4 +60,51 @@ type User struct {
 	Bio        sql.NullString `json:"bio"`
 	Signature  sql.NullString `json:"signature"`
 	Status     sql.NullString `json:"status"`
+}
+
+type Category struct {
+	Id               int       `json:"id_categories"`
+	Name             string    `json:"name"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
+	IdAuthor         int       `json:"id_author"`
+	IdParentCategory int       `json:"id_parent_category"` // fixme handle null values
+}
+
+type Tag struct {
+	Id        int       `json:"id_tags"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	IdAuthor  int       `json:"id_author"`
+}
+
+type Thread struct {
+	Id          int       `json:"id_threads"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	IsPublic    bool      `json:"is_public"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Status      string    `json:"status"`
+	IdAuthor    int       `json:"id_author"`
+	IdCategory  int       `json:"id_categories"`
+}
+
+type Post struct {
+	Id           int       `json:"id_posts"`
+	Content      string    `json:"content"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	IdAuthor     int       `json:"id_author"`
+	IdParentPost int       `json:"id_parent_post"`
+	IdThread     int       `json:"id_thread"`
+}
+
+type Friend struct {
+	Id        int       `json:"id_friends"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Status    string    `json:"status"`
 }

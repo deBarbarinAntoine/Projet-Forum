@@ -40,7 +40,7 @@ CREATE TABLE categories(
 DROP TABLE IF EXISTS tags;
 CREATE TABLE tags(
                      Id_tags INT unsigned auto_increment,
-                     Name VARCHAR(50) unique NOT NULL,
+                     Name VARCHAR(50) NOT NULL,
                      Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                      Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                      Id_author INT unsigned,
