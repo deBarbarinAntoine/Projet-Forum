@@ -18,6 +18,10 @@ func Init() {
 	Mux.HandleFunc("GET /logs", controllers.LogHandlerGetBundle)
 	Mux.HandleFunc("GET /confirm", controllers.ConfirmHandlerGetBundle)
 	Mux.HandleFunc("GET /logout", controllers.LogoutHandlerGetBundle)
+	//Mux.HandleFunc("POST /", controllers.CreateCategoryPostBundle)
+	//Mux.HandleFunc("POST /", controllers.CreateThreadPostBundle)
+	//Mux.HandleFunc("POST /", controllers.CreatePostPostBundle)
+	//Mux.HandleFunc("POST /", controllers.CreateTagPostBundle)
 
 	// Handling StatusNotFound errors
 	Mux.HandleFunc("/", controllers.ErrorHandlerBundle)

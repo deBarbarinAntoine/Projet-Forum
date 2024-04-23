@@ -13,3 +13,8 @@ var LogHandlerGetBundle = middlewares.Join(logHandlerGet, middlewares.Log, middl
 var ConfirmHandlerGetBundle = middlewares.Join(confirmHandlerGet, middlewares.Log, middlewares.OnlyVisitors)
 var LogoutHandlerGetBundle = middlewares.Join(logoutHandlerGet, middlewares.Log, middlewares.Guard)
 var ErrorHandlerBundle = middlewares.Join(errorHandler, middlewares.Log, middlewares.UserCheck)
+
+//var CreateCategoryPostBundle = middlewares.Join(createCategoryPost, middlewares.Log, middlewares.Guard)
+//var CreateThreadPostBundle = middlewares.Join(createThreadPost, middlewares.Log, middlewares.Guard)
+//var CreatePostPostBundle = middlewares.Join(createPostPost, middlewares.Log, middlewares.Guard)
+//var CreateTagPostBundle = middlewares.Join(createTagPost, middlewares.Log, middlewares.Guard)

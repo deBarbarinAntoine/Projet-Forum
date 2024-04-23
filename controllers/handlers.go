@@ -194,3 +194,94 @@ func errorHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Logger.Warn("errorHandler", slog.Int("req_id", middlewares.LogId), slog.String("req_url", r.URL.String()), slog.Int("http_status", http.StatusNotFound))
 	w.Write([]byte("Error " + fmt.Sprint(http.StatusNotFound) + " !"))
 }
+
+func createCategoryPost(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var category models.Category
+	var name string
+	var parent string
+	var idAuthor int
+
+	if !category.Exists(r.FormValue("name")) {
+		name = r.FormValue("name")
+		if r.FormValue("parent") != "" {
+			parent = r.FormValue("parent")
+		}
+		idAuthor = category.GetId("author")
+	}
+
+	// to avoid "not used" errors
+	fmt.Println(name, parent, idAuthor)
+
+	// fill post with data
+	category.Create()
+}
+
+func createThreadPost(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var thread models.Thread
+	var name string
+	var description string
+	var public bool
+	var idAuthor int
+	var idCategory int
+
+	if !thread.Exists(r.FormValue("name")) {
+		name = r.FormValue("name")
+		description = r.FormValue("description")
+		if r.FormValue("public") == "public" {
+			public = true
+		} else {
+			public = false
+		}
+		idAuthor = thread.GetId("author")
+		idCategory = thread.GetId("category")
+	}
+
+	// to avoid "not used" errors
+	fmt.Println(name, description, public, idAuthor, idCategory)
+
+	// fill post with data
+	thread.Create()
+}
+
+func createPostPost(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var post models.Post
+	var parent string
+
+	content := r.FormValue("content")
+	idAuthor := post.GetId("author")
+	if post.Exists(r.FormValue("parent")) {
+		parent = r.FormValue("parent")
+	}
+	idPost := post.GetId("thread")
+
+	// to avoid "not used" errors
+	fmt.Println(content, parent, idAuthor, idPost)
+
+	// fill post with data
+	post.Create()
+}
+
+func createTagPost(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var tag models.Tag
+	var name string
+	var idAuthor int
+
+	if !tag.Exists(r.FormValue("name")) {
+		name = r.FormValue("name")
+		idAuthor = tag.GetId("author")
+	}
+
+	// to avoid "not used" errors
+	fmt.Println(name, idAuthor)
+
+	// fill post with data
+	tag.Create()
+}
