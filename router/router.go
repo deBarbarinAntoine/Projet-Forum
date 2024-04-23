@@ -22,6 +22,10 @@ func Init() {
 	//Mux.HandleFunc("POST /", controllers.CreateThreadPostBundle)
 	//Mux.HandleFunc("POST /", controllers.CreatePostPostBundle)
 	//Mux.HandleFunc("POST /", controllers.CreateTagPostBundle)
+	//Mux.HandleFunc("POST /thread", controllers.ThreadGetBundle)
+	//Mux.HandleFunc("POST /tag", controllers.TagGetBundle)
+	//Mux.HandleFunc("POST /categories", controllers.CategoryGetBundle)
+	//Mux.HandleFunc("POST /profile", controllers.ProfileGetBundle)
 
 	// Handling StatusNotFound errors
 	Mux.HandleFunc("/", controllers.ErrorHandlerBundle)

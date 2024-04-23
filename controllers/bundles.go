@@ -18,3 +18,7 @@ var ErrorHandlerBundle = middlewares.Join(errorHandler, middlewares.Log, middlew
 //var CreateThreadPostBundle = middlewares.Join(createThreadPost, middlewares.Log, middlewares.Guard)
 //var CreatePostPostBundle = middlewares.Join(createPostPost, middlewares.Log, middlewares.Guard)
 //var CreateTagPostBundle = middlewares.Join(createTagPost, middlewares.Log, middlewares.Guard)
+//var ThreadGetBundle = middlewares.Join(threadGet, middlewares.Log, middlewares.Guard)
+//var TagGetBundle = middlewares.Join(tagGet, middlewares.Log, middlewares.Guard)
+//var CategoryGetBundle = middlewares.Join(categoryGet, middlewares.Log, middlewares.Guard)
+//var ProfileGetBundle = middlewares.Join(profileGet, middlewares.Log, middlewares.Guard)

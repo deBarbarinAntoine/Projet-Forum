@@ -285,3 +285,47 @@ func createTagPost(w http.ResponseWriter, r *http.Request) {
 	// fill post with data
 	tag.Create()
 }
+
+func threadGet(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var thread models.Thread
+
+	idThread := r.URL.Query().Get("id")
+	thread.Fetch(idThread)
+
+	// todo : execute template
+}
+
+func tagGet(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var tag models.Tag
+
+	idTag := r.URL.Query().Get("id")
+	tag.Fetch(idTag)
+
+	// todo : execute template
+}
+
+func categoryGet(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var category models.Category
+
+	idCategory := r.URL.Query().Get("id")
+	category.Fetch(idCategory)
+
+	// todo : execute template
+}
+
+func profileGet(w http.ResponseWriter, r *http.Request) {
+	log.Println(utils.GetCurrentFuncName())
+
+	var user models.User
+
+	idUser := r.URL.Query().Get("id")
+	user.Fetch(idUser)
+
+	// todo : execute template
+}
