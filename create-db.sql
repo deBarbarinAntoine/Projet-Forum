@@ -121,37 +121,37 @@ CREATE TABLE posts_tags(
 )ENGINE = INNODB;
 
 ALTER TABLE categories
-    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL,
-    ADD CONSTRAINT FOREIGN KEY(Id_parent_categories) REFERENCES categories(Id_categories);
+    ADD CONSTRAINT fk_Id_author FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL,
+    ADD CONSTRAINT fk_Id_parent_categories FOREIGN KEY(Id_parent_categories) REFERENCES categories(Id_categories);
 
 ALTER TABLE tags
-    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL;
+    ADD CONSTRAINT fk_Id_author FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL;
 
 ALTER TABLE threads
-    ADD CONSTRAINT FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL,
-    ADD CONSTRAINT FOREIGN KEY(Id_categories) REFERENCES categories(Id_categories);
+    ADD CONSTRAINT fk_Id_author FOREIGN KEY(Id_author) REFERENCES users(Id_users) ON DELETE SET NULL,
+    ADD CONSTRAINT fk_Id_categories FOREIGN KEY(Id_categories) REFERENCES categories(Id_categories);
 
 ALTER TABLE posts
-    ADD CONSTRAINT FOREIGN KEY(Id_authors) REFERENCES users(Id_users) ON DELETE SET NULL,
-    ADD CONSTRAINT FOREIGN KEY(Id_parent_posts) REFERENCES posts(Id_posts),
-    ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
+    ADD CONSTRAINT fk_Id_authors FOREIGN KEY(Id_authors) REFERENCES users(Id_users) ON DELETE SET NULL,
+    ADD CONSTRAINT fk_Id_parent_posts FOREIGN KEY(Id_parent_posts) REFERENCES posts(Id_posts),
+    ADD CONSTRAINT fk_Id_threads FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
 
 ALTER TABLE threads_users
-    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
-    ADD CONSTRAINT FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
+    ADD CONSTRAINT fk_Id_users FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
+    ADD CONSTRAINT fk_Id_threads FOREIGN KEY(Id_threads) REFERENCES threads(Id_threads);
 
 ALTER TABLE tags_users
-    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
-    ADD CONSTRAINT FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags);
+    ADD CONSTRAINT fk_Id_users FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
+    ADD CONSTRAINT fk_Id_tags FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags);
 
 ALTER TABLE posts_users
-    ADD CONSTRAINT FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
-    ADD CONSTRAINT FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
+    ADD CONSTRAINT fk_Id_users FOREIGN KEY(Id_users) REFERENCES users(Id_users) ON DELETE CASCADE,
+    ADD CONSTRAINT fk_Id_posts FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
 
 ALTER TABLE friends
-    ADD CONSTRAINT FOREIGN KEY(Id_users_1) REFERENCES users(Id_users),
-    ADD CONSTRAINT FOREIGN KEY(Id_users_2) REFERENCES users(Id_users);
+    ADD CONSTRAINT fk_Id_users_1 FOREIGN KEY(Id_users_1) REFERENCES users(Id_users),
+    ADD CONSTRAINT fk_Id_users_2 FOREIGN KEY(Id_users_2) REFERENCES users(Id_users);
 
 ALTER TABLE posts_tags
-    ADD CONSTRAINT FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags),
-    ADD CONSTRAINT FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
+    ADD CONSTRAINT fk_Id_tags FOREIGN KEY(Id_tags) REFERENCES tags(Id_tags),
+    ADD CONSTRAINT fk_Id_posts FOREIGN KEY(Id_posts) REFERENCES posts(Id_posts);
