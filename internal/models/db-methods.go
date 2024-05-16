@@ -1,5 +1,7 @@
 package models
 
+import "Projet-Forum/internal/db"
+
 // User methods
 
 func (user *User) GetSqlRows() []any {
@@ -12,9 +14,12 @@ func (user *User) CreateSqlRow() []any {
 
 // DbData interface implementation
 
-func (user *User) Create() {
+func (user *User) Create() int {
 	//TODO implement me
 	panic("implement me")
+	id := 1
+
+	return id
 }
 
 func (user *User) Fetch(a any) {
@@ -23,8 +28,20 @@ func (user *User) Fetch(a any) {
 }
 
 func (user *User) GetId(a any) int {
-	//TODO implement me
-	panic("implement me")
+	var login string
+	switch a.(type) {
+	case string:
+		login = a.(string)
+	default:
+		// todo handle error
+		return -1
+	}
+	id, err := db.GetUserByLogin(login)
+	if err != nil {
+		// todo handle error
+		return -1
+	}
+	return id.Id
 }
 
 func (user *User) Exists(a any) bool {
@@ -41,9 +58,12 @@ func (user *User) Update(a any) {
 
 // DbData interface implementation
 
-func (c *Category) Create() {
+func (c *Category) Create() int {
 	//TODO implement me
 	panic("implement me")
+	id := 1
+
+	return id
 }
 
 func (c *Category) Fetch(a any) {
@@ -70,9 +90,12 @@ func (c *Category) Update(a any) {
 
 // DbData interface implementation
 
-func (t *Tag) Create() {
+func (t *Tag) Create() int {
 	//TODO implement me
 	panic("implement me")
+	id := 1
+
+	return id
 }
 
 func (t *Tag) Fetch(a any) {
@@ -99,9 +122,12 @@ func (t *Tag) Update(a any) {
 
 // DbData interface implementation
 
-func (t *Thread) Create() {
+func (t *Thread) Create() int {
 	//TODO implement me
 	panic("implement me")
+	id := 1
+
+	return id
 }
 
 func (t *Thread) Fetch(a any) {
@@ -128,9 +154,12 @@ func (t *Thread) Update(a any) {
 
 // DbData interface implementation
 
-func (p *Post) Create() {
+func (p *Post) Create() int {
 	//TODO implement me
 	panic("implement me")
+	id := 1
+
+	return id
 }
 
 func (p *Post) Fetch(a any) {
@@ -157,9 +186,12 @@ func (p *Post) Update(a any) {
 
 // DbData interface implementation
 
-func (f *Friend) Create() {
+func (f *Friend) Create() int {
 	//TODO implement me
 	panic("implement me")
+	id := 1
+
+	return id
 }
 
 func (f *Friend) Fetch(a any) {

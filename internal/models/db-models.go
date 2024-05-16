@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
+// DbData provides all methods to interact with the database's items
 type DbData interface {
-	Create()
+	Create() int
 	Fetch(any)
 	GetId(any) int
 	Exists(any) bool
@@ -49,7 +50,7 @@ type User struct {
 	Id         int            `json:"id_users"`
 	Username   string         `json:"username"`
 	Email      string         `json:"email"`
-	HashedPwd  sql.NullString `json:"password"`
+	HashedPwd  sql.NullString `json:"password"` // fixme
 	Salt       sql.NullString `json:"salt"`
 	AvatarPath sql.NullString `json:"avatar_path"`
 	Role       string         `json:"role"`
@@ -63,12 +64,12 @@ type User struct {
 }
 
 type Category struct {
-	Id               int       `json:"id_categories"`
-	Name             string    `json:"name"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
-	IdAuthor         int       `json:"id_author"`
-	IdParentCategory int       `json:"id_parent_category"` // fixme handle null values
+	Id             int       `json:"id_categories"`
+	Name           string    `json:"name"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Author         string    `json:"author"`
+	ParentCategory string    `json:"parent_category"` // fixme handle null values
 }
 
 type Tag struct {
@@ -76,7 +77,7 @@ type Tag struct {
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	IdAuthor  int       `json:"id_author"`
+	Author    string    `json:"author"`
 }
 
 type Thread struct {
@@ -87,8 +88,8 @@ type Thread struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	Status      string    `json:"status"`
-	IdAuthor    int       `json:"id_author"`
-	IdCategory  int       `json:"id_categories"`
+	Author      string    `json:"author"`
+	Category    string    `json:"categories"`
 }
 
 type Post struct {
@@ -96,9 +97,9 @@ type Post struct {
 	Content      string    `json:"content"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
-	IdAuthor     int       `json:"id_author"`
-	IdParentPost int       `json:"id_parent_post"`
-	IdThread     int       `json:"id_thread"`
+	Author       string    `json:"author"`
+	ParentPostId int       `json:"parent_post_id"`
+	ThreadId     int       `json:"thread_id"`
 }
 
 type Friend struct {
