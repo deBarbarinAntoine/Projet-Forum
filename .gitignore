@@ -1,12 +1,12 @@
-
-config/
-
-data/
-
+# basic files
 .idea/
 
-.env
+# API files
+api/.envrc
 
-logs/*.log
-
-tls/*.pem
+# backend files
+backend/config/
+backend/data
+backend/.env
+backend/logs/*.log
+backend/tls/*.pem

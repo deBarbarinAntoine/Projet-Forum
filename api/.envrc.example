@@ -1,0 +1,10 @@
+export FORUM_DB_USERNAME="forum"
+export FORUM_DB_PASS=""
+export FORUM_DB_NAME="forum"
+export FORUM_DB_ARG="parseTime=true"
+export FORUM_DB_DSN="${FORUM_DB_USERNAME}:${FORUM_DB_PASS}@/${FORUM_DB_NAME}?${FORUM_DB_ARG}"
+export SSH_PASS=""
+export SMTP_USERNAME=""
+export SMTP_PASS=""
+export SMTP_HOST="sandbox.smtp.mailtrap.io"
+export SMTP_PORT=2525
