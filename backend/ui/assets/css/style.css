@@ -445,4 +445,85 @@ header .notification-profile .profile .dropdown .item .item-text {
   font-size: 15px;
 }
 
-/* *//*# sourceMappingURL=style.css.map */
+/* ACCUEIL */
+.container-accueil-row {
+  font-family: "Varela";
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.container-accueil-row .container-accueil {
+  height: 100%;
+  padding-top: 20px;
+  margin-left: 5px;
+  width: 935px;
+  margin-top: 130px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+  font-family: "Varela";
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+}
+.container-accueil-row .container-accueil .container-accueil-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.container-accueil-row .container-accueil .container-accueil-text h3 {
+  font-size: 30px;
+}
+.container-accueil-row .container-accueil .container-accueil-text p {
+  margin-top: 25px;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: lighter;
+}
+.container-accueil-row .container-accueil .container-accueil-content {
+  height: 100%;
+  margin-top: 50px;
+  margin-left: 50px;
+  margin-right: 50px;
+  padding-left: 50px;
+  padding-top: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+  font-family: "Varela";
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 30px;
+}
+.container-accueil-row .container-accueil .container-accueil-content h4 {
+  font-size: 20px;
+  font-weight: normal;
+  opacity: 0.8;
+}
+.container-accueil-row .container-accueil .container-accueil-content .container-hottopic {
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+  height: 51px;
+  width: 750px;
+  border-radius: 5px;
+  margin-top: 20px;
+  padding-left: 10px;
+}
+.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 20px;
+  padding-right: 20px;
+  width: 750px;
+}
+.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text h3 {
+  font-size: 15px;
+  font-weight: normal;
+}
+.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text h4 {
+  font-size: 15px;
+  font-weight: normal;
+}
+.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text p {
+  font-size: 15px;
+}/*# sourceMappingURL=style.css.map */
