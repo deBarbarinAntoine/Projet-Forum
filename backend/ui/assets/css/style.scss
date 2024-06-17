@@ -1,0 +1,38 @@
+@import 'base';
+ 
+@font-face {
+    font-family: 'Varela';
+    src: url(../font/VarelaRound-Regular.ttf);
+}
+.container-global-mentions {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+
+    .container-mentions {
+        height: 100%;
+        padding-top: 20px;
+        padding-left: 50px;
+        margin-left: 5px;
+        width: 935px;
+        margin-top: 130px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Varela';
+        
+         h2 {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        h3 {
+            margin-top: 25px;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+    }
+}
