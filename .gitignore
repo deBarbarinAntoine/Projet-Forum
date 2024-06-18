@@ -3,10 +3,8 @@
 
 # API files
 api/.envrc
+api/tls/*.pem
 
 # backend files
-backend/config/
-backend/data
-backend/.env
-backend/logs/*.log
+backend/.envrc
 backend/tls/*.pem

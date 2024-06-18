@@ -2,7 +2,7 @@
 //
 // Examples/readme can be found on the GitHub page at https://github.com/joho/godotenv
 //
-// The TL;DR is that you make a .env file that looks something like
+// The TL;DR is that you make a .envrc file that looks something like
 //
 //	SOME_ENV_VAR=somevalue
 //
@@ -10,7 +10,7 @@
 //
 //	godotenv.Load()
 //
-// and all the env vars declared in .env will be available through os.Getenv("SOME_ENV_VAR")
+// and all the env vars declared in .envrc will be available through os.Getenv("SOME_ENV_VAR")
 package godotenv
 
 import (
@@ -41,13 +41,13 @@ func Parse(r io.Reader) (map[string]string, error) {
 //
 // Call this function as close as possible to the start of your program (ideally in main).
 //
-// If you call Load without any args it will default to loading .env in the current path.
+// If you call Load without any args it will default to loading .envrc in the current path.
 //
 // You can otherwise tell it which files to load (there can be more than one) like:
 //
 //	godotenv.Load("fileone", "filetwo")
 //
-// It's important to note that it WILL NOT OVERRIDE an env variable that already exists - consider the .env file to set dev vars or sensible defaults.
+// It's important to note that it WILL NOT OVERRIDE an env variable that already exists - consider the .envrc file to set dev vars or sensible defaults.
 func Load(filenames ...string) (err error) {
 	filenames = filenamesOrDefault(filenames)
 
@@ -64,13 +64,13 @@ func Load(filenames ...string) (err error) {
 //
 // Call this function as close as possible to the start of your program (ideally in main).
 //
-// If you call Overload without any args it will default to loading .env in the current path.
+// If you call Overload without any args it will default to loading .envrc in the current path.
 //
 // You can otherwise tell it which files to load (there can be more than one) like:
 //
 //	godotenv.Overload("fileone", "filetwo")
 //
-// It's important to note this WILL OVERRIDE an env variable that already exists - consider the .env file to forcefully set all vars.
+// It's important to note this WILL OVERRIDE an env variable that already exists - consider the .envrc file to forcefully set all vars.
 func Overload(filenames ...string) (err error) {
 	filenames = filenamesOrDefault(filenames)
 
@@ -176,7 +176,7 @@ func Marshal(envMap map[string]string) (string, error) {
 
 func filenamesOrDefault(filenames []string) []string {
 	if len(filenames) == 0 {
-		return []string{".env"}
+		return []string{".envrc"}
 	}
 	return filenames
 }
