@@ -403,14 +403,14 @@ header {
         margin-bottom: 30px;
 
         .footer-link {
-            width: calc(100% - 50px);
+            width: calc(100% - 30px);
             height: 40px;
             display: flex;
             flex-flow: row nowrap;
             justify-content: flex-start;
             align-items: center;
             gap: 12px;
-            padding-left: 50px;
+            padding-left: 30px;
             font-family: Varela-Round;
 
             .footer-icon {
