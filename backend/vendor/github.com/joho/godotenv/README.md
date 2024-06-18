@@ -56,7 +56,7 @@ import (
 func main() {
   err := godotenv.Load()
   if err != nil {
-    log.Fatal("Error loading .env file")
+    log.Fatal("Error loading .envrc file")
   }
 
   s3Bucket := os.Getenv("S3_BUCKET")
@@ -132,12 +132,12 @@ if "" == env {
   env = "development"
 }
 
-godotenv.Load(".env." + env + ".local")
+godotenv.Load(".envrc." + env + ".local")
 if "test" != env {
-  godotenv.Load(".env.local")
+  godotenv.Load(".envrc.local")
 }
-godotenv.Load(".env." + env)
-godotenv.Load() // The Original .env
+godotenv.Load(".envrc." + env)
+godotenv.Load() // The Original .envrc
 ```
 
 If you need to, you can also use `godotenv.Overload()` to defy this convention
@@ -161,7 +161,7 @@ Godotenv can also write a map representing the environment to a correctly-format
 
 ```go
 env, err := godotenv.Unmarshal("KEY=value")
-err := godotenv.Write(env, "./.env")
+err := godotenv.Write(env, "./.envrc")
 ```
 
 ... or to a string

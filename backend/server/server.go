@@ -12,9 +12,9 @@ import (
 
 func Run() {
 	// Loading environment variables
-	err := godotenv.Load(utils.Path + ".env")
+	err := godotenv.Load(utils.Path + ".envrc")
 	if err != nil {
-		log.Println("Error loading .env file", err)
+		log.Println("Error loading .envrc file", err)
 	}
 
 	// Connecting to MySQL database
@@ -40,7 +40,7 @@ func Run() {
 	// Running the goroutine to automatically remove old TempUsers
 	go utils.ManageTempUsers()
 
-	// retrieving port from .env file
+	// retrieving port from .envrc file
 	port := os.Getenv("PORT")
 
 	// Running the server
