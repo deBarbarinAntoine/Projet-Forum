@@ -2,6 +2,11 @@
     --background-color: #F1F6F9;
 }
 
+@font-face {
+    font-family: Varela-Round;
+    src: url(../font/VarelaRound-Regular.ttf);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -127,10 +132,9 @@ header {
                 border-right: 2px solid rgba($color: #000000, $alpha: 0.2);
                 border-left: 2px solid rgba($color: #000000, $alpha: 0.2);
                 border-radius: 0 0 5px 5px;
-                padding: 5px;
 
                 .item {
-                    width: 100%;
+                    width: calc(100% - 10px);
                     height: 30px;
                     display: flex;
                     flex-flow: row nowrap;
@@ -138,6 +142,14 @@ header {
                     align-items: center;
                     gap: 10px;
                     padding-left: 10px;
+                    padding-bottom: 5px;
+                    padding-top: 5px;
+
+                    &:hover {
+                        cursor: pointer;
+                        background-color: rgb(216, 216, 216);
+                    }
+        
 
                     .item-icon {
                         opacity: 0.5;
@@ -145,6 +157,7 @@ header {
 
                     .item-text {
                         font-size: 15px;
+                        font-family: Varela-Round;
                     }
                 
                 }
@@ -152,6 +165,12 @@ header {
         }
     }
 }
+
+.navs {
+    display: flex;
+    justify-content: space-between;
+}
+
 
 .nav-left {
     top: 100px;
@@ -209,6 +228,7 @@ header {
                 flex-flow: column nowrap;
                 justify-content: center;
                 align-items: flex-start;
+                font-family: Varela-Round;
                 
                 p:nth-child(1) {
                     font-size: 17px;
@@ -238,6 +258,7 @@ header {
                 justify-content: center;
                 align-items: flex-start;
                 gap: 5px;
+                font-family: Varela-Round;
 
                 p:nth-child(1) {
                     font-size: 15px;
@@ -255,6 +276,7 @@ header {
                 justify-content: center;
                 align-items: flex-start;
                 gap: 5px;
+                font-family: Varela-Round;
 
                 p:nth-child(1) {
                     font-size: 15px;
@@ -275,7 +297,6 @@ header {
         flex-flow: column nowrap;
         justify-content: flex-start;
         align-items: center;
-        gap: 12px;
         border-radius: 0 0 10px 10px;
         background-color: var(--background-color);
         border-bottom: 2px solid rgba($color: #000000, $alpha: 0.2);
@@ -283,35 +304,53 @@ header {
         border-left: 2px solid rgba($color: #000000, $alpha: 0.2);
         box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.1);
         margin-top: 20px;
+        transition: 0.3s;
 
         .link {
-            width: 100%;
+            width: calc(100% - 30px);
             height: 40px;
             display: flex;
             flex-flow: row nowrap;
             justify-content: flex-start;
             align-items: center;
             gap: 12px;
-            padding-left: 50px;
+            padding-left: 30px;
+            transition: .3s;
+            font-family: Varela-Round;
+            margin-bottom: 12px;
+
+            &:hover {
+                cursor: pointer;
+                background-color: rgb(216, 216, 216);
+            }
 
             .link-icon {
                 opacity: 0.5;
+                transition: .3s;
+                transform: rotate(0deg);
+
+                &.rotated {
+                    transform: rotate(-90deg);
+                }
             }
             
             .link-text {
-                font-size: 17px;
+                font-size: 16px;
             }
         }
             
         .category-list {
-            width: 150px;
-            height: auto;
+            position: relative;
+            width: calc(100% - 60px);            
             display: flex;
             flex-flow: column nowrap;
             justify-content: flex-start;
             align-items: center;
-            gap: 12px;
             margin-bottom: 10px;
+            transition: 0.3s;
+            font-family: Varela-Round;
+            top: 0;
+            
 
             .category {
                 width: 100%;
@@ -321,15 +360,27 @@ header {
                 justify-content: flex-start;
                 align-items: center;
                 gap: 12px;
-                padding-left: 50px;
+                padding-left: 60px;
+                margin-bottom: 12px;
+                transition: .3s;
+                overflow: hidden;
+
+                &:hover {
+                    cursor: pointer;
+                    background-color: rgb(216, 216, 216);
+                }
 
                 .category-icon {
                     opacity: 0.5;
                 }
 
                 .category-text {
-                    font-size: 17px;
+                    font-size: 16px;
                 }
+            }
+
+            &.closed {
+                max-height: 0px !important;
             }
         }
     }
@@ -352,7 +403,7 @@ header {
         margin-bottom: 30px;
 
         .footer-link {
-            width: 100%;
+            width: calc(100% - 50px);
             height: 40px;
             display: flex;
             flex-flow: row nowrap;
@@ -360,20 +411,95 @@ header {
             align-items: center;
             gap: 12px;
             padding-left: 50px;
+            font-family: Varela-Round;
 
             .footer-icon {
                 opacity: 0.5;
             }
             
             .footer-text {
-                font-size: 17px;
+                font-size: 16px;
+            }
+
+            &:hover {
+                cursor: pointer;
+                background-color: rgb(216, 216, 216);
             }
         }
 
         .rights {
-            font-size: 10px;
+            font-size: 9px;
             opacity: 0.5;
             margin-bottom: 10px;
+            font-family: Varela-Round;
+        }
+    }
+}
+
+.nav-right {
+    width: 200px;
+    height: auto;
+    background-color: var(--background-color);
+    top: 100px;
+    margin-top: 30px;
+    position: relative;
+    margin-right: 28px;
+
+    .nav-right-container {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 20px;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        border-radius: 0 0 10px 10px;
+        background-color: var(--background-color);
+        border-bottom: 2px solid rgba($color: #000000, $alpha: 0.2);
+        border-right: 2px solid rgba($color: #000000, $alpha: 0.2);
+        border-left: 2px solid rgba($color: #000000, $alpha: 0.2);
+        box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.1);
+    }
+
+    .nav-right-title {
+        font-size: 20px;
+        font-family: Varela-Round;
+        opacity: 0.5;
+    }
+
+    .all-tags {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 5px;
+
+        .tag {
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            border-bottom: 2px solid rgba($color: #000000, $alpha: 0.1);
+            border-right: 2px solid rgba($color: #000000, $alpha: 0.1);
+            border-left: 2px solid rgba($color: #000000, $alpha: 0.1);
+            box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.2);
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 20px;
+            padding: 5px;
+            transition: .3s;
+
+            .tag-link {
+                font-size: 15px;
+                font-family: Varela-Round;
+            }
+
+            &:hover {
+                cursor: pointer;
+                box-shadow: 0px 4px 5px rgba($color: #000000, $alpha: 0.5);
+            }
         }
     }
 }
