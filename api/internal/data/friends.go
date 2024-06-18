@@ -17,7 +17,7 @@ type Friend struct {
 func (m UserModel) GetFriendsByUserID(id int) ([]Friend, error) {
 
 	query := `
-		SELECT users.Id_users, users.Username
+		SELECT users.Id_users, users.Username, f1.Status, f2.Status
 		FROM users
 		LEFT OUTER JOIN friends f1 ON ? = f1.Id_users_to
 		LEFT OUTER JOIN friends f2 ON ? = f2.Id_users_from
@@ -42,8 +42,15 @@ func (m UserModel) GetFriendsByUserID(id int) ([]Friend, error) {
 
 	for rows.Next() {
 		var friend Friend
-		if err := rows.Scan(&friend.ID, &friend.Name); err != nil {
+		var status1, status2 *string
+		if err := rows.Scan(&friend.ID, &friend.Name, &status1, &status2); err != nil {
 			log.Fatal(err)
+		}
+		switch {
+		case status1 != nil:
+			friend.Status = *status1
+		case status2 != nil:
+			friend.Status = *status2
 		}
 		friends = append(friends, friend)
 	}

@@ -22,12 +22,12 @@ confirm:
 ## run/api: run the cmd/api application
 .PHONY: run/api
 run/api:
-	@go run ./cmd/api -dsn=${FORUM_DB_DSN} -smtp-username=${SMTP_USERNAME} -smtp-password=${SMTP_PASS} -smtp-host=${SMTP_HOST} -smtp-port=${SMTP_PORT}
+	@go run ./cmd/api -port=${PORT} -dsn=${DB_DSN} -smtp-username=${SMTP_USERNAME} -smtp-password=${SMTP_PASS} -smtp-host=${SMTP_HOST} -smtp-port=${SMTP_PORT}
 
 ## db/mysql: connect to the database using mysql
 .PHONY: db/mysql
 db/mysql:
-	@mysql -u ${FORUM_DB_USERNAME} -p${FORUM_DB_PASS}
+	@mysql -u ${DB_USER} -p${DB_PASSWORD}
 
 ## db/migrations/new name=$1: create a new database migration
 .PHONY: db/migrations/new
@@ -39,13 +39,13 @@ db/migrations/new:
 .PHONY: db/migrations/up
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
-	@migrate -path ./migrations -database ${FORUM_DB_DSN} up
+	@migrate -path ./migrations -database ${DB_DSN} up
 
 ## db/migrations/drop: drop database migrations
 .PHONY: db/migrations/drop
 db/migrations/drop: confirm
 	@echo 'Dropping migrations...'
-	@migrate -path ./migrations -database ${FORUM_DB_DSN} drop
+	@migrate -path ./migrations -database ${DB_DSN} drop
 
 # =================================================================================== #
 # QUALITY CONTROL
@@ -113,4 +113,4 @@ production/deploy/api:
 .PHONY: bin/api
 bin/api:
 	@echo 'Executing binary...'
-	@./bin/linux_amd64/api -dsn=${FORUM_DB_DSN} -smtp-username=${SMTP_USERNAME} -smtp-password=${SMTP_PASS} -smtp-host=${SMTP_HOST} -smtp-port=${SMTP_PORT}
+	@./bin/linux_amd64/api -port=${PORT} -dsn=${DB_DSN} -smtp-username=${SMTP_USERNAME} -smtp-password=${SMTP_PASS} -smtp-host=${SMTP_HOST} -smtp-port=${SMTP_PORT}

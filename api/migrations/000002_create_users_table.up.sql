@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users(
                       Id_users INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-                      Username VARCHAR(30) UNIQUE NOT NULL,
-                      Email VARCHAR(35) UNIQUE NOT NULL,
+                      Username VARCHAR(70) UNIQUE NOT NULL,
+                      Email VARCHAR(150) UNIQUE NOT NULL,
                       Hashed_password CHAR(60) NOT NULL,
                       Avatar_path VARCHAR(255) NOT NULL DEFAULT '',
                       Role VARCHAR(20) NOT NULL DEFAULT 'normal',

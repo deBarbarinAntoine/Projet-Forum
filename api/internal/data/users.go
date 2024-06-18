@@ -127,7 +127,8 @@ func ValidateNewPassword(v *validator.Validator, newPassword, confirmationPasswo
 
 func (u *User) Validate(v *validator.Validator) {
 	v.Check(u.Name != "", "name", "must be provided")
-	v.Check(len(u.Name) <= 30, "name", "must not be more than 30 bytes long")
+	v.Check(len(u.Name) > 2, "name", "must be more than 2 bytes long")
+	v.Check(len(u.Name) <= 70, "name", "must not be more than 70 bytes long")
 
 	ValidateEmail(v, u.Email)
 

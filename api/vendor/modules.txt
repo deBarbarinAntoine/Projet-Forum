@@ -2,6 +2,9 @@
 ## explicit; go 1.20
 filippo.io/edwards25519
 filippo.io/edwards25519/field
+# github.com/alexedwards/flow v0.1.0
+## explicit; go 1.21
+github.com/alexedwards/flow
 # github.com/go-mail/mail/v2 v2.3.0
 ## explicit
 github.com/go-mail/mail/v2
@@ -11,12 +14,6 @@ github.com/go-playground/form/v4
 # github.com/go-sql-driver/mysql v1.8.1
 ## explicit; go 1.18
 github.com/go-sql-driver/mysql
-# github.com/julienschmidt/httprouter v1.3.0
-## explicit; go 1.7
-github.com/julienschmidt/httprouter
-# github.com/justinas/alice v1.2.0
-## explicit; go 1.12
-github.com/justinas/alice
 # github.com/lib/pq v1.10.9
 ## explicit; go 1.13
 github.com/lib/pq

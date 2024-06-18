@@ -1,14 +1,19 @@
 package main
 
 import (
-	"expvar"
-	"github.com/julienschmidt/httprouter"
-	"github.com/justinas/alice"
+	"github.com/alexedwards/flow"
 	"net/http"
 )
 
 func (app *application) routes() http.Handler {
-	router := httprouter.New()
+
+	router := flow.New()
+
+	/* #############################################################################
+	/* # COMMON MIDDLEWARES
+	/* ############################################################################# */
+
+	router.Use(app.recoverPanic, app.enableCORS, app.rateLimit, app.authenticate)
 
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
 
@@ -18,100 +23,94 @@ func (app *application) routes() http.Handler {
 	/* # HEALTHCHECK
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
+	router.HandleFunc("/v1/healthcheck", app.healthcheckHandler, http.MethodGet)
 
 	/* #############################################################################
 	/* # USERS
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodGet, "/v1/users", app.getUsersHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
-	router.HandlerFunc(http.MethodPut, "/v1/users/activated", app.activateUserHandler)
+	router.HandleFunc("/v1/users", app.getUsersHandler, http.MethodGet)
+	router.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
+	router.HandleFunc("/v1/users/activated", app.activateUserHandler, http.MethodPut)
 
-	router.HandlerFunc(http.MethodGet, "/v1/users/:id", app.getSingleUserHandler)
-	router.HandlerFunc(http.MethodPut, "/v1/users/:id", app.updateUserHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/users/:id", app.deleteUserHandler)
+	router.HandleFunc("/v1/users/:id", app.getSingleUserHandler, http.MethodGet)
+	router.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
+	router.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
 
-	router.HandlerFunc(http.MethodPost, "/v1/users/:id/friend", app.friendRequestHandler)
-	router.HandlerFunc(http.MethodPut, "/v1/users/:id/friend", app.friendResponseHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/users/:id/friend", app.friendDeleteHandler)
+	router.HandleFunc("/v1/users/:id/friend", app.friendRequestHandler, http.MethodPost)
+	router.HandleFunc("/v1/users/:id/friend", app.friendResponseHandler, http.MethodPut)
+	router.HandleFunc("/v1/users/:id/friend", app.friendDeleteHandler, http.MethodDelete)
 
 	/* #############################################################################
 	/* # TOKENS
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodPost, "/v1/tokens/authentication", app.createAuthenticationTokenHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/tokens/refresh", app.refreshAuthenticationTokenHandler)
+	router.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
+	router.HandleFunc("/v1/tokens/refresh", app.refreshAuthenticationTokenHandler, http.MethodPost)
 
 	/* #############################################################################
 	/* # CATEGORIES
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodGet, "/v1/categories", app.getCategoriesHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/categories", app.createCategoryHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/categories/:id", app.getSingleCategoryHandler)
-	router.HandlerFunc(http.MethodPut, "/v1/categories/:id", app.updateCategoryHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/categories/:id", app.deleteCategoryHandler)
+	router.HandleFunc("/v1/categories", app.getCategoriesHandler, http.MethodGet)
+	router.HandleFunc("/v1/categories", app.createCategoryHandler, http.MethodPost)
+	router.HandleFunc("/v1/categories/:id", app.getSingleCategoryHandler, http.MethodGet)
+	router.HandleFunc("/v1/categories/:id", app.updateCategoryHandler, http.MethodPut)
+	router.HandleFunc("/v1/categories/:id", app.deleteCategoryHandler, http.MethodDelete)
 
 	/* #############################################################################
 	/* # THREADS
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodGet, "/v1/threads", app.getThreadsHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/threads", app.createThreadHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/threads/:id", app.getSingleThreadHandler)
-	router.HandlerFunc(http.MethodPut, "/v1/threads/:id", app.updateThreadHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/threads/:id", app.deleteThreadHandler)
+	router.HandleFunc("/v1/threads", app.getThreadsHandler, http.MethodGet)
+	router.HandleFunc("/v1/threads", app.createThreadHandler, http.MethodPost)
+	router.HandleFunc("/v1/threads/:id", app.getSingleThreadHandler, http.MethodGet)
+	router.HandleFunc("/v1/threads/:id", app.updateThreadHandler, http.MethodPut)
+	router.HandleFunc("/v1/threads/:id", app.deleteThreadHandler, http.MethodDelete)
 
-	router.HandlerFunc(http.MethodPost, "/v1/threads/:id/follow", app.followThreadHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/threads/:id/follow", app.unfollowThreadHandler)
+	router.HandleFunc("/v1/threads/:id/follow", app.followThreadHandler, http.MethodPost)
+	router.HandleFunc("/v1/threads/:id/follow", app.unfollowThreadHandler, http.MethodDelete)
 
 	/* #############################################################################
 	/* # TAGS
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodGet, "/v1/tags", app.getTagsHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/tags", app.createTagHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/tags/:id", app.getSingleTagHandler)
-	router.HandlerFunc(http.MethodPut, "/v1/tags/:id", app.updateTagHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/tags/:id", app.deleteTagHandler)
+	router.HandleFunc("/v1/tags", app.getTagsHandler, http.MethodGet)
+	router.HandleFunc("/v1/tags", app.createTagHandler, http.MethodPost)
+	router.HandleFunc("/v1/tags/:id", app.getSingleTagHandler, http.MethodGet)
+	router.HandleFunc("/v1/tags/:id", app.updateTagHandler, http.MethodPut)
+	router.HandleFunc("/v1/tags/:id", app.deleteTagHandler, http.MethodDelete)
 
-	router.HandlerFunc(http.MethodPost, "/v1/tags/:id/favorite", app.addFavoriteTagHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/tags/:id/favorite", app.removeFavoriteTagHandler)
+	router.HandleFunc("/v1/tags/:id/favorite", app.addFavoriteTagHandler, http.MethodPost)
+	router.HandleFunc("/v1/tags/:id/favorite", app.removeFavoriteTagHandler, http.MethodDelete)
 
 	/* #############################################################################
 	/* # POSTS
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodGet, "/v1/posts", app.getPostsHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/posts", app.createPostHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/posts/:id", app.getSinglePostHandler)
-	router.HandlerFunc(http.MethodPut, "/v1/posts/:id", app.updatePostHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/posts/:id", app.deletePostHandler)
+	router.HandleFunc("/v1/posts", app.getPostsHandler, http.MethodGet)
+	router.HandleFunc("/v1/posts", app.createPostHandler, http.MethodPost)
+	router.HandleFunc("/v1/posts/:id", app.getSinglePostHandler, http.MethodGet)
+	router.HandleFunc("/v1/posts/:id", app.updatePostHandler, http.MethodPut)
+	router.HandleFunc("/v1/posts/:id", app.deletePostHandler, http.MethodDelete)
 
-	router.HandlerFunc(http.MethodPost, "/v1/posts/:id/react", app.reactToPostHandler)
-	router.HandlerFunc(http.MethodPatch, "/v1/posts/:id/react", app.changeReactionPostHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/posts/:id/react", app.removeReactionPostHandler)
+	router.HandleFunc("/v1/posts/:id/react", app.reactToPostHandler, http.MethodPost)
+	router.HandleFunc("/v1/posts/:id/react", app.changeReactionPostHandler, http.MethodPatch)
+	router.HandleFunc("/v1/posts/:id/react", app.removeReactionPostHandler, http.MethodDelete)
 
 	/* #############################################################################
 	/* # DATA MANIPULATION
 	/* ############################################################################# */
 
-	router.HandlerFunc(http.MethodGet, "/v1/popular", app.getPopularHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/recommendations/:id", app.getRecommendations)
-	router.HandlerFunc(http.MethodGet, "/v1/search", app.searchHandler)
+	router.HandleFunc("/v1/popular", app.getPopularHandler, http.MethodGet)
+	router.HandleFunc("/v1/recommendations/:id", app.getRecommendations, http.MethodGet)
+	router.HandleFunc("/v1/search", app.searchHandler, http.MethodGet)
 
 	/* #############################################################################
 	/* # DEBUG
 	/* ############################################################################# */
 
-	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
+	//router.Handle("/debug/vars", expvar.Handler(), http.MethodGet)
 
-	/* #############################################################################
-	/* # COMMON MIDDLEWARES
-	/* ############################################################################# */
-
-	basic := alice.New(app.metrics, app.recoverPanic, app.enableCORS, app.rateLimit, app.authenticate)
-
-	return basic.Then(router)
+	return router
 }

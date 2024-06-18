@@ -84,7 +84,17 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		}
 	})
 
-	err = app.writeJSON(w, http.StatusAccepted, envelope{"user": user}, nil)
+	response := envelope{
+		"user": envelope{
+			"id":        user.ID,
+			"name":      user.Name,
+			"email":     user.Email,
+			"createdAt": user.CreatedAt,
+			"message":   fmt.Sprintf("a mail has been sent to %s", user.Email),
+		},
+	}
+
+	err = app.writeJSON(w, http.StatusAccepted, response, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -156,10 +166,15 @@ func (app *application) getUsersHandler(w http.ResponseWriter, r *http.Request) 
 func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	form := newUserByIDForm()
+
 	err := app.decodeForm(r, &form)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
+	}
+	form.ID, err = app.readIDParam(r)
+	if err != nil {
+		form.AddError("id", "must be an integer")
 	}
 
 	form.Check(form.ID > 0, "id", "must contain a valid id")
