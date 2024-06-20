@@ -142,7 +142,7 @@ func main() {
 
 	// TODO -> remove when leaving development phase
 	if cfg.env == "development" && secret != "" {
-		_, err := app.models.Users.GetByEmail("api@api.com")
+		user, err := app.models.Users.GetByEmail("api@api.com")
 		if err != nil {
 			logger.Info(err.Error())
 			user := data.User{
@@ -176,11 +176,31 @@ func main() {
 				logger.Error(err.Error())
 				os.Exit(1)
 			}
-			app.config.apiUserID = user.ID
 		}
+		if user == nil || user.ID < 1 {
+			logger.Error("could not retrieve API user")
+			os.Exit(1)
+		}
+		app.config.apiUserID = user.ID
 	}
 	secret = ""
 	// TODO <- END
+
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.Error(fmt.Sprintf("%v", err))
+			}
+		}()
+
+		for {
+			errExpiredTokens := app.models.Tokens.DeleteExpired()
+			if errExpiredTokens != nil {
+				logger.Error(err.Error())
+			}
+			time.Sleep(2 * time.Hour)
+		}
+	}()
 
 	err = app.serve()
 	if err != nil {

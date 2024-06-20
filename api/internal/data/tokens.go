@@ -10,7 +10,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"github.com/go-sql-driver/mysql"
-	"log"
 	"strings"
 	"time"
 )
@@ -62,7 +61,7 @@ type TokenModel struct {
 	DB *sql.DB
 }
 
-func (m *TokenModel) New(userID int, ttl time.Duration, scope string) (*Token, error) {
+func (m TokenModel) New(userID int, ttl time.Duration, scope string) (*Token, error) {
 	token, err := generateToken(userID, ttl, scope)
 	if err != nil {
 		return nil, err
@@ -80,7 +79,7 @@ func (m *TokenModel) New(userID int, ttl time.Duration, scope string) (*Token, e
 	return token, err
 }
 
-func (m *TokenModel) Insert(token *Token) error {
+func (m TokenModel) Insert(token *Token) error {
 
 	query := `
 		INSERT INTO tokens (Hash, Id_users, Expiry, Scope)
@@ -91,7 +90,7 @@ func (m *TokenModel) Insert(token *Token) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	res, err := m.DB.ExecContext(ctx, query, args...)
+	_, err := m.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		var mySQLError *mysql.MySQLError
 		switch {
@@ -108,16 +107,10 @@ func (m *TokenModel) Insert(token *Token) error {
 		}
 	}
 
-	rowsNb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	log.Printf("Insert token: %d rows affected\n", rowsNb)
-
 	return nil
 }
 
-func (m *TokenModel) DeleteAllForUser(scope string, userID int) error {
+func (m TokenModel) DeleteAllForUser(scope string, userID int) error {
 
 	query := `
 		DELETE FROM tokens
@@ -127,5 +120,18 @@ func (m *TokenModel) DeleteAllForUser(scope string, userID int) error {
 	defer cancel()
 
 	_, err := m.DB.ExecContext(ctx, query, scope, userID)
+	return err
+}
+
+func (m TokenModel) DeleteExpired() error {
+
+	query := `
+		DELETE FROM tokens
+		WHERE Expiry < CURRENT_TIMESTAMP;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err := m.DB.ExecContext(ctx, query)
 	return err
 }
