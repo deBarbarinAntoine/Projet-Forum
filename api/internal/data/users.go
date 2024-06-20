@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
@@ -145,11 +146,18 @@ type UserModel struct {
 
 func (m UserModel) Insert(user *User) error {
 
-	query := `
-		INSERT INTO users (Username, Email, Hashed_password, Status, Role)
-		VALUES (?, ?, ?, ?, ?);`
+	args := []any{user.Name, user.Email, user.Password.hash, user.Status}
 
-	args := []any{user.Name, user.Email, user.Password.hash, user.Status, user.Role}
+	var role, roleValue string
+	if user.Role != "" {
+		role = ", Role"
+		roleValue = ", ?"
+		args = append(args, user.Role)
+	}
+
+	query := fmt.Sprintf(`
+		INSERT INTO users (Username, Email, Hashed_password, Status%s)
+		VALUES (?, ?, ?, ?%s);`, role, roleValue)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"errors"
 	"expvar"
 	"flag"
 	"fmt"
@@ -144,35 +145,40 @@ func main() {
 	if cfg.env == "development" && secret != "" {
 		user, err := app.models.Users.GetByEmail("api@api.com")
 		if err != nil {
-			logger.Info(err.Error())
-			user := data.User{
-				Name:   "API",
-				Email:  "api@api.com",
-				Role:   "api-secret",
-				Status: "api-secret",
-			}
-			randomBytes := make([]byte, 16)
-			_, err := rand.Read(randomBytes)
-			if err != nil {
-				logger.Error(err.Error())
-				os.Exit(1)
-			}
-			user.Password.Set(hex.EncodeToString(randomBytes))
-			err = app.models.Users.Insert(&user)
-			if err != nil {
-				logger.Error(err.Error())
-				os.Exit(1)
-			}
-			hash := sha256.Sum256([]byte(secret))
-			token := data.Token{
-				Plaintext: "",
-				Hash:      hash[:],
-				UserID:    user.ID,
-				Expiry:    time.Now().Add(1<<63 - 1),
-				Scope:     data.ScopeHostSecret,
-			}
-			err = app.models.Tokens.Insert(&token)
-			if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				logger.Info(err.Error())
+				user := data.User{
+					Name:   "API",
+					Email:  "api@api.com",
+					Role:   "api-secret",
+					Status: "api-secret",
+				}
+				randomBytes := make([]byte, 16)
+				_, err := rand.Read(randomBytes)
+				if err != nil {
+					logger.Error(err.Error())
+					os.Exit(1)
+				}
+				user.Password.Set(hex.EncodeToString(randomBytes))
+				err = app.models.Users.Insert(&user)
+				if err != nil {
+					logger.Error(err.Error())
+					os.Exit(1)
+				}
+				hash := sha256.Sum256([]byte(secret))
+				token := data.Token{
+					Plaintext: "",
+					Hash:      hash[:],
+					UserID:    user.ID,
+					Expiry:    time.Now().Add(1<<63 - 1),
+					Scope:     data.ScopeHostSecret,
+				}
+				err = app.models.Tokens.Insert(&token)
+				if err != nil {
+					logger.Error(err.Error())
+					os.Exit(1)
+				}
+			} else {
 				logger.Error(err.Error())
 				os.Exit(1)
 			}
