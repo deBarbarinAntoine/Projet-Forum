@@ -6,8 +6,12 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"database/sql"
-	"encoding/base32"
+	"encoding/base64"
 	"encoding/hex"
+	"errors"
+	"github.com/go-sql-driver/mysql"
+	"log"
+	"strings"
 	"time"
 )
 
@@ -15,6 +19,7 @@ const (
 	ScopeActivation     = "activation"
 	ScopeAuthentication = "authentication"
 	ScopeClient         = "client"
+	ScopeHostSecret     = "host_secret"
 )
 
 type Token struct {
@@ -33,14 +38,14 @@ func generateToken(userID int, ttl time.Duration, scope string) (*Token, error) 
 		Scope:  scope,
 	}
 
-	randomBytes := make([]byte, 16)
+	randomBytes := make([]byte, 64)
 
 	_, err := rand.Read(randomBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	token.Plaintext = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
+	token.Plaintext = base64.StdEncoding.WithPadding(base64.NoPadding).EncodeToString(randomBytes)
 
 	hash := sha256.Sum256([]byte(token.Plaintext))
 	token.Hash = hash[:]
@@ -50,7 +55,7 @@ func generateToken(userID int, ttl time.Duration, scope string) (*Token, error) 
 
 func ValidateTokenPlaintext(v *validator.Validator, tokenPlaintext string) {
 	v.Check(tokenPlaintext != "", "token", "must be provided")
-	v.Check(len(tokenPlaintext) == 26, "token", "must be 26 bytes long")
+	v.Check(len(tokenPlaintext) == 86, "token", "must be 86 bytes long")
 }
 
 type TokenModel struct {
@@ -64,6 +69,14 @@ func (m *TokenModel) New(userID int, ttl time.Duration, scope string) (*Token, e
 	}
 
 	err = m.Insert(token)
+	if errors.Is(err, ErrDuplicateToken) {
+		token, err = generateToken(userID, ttl, scope)
+		if err != nil {
+			return nil, err
+		}
+
+		err = m.Insert(token)
+	}
 	return token, err
 }
 
@@ -78,8 +91,30 @@ func (m *TokenModel) Insert(token *Token) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	_, err := m.DB.ExecContext(ctx, query, args...)
-	return err
+	res, err := m.DB.ExecContext(ctx, query, args...)
+	if err != nil {
+		var mySQLError *mysql.MySQLError
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Hash") {
+					return ErrDuplicateToken
+				}
+			} else {
+				return err
+			}
+		default:
+			return err
+		}
+	}
+
+	rowsNb, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	log.Printf("Insert token: %d rows affected\n", rowsNb)
+
+	return nil
 }
 
 func (m *TokenModel) DeleteAllForUser(scope string, userID int) error {

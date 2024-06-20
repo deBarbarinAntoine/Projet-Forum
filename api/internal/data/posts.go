@@ -80,11 +80,11 @@ func (m PostModel) Insert(post Post) error {
 func (m PostModel) Get(id int) (*Post, error) {
 
 	query := `
-		SELECT m.Id_posts, m.Content, m.Created_at, m.Updated_at, m.Id_author, u.Username, m.Id_parent_posts, m.Id_threads, t.Title, m.Version
-		FROM posts m
-		INNER JOIN users u ON m.Id_author = u.Id_users
-		INNER JOIN threads t ON m.Id_threads = t.Id_threads
-		WHERE m.Id_posts = ?;`
+		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, p.Id_parent_posts, p.Id_threads, t.Title, p.Version
+		FROM posts p
+		INNER JOIN users u ON p.Id_author = u.Id_users
+		INNER JOIN threads t ON p.Id_threads = t.Id_threads
+		WHERE p.Id_posts = ?;`
 
 	var post Post
 	var parentPost sql.NullInt64
@@ -124,7 +124,7 @@ func (m PostModel) Get(id int) (*Post, error) {
 func (m PostModel) GetPostsByAuthorID(id int) ([]Post, error) {
 
 	query := `
-		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_threads, t.Title
+		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_threads, t.Title, p.Version
 		FROM posts p
 		INNER JOIN forum.threads t on p.Id_threads = t.Id_threads
 		WHERE p.Id_author = ?;`
@@ -148,7 +148,14 @@ func (m PostModel) GetPostsByAuthorID(id int) ([]Post, error) {
 
 	for rows.Next() {
 		var post Post
-		if err := rows.Scan(&post.ID, &post.Content, &post.CreatedAt, &post.UpdatedAt, &post.Thread.ID, &post.Thread.Title); err != nil {
+		if err := rows.Scan(
+			&post.ID,
+			&post.Content,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+			&post.Thread.ID,
+			&post.Thread.Title,
+			&post.Version); err != nil {
 			log.Fatal(err)
 		}
 		posts = append(posts, post)
@@ -158,6 +165,58 @@ func (m PostModel) GetPostsByAuthorID(id int) ([]Post, error) {
 		log.Fatal(rerr)
 	}
 	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return posts, nil
+}
+
+func (m PostModel) GetPostsByThreadID(id int) ([]Post, error) {
+
+	query := `
+		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, p.Version
+		FROM posts p
+		INNER JOIN forum.users u on p.Id_author = u.Id_users
+		WHERE p.Id_threads = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	rows, err := m.DB.QueryContext(ctx, query, id)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+	defer rows.Close()
+
+	var posts []Post
+
+	for rows.Next() {
+		var post Post
+		if err := rows.Scan(
+			&post.ID,
+			&post.Content,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+			&post.Author.ID,
+			&post.Author.Name,
+			&post.Version); err != nil {
+			log.Fatal(err)
+		}
+		posts = append(posts, post)
+	}
+
+	err = rows.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 

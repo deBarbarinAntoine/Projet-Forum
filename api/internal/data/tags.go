@@ -5,7 +5,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -13,7 +16,7 @@ type TagModel struct {
 	DB *sql.DB
 }
 
-func (m TagModel) Insert(tag Tag) error {
+func (m TagModel) Insert(tag *Tag) error {
 
 	args := []any{tag.Name, tag.Author.ID}
 
@@ -52,11 +55,17 @@ func (m TagModel) Insert(tag Tag) error {
 		FROM tags
 		WHERE Id_tags = ?;`
 
+	var mySQLError *mysql.MySQLError
+
 	err = tx.QueryRowContext(ctx, query, tag.ID).Scan(&tag.CreatedAt, &tag.Version)
 	if err != nil {
 		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return ErrRecordNotFound
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Name") {
+					return ErrDuplicateName
+				}
+			}
 		default:
 			return err
 		}
@@ -69,12 +78,13 @@ func (m TagModel) Insert(tag Tag) error {
 	return nil
 }
 
-func (m TagModel) Get(id int) (Tag, error) {
+func (m TagModel) Get(id int) (*Tag, error) {
 
 	query := `
-		SELECT Id_tags, Name, Created_at, Id_author, Version
-		FROM tags
-		WHERE Id_tags = ?;`
+		SELECT t.Id_tags, t.Name, t.Created_at, t.Updated_at, t.Id_author, u.Username, t.Version
+		FROM tags t
+		INNER JOIN users u on t.Id_author = u.Id_users
+		WHERE t.Id_tags = ?;`
 
 	var tag Tag
 
@@ -85,26 +95,28 @@ func (m TagModel) Get(id int) (Tag, error) {
 		&tag.ID,
 		&tag.Name,
 		&tag.CreatedAt,
+		&tag.UpdatedAt,
 		&tag.Author.ID,
+		&tag.Author.Name,
 		&tag.Version,
 	)
 
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return Tag{}, ErrRecordNotFound
+			return nil, ErrRecordNotFound
 		default:
-			return Tag{}, err
+			return nil, err
 		}
 	}
 
-	return tag, nil
+	return &tag, nil
 }
 
 func (m TagModel) GetOwnedTagsByUserID(id int) ([]Tag, error) {
 
 	query := `
-		SELECT Id_tags, Name, Created_at, Updated_at
+		SELECT Id_tags, Name, Created_at, Updated_at, Version
 		FROM tags
 		WHERE Id_author = ?;`
 
@@ -127,7 +139,7 @@ func (m TagModel) GetOwnedTagsByUserID(id int) ([]Tag, error) {
 
 	for rows.Next() {
 		var tagOwned Tag
-		if err := rows.Scan(&tagOwned.ID, &tagOwned.Name, &tagOwned.CreatedAt, &tagOwned.UpdatedAt); err != nil {
+		if err := rows.Scan(&tagOwned.ID, &tagOwned.Name, &tagOwned.CreatedAt, &tagOwned.UpdatedAt, &tagOwned.Version); err != nil {
 			log.Fatal(err)
 		}
 		tagsOwned = append(tagsOwned, tagOwned)
@@ -141,6 +153,50 @@ func (m TagModel) GetOwnedTagsByUserID(id int) ([]Tag, error) {
 	}
 
 	return tagsOwned, nil
+}
+
+func (m TagModel) GetTagsBySearch(search string) ([]Tag, error) {
+
+	query := `
+		SELECT t.Id_tags, t.Name, t.Created_at, t.Updated_at, t.Id_author, u.Username, t.Version
+		FROM tags t
+		INNER JOIN users u on t.Id_author = u.Id_users
+		WHERE t.Name LIKE ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	search = fmt.Sprintf("%%%s%%", search)
+	rows, err := m.DB.QueryContext(ctx, query, search)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+	defer rows.Close()
+
+	var tags []Tag
+
+	for rows.Next() {
+		var tag Tag
+		if err := rows.Scan(&tag.ID, &tag.Name, &tag.CreatedAt, &tag.UpdatedAt, &tag.Author.ID, &tag.Author.Name, &tag.Version); err != nil {
+			log.Fatal(err)
+		}
+		tags = append(tags, tag)
+	}
+	rerr := rows.Close()
+	if rerr != nil {
+		log.Fatal(rerr)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return tags, nil
 }
 
 func (m TagModel) GetFollowingTagsByUserID(id int) ([]struct {
@@ -213,9 +269,20 @@ func (m TagModel) Update(tag Tag) error {
 	}
 	defer tx.Rollback()
 
+	var mySQLError *mysql.MySQLError
+
 	rs, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Name") {
+					return ErrDuplicateName
+				}
+			}
+		default:
+			return err
+		}
 	}
 	rowsAffected, err := rs.RowsAffected()
 	if err != nil {

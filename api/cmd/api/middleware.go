@@ -86,7 +86,48 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 	})
 }
 
-func (app *application) authenticate(next http.Handler) http.Handler {
+func (app *application) authenticateClient(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Add("Vary", "X-API-KEY")
+
+		authorizationHeader := r.Header.Get("X-API-KEY")
+
+		headerParts := strings.Split(authorizationHeader, " ")
+		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+			app.invalidAuthenticationTokenResponse(w, r)
+			return
+		}
+
+		token := headerParts[1]
+
+		v := validator.New()
+
+		if data.ValidateTokenPlaintext(v, token); !v.Valid() {
+			app.invalidAuthenticationTokenResponse(w, r)
+			return
+		}
+
+		user, err := app.models.Users.GetForToken(data.ScopeHostSecret, token)
+		if err != nil {
+			switch {
+			case errors.Is(err, data.ErrRecordNotFound):
+				app.invalidAuthenticationTokenResponse(w, r)
+			default:
+				app.serverErrorResponse(w, r, err)
+			}
+			return
+		}
+		if user.ID != app.config.apiUserID {
+			app.invalidAuthenticationTokenResponse(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) authenticateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Add("Vary", "Authorization")

@@ -4,6 +4,5 @@ CREATE TABLE IF NOT EXISTS friends(
                         Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         Status VARCHAR(20) NOT NULL DEFAULT 'pending',
-                        Version INTEGER NOT NULL DEFAULT 1,
                         PRIMARY KEY(Id_users_from, Id_users_to)
 )ENGINE = INNODB;

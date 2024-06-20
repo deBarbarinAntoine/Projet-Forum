@@ -13,7 +13,7 @@ func (app *application) routes() http.Handler {
 	/* # COMMON MIDDLEWARES
 	/* ############################################################################# */
 
-	router.Use(app.recoverPanic, app.enableCORS, app.rateLimit, app.authenticate)
+	router.Use(app.recoverPanic, app.enableCORS, app.rateLimit, app.authenticateClient, app.authenticateUser)
 
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
 

@@ -131,9 +131,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	user.Status = data.StatusActivated
-
-	err = app.models.Users.Update(user)
+	err = app.models.Users.Activate(user)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrEditConflict):

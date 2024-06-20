@@ -6,8 +6,14 @@ import (
 )
 
 var (
-	ErrRecordNotFound = errors.New("record not found")
-	ErrEditConflict   = errors.New("edit conflict")
+	ErrRecordNotFound    = errors.New("record not found")
+	ErrEditConflict      = errors.New("edit conflict")
+	ErrDuplicateEmail    = errors.New("duplicate user email")
+	ErrDuplicateUsername = errors.New("duplicate username")
+	ErrDuplicateFriend   = errors.New("duplicate friend")
+	ErrDuplicateName     = errors.New("duplicate tag or category name")
+	ErrDuplicateTitle    = errors.New("duplicate thread title")
+	ErrDuplicateToken    = errors.New("duplicate token")
 )
 
 type Models struct {

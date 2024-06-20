@@ -6,7 +6,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -38,16 +40,26 @@ func (m CategoryModel) Insert(category Category) error {
 	}
 	defer tx.Rollback()
 
-	rs, err := tx.ExecContext(ctx, query, args...)
+	res, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		var mySQLError *mysql.MySQLError
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Name") {
+					return ErrDuplicateName
+				}
+			}
+		default:
+			return err
+		}
 	}
-	categoryID, err := rs.LastInsertId()
+	categoryID, err := res.LastInsertId()
 	if err != nil {
 		return err
 	}
 	category.ID = int(categoryID)
-	rowsAffected, err := rs.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return err
 	}
@@ -80,7 +92,7 @@ func (m CategoryModel) Insert(category Category) error {
 func (m CategoryModel) Get(id int) (Category, error) {
 
 	query := `
-		SELECT Id_categories, Name, Id_parent_categories, Created_at, Version
+		SELECT Id_categories, Name, Id_parent_categories, Created_at, Updated_at, Version
 		FROM categories
 		WHERE Id_categories = ?;`
 
@@ -89,11 +101,14 @@ func (m CategoryModel) Get(id int) (Category, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	var parentID sql.NullInt64
+
 	err := m.DB.QueryRowContext(ctx, query, id).Scan(
 		&category.ID,
 		&category.Name,
-		&category.ParentCategory.ID,
+		&parentID,
 		&category.CreatedAt,
+		&category.UpdatedAt,
 		&category.Version,
 	)
 
@@ -104,6 +119,10 @@ func (m CategoryModel) Get(id int) (Category, error) {
 		default:
 			return Category{}, err
 		}
+	}
+
+	if parentID.Valid {
+		category.ParentCategory.ID = int(parentID.Int64)
 	}
 
 	return category, nil
@@ -171,7 +190,17 @@ func (m CategoryModel) Update(category Category) error {
 
 	rs, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		var mySQLError *mysql.MySQLError
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Name") {
+					return ErrDuplicateName
+				}
+			}
+		default:
+			return err
+		}
 	}
 	rowsAffected, err := rs.RowsAffected()
 	if err != nil {
@@ -255,6 +284,7 @@ func (category *Category) Validate(v *validator.Validator) {
 	if category.ParentCategory.ID != 0 || category.ParentCategory.Name != "" {
 		v.Check(category.ParentCategory.ID != 0, "parent_category.id", "must be provided")
 		v.Check(category.ParentCategory.Name != "", "parent_category.name", "must be provided")
+		v.Check(len(category.ParentCategory.Name) > 2, "parent_category.name", "must be more than 2 bytes long")
 		v.Check(len(category.ParentCategory.Name) <= 50, "parent_category.name", "must not be more than 50 bytes long")
 	}
 }

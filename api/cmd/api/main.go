@@ -5,7 +5,10 @@ import (
 	"ForumAPI/internal/mailer"
 	"ForumAPI/internal/vcs"
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"expvar"
 	"flag"
 	"fmt"
@@ -48,6 +51,7 @@ type config struct {
 	cors struct {
 		trustedOrigins []string
 	}
+	apiUserID int
 }
 
 type application struct {
@@ -85,6 +89,9 @@ func main() {
 		cfg.cors.trustedOrigins = strings.Fields(val)
 		return nil
 	})
+
+	var secret string
+	flag.StringVar(&secret, "secret", "", "API secret")
 
 	displayVersion := flag.Bool("version", false, "Display version and exit")
 
@@ -132,6 +139,48 @@ func main() {
 		formDecoder: form.NewDecoder(),
 		mailer:      mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
+
+	// TODO -> remove when leaving development phase
+	if cfg.env == "development" && secret != "" {
+		_, err := app.models.Users.GetByEmail("api@api.com")
+		if err != nil {
+			logger.Info(err.Error())
+			user := data.User{
+				Name:   "API",
+				Email:  "api@api.com",
+				Role:   "api-secret",
+				Status: "api-secret",
+			}
+			randomBytes := make([]byte, 16)
+			_, err := rand.Read(randomBytes)
+			if err != nil {
+				logger.Error(err.Error())
+				os.Exit(1)
+			}
+			user.Password.Set(hex.EncodeToString(randomBytes))
+			err = app.models.Users.Insert(&user)
+			if err != nil {
+				logger.Error(err.Error())
+				os.Exit(1)
+			}
+			hash := sha256.Sum256([]byte(secret))
+			token := data.Token{
+				Plaintext: "",
+				Hash:      hash[:],
+				UserID:    user.ID,
+				Expiry:    time.Now().Add(1<<63 - 1),
+				Scope:     data.ScopeHostSecret,
+			}
+			err = app.models.Tokens.Insert(&token)
+			if err != nil {
+				logger.Error(err.Error())
+				os.Exit(1)
+			}
+			app.config.apiUserID = user.ID
+		}
+	}
+	secret = ""
+	// TODO <- END
 
 	err = app.serve()
 	if err != nil {

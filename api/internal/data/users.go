@@ -14,9 +14,7 @@ import (
 )
 
 var (
-	ErrDuplicateEmail    = errors.New("duplicate email")
-	ErrDuplicateUsername = errors.New("duplicate username")
-	AnonymousUser        = &User{}
+	AnonymousUser = &User{}
 )
 
 const (
@@ -148,10 +146,10 @@ type UserModel struct {
 func (m UserModel) Insert(user *User) error {
 
 	query := `
-		INSERT INTO users (Username, Email, Hashed_password, Status)
-		VALUES (?, ?, ?, ?);`
+		INSERT INTO users (Username, Email, Hashed_password, Status, Role)
+		VALUES (?, ?, ?, ?, ?);`
 
-	args := []any{user.Name, user.Email, user.Password.hash, user.Status}
+	args := []any{user.Name, user.Email, user.Password.hash, user.Status, user.Role}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -280,18 +278,39 @@ func (m UserModel) GetByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
+func (m UserModel) Activate(user *User) error {
+
+	query := `
+		UPDATE users
+		SET Status = ?, Version = Version + 1
+		WHERE Id_users = ? AND Version = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err := m.DB.ExecContext(ctx, query, StatusActivated, user.ID, user.Version)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+	return nil
+}
+
 func (m UserModel) Update(user *User) error {
 
 	query := `
 		UPDATE users
-		SET Username = ?, Email = ?, Hashed_password = ?, Status = ?, Version = Version + 1
+		SET Username = ?, Email = ?, Hashed_password = ?, Version = Version + 1
 		WHERE Id_users = ? AND Version = ?;`
 
 	args := []any{
 		user.Name,
 		user.Email,
 		user.Password.hash,
-		user.Status,
 		user.ID,
 		user.Version,
 	}

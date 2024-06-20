@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/go-sql-driver/mysql"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -12,6 +14,98 @@ type Friend struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
 	Status string `json:"status"`
+}
+
+type friendStatus struct {
+	Pending  string
+	Accepted string
+	Rejected string
+}
+
+var FriendStatus = friendStatus{
+	Pending:  "pending",
+	Accepted: "accepted",
+	Rejected: "rejected",
+}
+
+func (m UserModel) RequestFriend(user *User, idTo int) error {
+
+	query := `
+		INSERT INTO friends (
+		    Id_users_from,
+		    Id_users_to,
+		    Status)
+		VALUES (
+		    Id_users_from = ?,
+		    Id_users_to = ?,
+		    Status = ?);`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var mySQLError *mysql.MySQLError
+
+	_, err := m.DB.ExecContext(ctx, query, user.ID, idTo, FriendStatus.Pending)
+	if err != nil {
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Id_users") {
+					return ErrDuplicateFriend
+				}
+			}
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m UserModel) AcceptFriend(idFrom int, user *User) error {
+
+	query := `
+		UPDATE friends SET Status = ?
+		WHERE Id_users_from = ? AND Id_users_to = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err := m.DB.ExecContext(ctx, query, FriendStatus.Accepted, idFrom, user.ID)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m UserModel) RejectFriend(idFrom int, user *User) error {
+
+	query := `
+		UPDATE friends SET Status = ?
+		WHERE Id_users_from = ? AND Id_users_to = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err := m.DB.ExecContext(ctx, query, FriendStatus.Rejected, idFrom, user.ID)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (m UserModel) GetFriendsByUserID(id int) ([]Friend, error) {

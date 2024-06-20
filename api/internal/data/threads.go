@@ -5,7 +5,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/go-sql-driver/mysql"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -13,7 +15,22 @@ type ThreadModel struct {
 	DB *sql.DB
 }
 
-func (m ThreadModel) Insert(thread Thread) error {
+type threadStatus struct {
+	Active   string
+	Archived string
+	Hidden   string
+}
+
+var (
+	ThreadStatus = threadStatus{
+		Active:   "active",
+		Archived: "archived",
+		Hidden:   "hidden",
+	}
+	permittedStatuses = []string{ThreadStatus.Active, ThreadStatus.Archived, ThreadStatus.Hidden}
+)
+
+func (m ThreadModel) Insert(thread *Thread) error {
 
 	args := []any{thread.Title, thread.Description, thread.IsPublic, thread.Status, thread.Author.ID, thread.Category.ID}
 
@@ -32,7 +49,17 @@ func (m ThreadModel) Insert(thread Thread) error {
 
 	rs, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		var mySQLError *mysql.MySQLError
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Title") {
+					return ErrDuplicateTitle
+				}
+			}
+		default:
+			return err
+		}
 	}
 	threadID, err := rs.LastInsertId()
 	if err != nil {
@@ -69,10 +96,10 @@ func (m ThreadModel) Insert(thread Thread) error {
 	return nil
 }
 
-func (m ThreadModel) Get(id int) (Thread, error) {
+func (m ThreadModel) Get(id int) (*Thread, error) {
 
 	query := `
-		SELECT Id_threads, Title, Description, Is_public, Created_at, Status, Id_author, Id_categories, Version
+		SELECT Id_threads, Title, Description, Is_public, Created_at, Updated_at, Status, Id_author, Id_categories, Version
 		FROM threads
 		WHERE Id_threads = ?;`
 
@@ -87,6 +114,7 @@ func (m ThreadModel) Get(id int) (Thread, error) {
 		&thread.Description,
 		&thread.IsPublic,
 		&thread.CreatedAt,
+		&thread.UpdatedAt,
 		&thread.Status,
 		&thread.Author.ID,
 		&thread.Category.ID,
@@ -96,19 +124,19 @@ func (m ThreadModel) Get(id int) (Thread, error) {
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return Thread{}, ErrRecordNotFound
+			return nil, ErrRecordNotFound
 		default:
-			return Thread{}, err
+			return nil, err
 		}
 	}
 
-	return thread, nil
+	return &thread, nil
 }
 
 func (m ThreadModel) GetOwnedThreadsByUserID(id int) ([]Thread, error) {
 
 	query := `
-		SELECT Id_threads, Title, Description, Is_public, Created_at, Updated_at, Status
+		SELECT Id_threads, Title, Description, Is_public, Created_at, Updated_at, Status, Id_categories, Version
 		FROM threads
 		WHERE Id_author = ?;`
 
@@ -131,7 +159,7 @@ func (m ThreadModel) GetOwnedThreadsByUserID(id int) ([]Thread, error) {
 
 	for rows.Next() {
 		var threadOwned Thread
-		if err := rows.Scan(&threadOwned.ID, &threadOwned.Title, &threadOwned.Description, &threadOwned.IsPublic, &threadOwned.CreatedAt, &threadOwned.UpdatedAt, &threadOwned.Status); err != nil {
+		if err := rows.Scan(&threadOwned.ID, &threadOwned.Title, &threadOwned.Description, &threadOwned.IsPublic, &threadOwned.CreatedAt, &threadOwned.UpdatedAt, &threadOwned.Status, &threadOwned.Category.ID, &threadOwned.Version); err != nil {
 			log.Fatal(err)
 		}
 		threadsOwned = append(threadsOwned, threadOwned)
@@ -219,7 +247,17 @@ func (m ThreadModel) Update(thread Thread) error {
 
 	rs, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		var mySQLError *mysql.MySQLError
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1062 {
+				if strings.Contains(mySQLError.Message, "Title") {
+					return ErrDuplicateTitle
+				}
+			}
+		default:
+			return err
+		}
 	}
 	rowsAffected, err := rs.RowsAffected()
 	if err != nil {
@@ -307,6 +345,7 @@ func (thread *Thread) Validate(v *validator.Validator) {
 	v.Check(thread.Description != "", "description", "must be provided")
 	v.Check(len(thread.Description) <= 1_020, "description", "must not be more than 1020 bytes long")
 	v.Check(thread.IsPublic, "is_public", "must be provided")
+	v.Check(validator.PermittedValue(thread.Status, permittedStatuses...), "status", "must be a permitted value")
 	v.Check(thread.Author.Name != "", "author.name", "must be provided")
 	v.Check(len(thread.Author.Name) <= 30, "author.name", "must not be more than 30 bytes long")
 	v.Check(thread.Category.ID != 0, "parent_category.id", "must be provided")
