@@ -147,7 +147,7 @@ func main() {
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				logger.Info(err.Error())
-				user := data.User{
+				user = &data.User{
 					Name:   "API",
 					Email:  "api@api.com",
 					Role:   "api-secret",
@@ -160,7 +160,7 @@ func main() {
 					os.Exit(1)
 				}
 				user.Password.Set(hex.EncodeToString(randomBytes))
-				err = app.models.Users.Insert(&user)
+				err = app.models.Users.Insert(user)
 				if err != nil {
 					logger.Error(err.Error())
 					os.Exit(1)
