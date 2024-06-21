@@ -19,6 +19,8 @@ const (
 	ScopeAuthentication = "authentication"
 	ScopeClient         = "client"
 	ScopeHostSecret     = "host_secret"
+
+	MaxDuration time.Duration = 1<<63 - 1
 )
 
 type Token struct {

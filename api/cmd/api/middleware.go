@@ -86,12 +86,12 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 	})
 }
 
-func (app *application) authenticateClient(next http.Handler) http.Handler {
+func (app *application) authenticateApiSecret(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Add("Vary", "X-API-KEY")
+		w.Header().Add("Vary", "Authorization")
 
-		authorizationHeader := r.Header.Get("X-API-KEY")
+		authorizationHeader := r.Header.Get("Authorization")
 
 		headerParts := strings.Split(authorizationHeader, " ")
 		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
@@ -120,6 +120,48 @@ func (app *application) authenticateClient(next http.Handler) http.Handler {
 		}
 		if user.ID != app.config.apiUserID {
 			app.invalidAuthenticationTokenResponse(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) authenticateClient(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Add("Vary", "X-API-KEY")
+
+		xApiKeyHeader := r.Header.Get("X-API-KEY")
+
+		headerParts := strings.Split(xApiKeyHeader, " ")
+		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+			app.invalidClientTokenResponse(w, r)
+			return
+		}
+
+		token := headerParts[1]
+
+		v := validator.New()
+
+		if data.ValidateTokenPlaintext(v, token); !v.Valid() {
+			app.invalidClientTokenResponse(w, r)
+			return
+		}
+
+		user, err := app.models.Users.GetForToken(data.ScopeClient, token)
+		if err != nil {
+			switch {
+			case errors.Is(err, data.ErrRecordNotFound):
+				app.invalidClientTokenResponse(w, r)
+			default:
+				app.serverErrorResponse(w, r, err)
+			}
+			return
+		}
+
+		if user == nil || user.ID < 1 {
+			app.serverErrorResponse(w, r, errors.New("client not found"))
 			return
 		}
 

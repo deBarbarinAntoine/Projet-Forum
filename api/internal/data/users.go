@@ -22,6 +22,12 @@ const (
 	StatusActivated = "activated"
 	StatusToConfirm = "to_confirm"
 	StatusBlocked   = "blocked"
+	StatusClient    = "client"
+
+	RoleAdmin     = "admin"
+	RoleModerator = "moderator"
+	RoleClient    = "client"
+	RoleNormal    = "normal"
 
 	MinPasswordLength = 8
 	MaxPasswordLength = 72

@@ -13,7 +13,22 @@ func (app *application) routes() http.Handler {
 	/* # COMMON MIDDLEWARES
 	/* ############################################################################# */
 
-	router.Use(app.recoverPanic, app.enableCORS, app.rateLimit, app.authenticateClient, app.authenticateUser)
+	router.Use(app.recoverPanic, app.enableCORS, app.rateLimit)
+
+	/* #############################################################################
+	/* # CLIENT TOKEN
+	/* ############################################################################# */
+
+	router.Group(func(mux *flow.Mux) {
+		mux.Use(app.authenticateApiSecret)
+		mux.HandleFunc("/v1/tokens/client", app.createClientTokenHandler, http.MethodPost)
+	})
+
+	/* #############################################################################
+	/* # SESSION HANDLING ROUTES
+	/* ############################################################################# */
+
+	router.Use(app.authenticateClient, app.authenticateUser)
 
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
 
@@ -24,6 +39,13 @@ func (app *application) routes() http.Handler {
 	/* ############################################################################# */
 
 	router.HandleFunc("/v1/healthcheck", app.healthcheckHandler, http.MethodGet)
+
+	/* #############################################################################
+	/* # TOKENS
+	/* ############################################################################# */
+
+	router.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
+	router.HandleFunc("/v1/tokens/refresh", app.refreshAuthenticationTokenHandler, http.MethodPost)
 
 	/* #############################################################################
 	/* # USERS
@@ -40,13 +62,6 @@ func (app *application) routes() http.Handler {
 	router.HandleFunc("/v1/users/:id/friend", app.friendRequestHandler, http.MethodPost)
 	router.HandleFunc("/v1/users/:id/friend", app.friendResponseHandler, http.MethodPut)
 	router.HandleFunc("/v1/users/:id/friend", app.friendDeleteHandler, http.MethodDelete)
-
-	/* #############################################################################
-	/* # TOKENS
-	/* ############################################################################# */
-
-	router.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
-	router.HandleFunc("/v1/tokens/refresh", app.refreshAuthenticationTokenHandler, http.MethodPost)
 
 	/* #############################################################################
 	/* # CATEGORIES

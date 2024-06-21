@@ -65,6 +65,13 @@ func (app *application) invalidCredentialsResponse(w http.ResponseWriter, r *htt
 	app.errorResponse(w, r, http.StatusUnauthorized, message)
 }
 
+func (app *application) invalidClientTokenResponse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("X-API-KEY", "Bearer")
+
+	message := "invalid or missing client token"
+	app.errorResponse(w, r, http.StatusUnauthorized, message)
+}
+
 func (app *application) invalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("WWW-Authenticate", "Bearer")
 

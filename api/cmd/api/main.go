@@ -170,7 +170,7 @@ func main() {
 					Plaintext: "",
 					Hash:      hash[:],
 					UserID:    user.ID,
-					Expiry:    time.Now().Add(1<<63 - 1),
+					Expiry:    time.Now().Add(data.MaxDuration),
 					Scope:     data.ScopeHostSecret,
 				}
 				err = app.models.Tokens.Insert(&token)
