@@ -13,14 +13,14 @@ import (
 
 type userByIDForm struct {
 	ID                  int      `form:"id"`
-	Include             []string `form:"include[]"`
+	Includes            []string `form:"includes[]"`
 	validator.Validator `form:"-"`
 }
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
-		Name     string `json:"name"`
+		Name     string `json:"username"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -34,7 +34,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	user := &data.User{
 		Name:   input.Name,
 		Email:  input.Email,
-		Status: data.StatusToConfirm,
+		Status: data.UserStatus.ToConfirm,
 	}
 
 	err = user.Password.Set(input.Password)
@@ -65,7 +65,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, data.ScopeActivation)
+	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, data.TokenScope.Activation)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -119,7 +119,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	user, err := app.models.Users.GetForToken(data.ScopeActivation, input.TokenPlainText)
+	user, err := app.models.Users.GetForToken(data.TokenScope.Activation, input.TokenPlainText)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
@@ -142,7 +142,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = app.models.Tokens.DeleteAllForUser(data.ScopeActivation, user.ID)
+	err = app.models.Tokens.DeleteAllForUser(data.TokenScope.Activation, user.ID)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -176,9 +176,9 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	form.Check(form.ID > 0, "id", "must contain a valid id")
-	form.Check(validator.Unique(form.Include), "include[]", "duplicate values")
-	for _, value := range form.Include {
-		form.Check(validator.PermittedValue(value, validator.UserByIDValues...), "include[]", fmt.Sprintf("incorrect value %s", value))
+	form.Check(validator.Unique(form.Includes), "includes[]", "duplicate values")
+	for _, value := range form.Includes {
+		form.Check(validator.PermittedValue(value, validator.UserByIDValues...), "includes[]", fmt.Sprintf("incorrect value %s", value))
 	}
 
 	if !form.Valid() {
@@ -194,49 +194,49 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	if slices.Contains(form.Include, "following_tags") {
+	if slices.Contains(form.Includes, "following_tags") {
 		user.FollowingTags, err = app.models.Tags.GetFollowingTagsByUserID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 	}
-	if slices.Contains(form.Include, "favorite_threads") {
+	if slices.Contains(form.Includes, "favorite_threads") {
 		user.FavoriteThreads, err = app.models.Threads.GetFavoriteThreadsByUserID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 	}
-	if slices.Contains(form.Include, "categories_owned") {
+	if slices.Contains(form.Includes, "categories_owned") {
 		user.CategoriesOwned, err = app.models.Categories.GetOwnedCategoriesByUserID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 	}
-	if slices.Contains(form.Include, "tags_owned") {
+	if slices.Contains(form.Includes, "tags_owned") {
 		user.TagsOwned, err = app.models.Tags.GetOwnedTagsByUserID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 	}
-	if slices.Contains(form.Include, "threads_owned") {
+	if slices.Contains(form.Includes, "threads_owned") {
 		user.ThreadsOwned, err = app.models.Threads.GetOwnedThreadsByUserID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 	}
-	if slices.Contains(form.Include, "posts") {
+	if slices.Contains(form.Includes, "posts") {
 		user.Posts, err = app.models.Posts.GetPostsByAuthorID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 	}
-	if slices.Contains(form.Include, "friends") {
+	if slices.Contains(form.Includes, "friends") {
 		user.Friends, err = app.models.Users.GetFriendsByUserID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
@@ -254,11 +254,16 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 
 	id, err := app.readIDParam(r)
 	if err != nil {
-		app.badRequestResponse(w, r, err)
+		switch {
+		case errors.Is(err, ErrUserIDNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.badRequestResponse(w, r, err)
+		}
 		return
 	}
 
-	user, err := app.models.Users.GetByID(int(id))
+	user, err := app.models.Users.GetByID(id)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
@@ -282,6 +287,10 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 		Password             *string `json:"password"`
 		NewPassword          *string `json:"new_password"`
 		ConfirmationPassword *string `json:"confirmation_password"`
+		Avatar               *string `json:"avatar"`
+		Birth                *string `json:"birth"`
+		Bio                  *string `json:"bio"`
+		Signature            *string `json:"signature"`
 	}
 
 	err = app.readJSON(w, r, &input)
@@ -290,14 +299,31 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	v := validator.New()
+
 	if input.Username != nil {
 		user.Name = *input.Username
 	}
 	if input.Email != nil {
 		user.Email = *input.Email
 	}
-
-	v := validator.New()
+	if input.Avatar != nil {
+		user.Avatar = *input.Avatar
+	}
+	if input.Birth != nil {
+		birth, err := time.Parse("2006-01-02", *input.Birth)
+		if err != nil {
+			v.AddError("birth", "must be a valid date in the format YYYY-MM-DD")
+		} else {
+			user.BirthDate = birth
+		}
+	}
+	if input.Bio != nil {
+		user.Bio = *input.Bio
+	}
+	if input.Signature != nil {
+		user.Signature = *input.Signature
+	}
 
 	if input.NewPassword != nil {
 		err := user.Password.Set(*input.NewPassword)

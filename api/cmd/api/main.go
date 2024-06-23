@@ -5,10 +5,8 @@ import (
 	"ForumAPI/internal/mailer"
 	"ForumAPI/internal/vcs"
 	"context"
-	"crypto/rand"
 	"crypto/sha256"
 	"database/sql"
-	"encoding/hex"
 	"errors"
 	"expvar"
 	"flag"
@@ -91,8 +89,9 @@ func main() {
 		return nil
 	})
 
-	var secret string
-	flag.StringVar(&secret, "secret", "", "API secret")
+	secret := flag.String("secret", "", "API secret")
+
+	frequency := flag.Duration("frequency", time.Hour*2, "expired tokens cleaning frequency")
 
 	displayVersion := flag.Bool("version", false, "Display version and exit")
 
@@ -142,36 +141,30 @@ func main() {
 	}
 
 	// TODO -> remove when leaving development phase
-	if cfg.env == "development" && secret != "" {
+	if cfg.env == "development" && *secret != "" {
 		user, err := app.models.Users.GetByEmail("api@api.com")
 		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				logger.Info(err.Error())
+			if errors.Is(err, data.ErrRecordNotFound) {
+				logger.Info("creating API user...")
 				user = &data.User{
 					Name:   "API",
 					Email:  "api@api.com",
-					Role:   "api-secret",
-					Status: "api-secret",
+					Role:   data.UserRole.Secret,
+					Status: data.UserStatus.HostSecret,
 				}
-				randomBytes := make([]byte, 16)
-				_, err := rand.Read(randomBytes)
-				if err != nil {
-					logger.Error(err.Error())
-					os.Exit(1)
-				}
-				user.Password.Set(hex.EncodeToString(randomBytes))
+				user.NoLogin()
 				err = app.models.Users.Insert(user)
 				if err != nil {
 					logger.Error(err.Error())
 					os.Exit(1)
 				}
-				hash := sha256.Sum256([]byte(secret))
+				hash := sha256.Sum256([]byte(*secret))
 				token := data.Token{
 					Plaintext: "",
 					Hash:      hash[:],
 					UserID:    user.ID,
 					Expiry:    time.Now().Add(data.MaxDuration),
-					Scope:     data.ScopeHostSecret,
+					Scope:     data.TokenScope.HostSecret,
 				}
 				err = app.models.Tokens.Insert(&token)
 				if err != nil {
@@ -189,24 +182,11 @@ func main() {
 		}
 		app.config.apiUserID = user.ID
 	}
-	secret = ""
+	*secret = ""
 	// TODO <- END
 
-	go func() {
-		defer func() {
-			if err := recover(); err != nil {
-				app.logger.Error(fmt.Sprintf("%v", err))
-			}
-		}()
-
-		for {
-			errExpiredTokens := app.models.Tokens.DeleteExpired()
-			if errExpiredTokens != nil {
-				logger.Error(err.Error())
-			}
-			time.Sleep(2 * time.Hour)
-		}
-	}()
+	// Clean expired tokens every N duration
+	go app.cleanExpiredTokens(*frequency)
 
 	err = app.serve()
 	if err != nil {

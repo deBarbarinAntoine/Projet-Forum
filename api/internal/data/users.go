@@ -14,24 +14,45 @@ import (
 	"time"
 )
 
-var (
-	AnonymousUser = &User{}
-)
-
 const (
-	StatusActivated = "activated"
-	StatusToConfirm = "to_confirm"
-	StatusBlocked   = "blocked"
-	StatusClient    = "client"
-
-	RoleAdmin     = "admin"
-	RoleModerator = "moderator"
-	RoleClient    = "client"
-	RoleNormal    = "normal"
-
 	MinPasswordLength = 8
 	MaxPasswordLength = 72
+	MinAge            = 13
 )
+
+var (
+	AnonymousUser = &User{}
+	UserStatus    = &userStatus{
+		Activated:  "activated",
+		ToConfirm:  "to_confirm",
+		Blocked:    "blocked",
+		Client:     "client",
+		HostSecret: "host_secret",
+	}
+	UserRole = &userRole{
+		Secret:    "host_secret",
+		Client:    "client",
+		Admin:     "admin",
+		Moderator: "moderator",
+		Normal:    "normal",
+	}
+)
+
+type userStatus struct {
+	Activated  string
+	ToConfirm  string
+	Blocked    string
+	Client     string
+	HostSecret string
+}
+
+type userRole struct {
+	Secret    string
+	Client    string
+	Admin     string
+	Moderator string
+	Normal    string
+}
 
 type User struct {
 	ID            int       `json:"id"`
@@ -41,44 +62,51 @@ type User struct {
 	Password      password  `json:"-"`
 	Role          string    `json:"role"`
 	BirthDate     time.Time `json:"birth_date"`
-	Bio           string    `json:"bio"`
-	Signature     string    `json:"signature"`
-	Avatar        string    `json:"avatar"`
+	Bio           string    `json:"bio,omitempty"`
+	Signature     string    `json:"signature,omitempty"`
+	Avatar        string    `json:"avatar,omitempty"`
 	Status        string    `json:"status"`
 	Version       int       `json:"-"`
 	FollowingTags []struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
-	} `json:"following_tags"`
+	} `json:"following_tags,omitempty"`
 	FavoriteThreads []struct {
 		ID    int    `json:"id"`
 		Title string `json:"title"`
-	} `json:"favorite_threads"`
-	CategoriesOwned []Category `json:"categories_owned"`
-	TagsOwned       []Tag      `json:"tags_owned"`
-	ThreadsOwned    []Thread   `json:"threads_owned"`
-	Posts           []Post     `json:"posts"`
-	Friends         []Friend   `json:"friends"`
+	} `json:"favorite_threads,omitempty"`
+	CategoriesOwned []Category `json:"categories_owned,omitempty"`
+	TagsOwned       []Tag      `json:"tags_owned,omitempty"`
+	ThreadsOwned    []Thread   `json:"threads_owned,omitempty"`
+	Posts           []Post     `json:"posts,omitempty"`
+	Friends         []Friend   `json:"friends,omitempty"`
 	Invitations     struct {
 		Received []Friend `json:"received"`
 		Sent     []Friend `json:"sent"`
-	} `json:"invitations"`
+	} `json:"invitations,omitempty"`
 }
 
 func (u *User) IsActivated() bool {
-	return u.Status == StatusActivated
+	return u.Status == UserStatus.Activated
 }
 
 func (u *User) IsToConfirm() bool {
-	return u.Status == StatusToConfirm
+	return u.Status == UserStatus.ToConfirm
 }
 
 func (u *User) IsBlocked() bool {
-	return u.Status == StatusBlocked
+	return u.Status == UserStatus.Blocked
 }
 
 func (u *User) IsAnonymous() bool {
 	return u == AnonymousUser
+}
+
+func (u *User) NoLogin() {
+	u.Password = password{
+		plaintext: nil,
+		hash:      []byte("no-login"),
+	}
 }
 
 type password struct {
@@ -134,6 +162,7 @@ func (u *User) Validate(v *validator.Validator) {
 	v.Check(u.Name != "", "name", "must be provided")
 	v.Check(len(u.Name) > 2, "name", "must be more than 2 bytes long")
 	v.Check(len(u.Name) <= 70, "name", "must not be more than 70 bytes long")
+	v.Check(u.BirthDate.AddDate(MinAge, 0, 0).Before(time.Now()), "birth", fmt.Sprintf("must be at least %d years old", MinAge))
 
 	ValidateEmail(v, u.Email)
 
@@ -302,7 +331,7 @@ func (m UserModel) Activate(user *User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	_, err := m.DB.ExecContext(ctx, query, StatusActivated, user.ID, user.Version)
+	_, err := m.DB.ExecContext(ctx, query, UserStatus.Activated, user.ID, user.Version)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -318,13 +347,17 @@ func (m UserModel) Update(user *User) error {
 
 	query := `
 		UPDATE users
-		SET Username = ?, Email = ?, Hashed_password = ?, Version = Version + 1
+		SET Username = ?, Email = ?, Hashed_password = ?, Avatar_path = ?, Birth_date = ?, Bio = ?, Signature = ?, Version = Version + 1
 		WHERE Id_users = ? AND Version = ?;`
 
 	args := []any{
 		user.Name,
 		user.Email,
 		user.Password.hash,
+		user.Avatar,
+		user.BirthDate,
+		user.Bio,
+		user.Signature,
 		user.ID,
 		user.Version,
 	}
@@ -332,15 +365,9 @@ func (m UserModel) Update(user *User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	tx, err := m.DB.BeginTx(ctx, nil)
+	res, err := m.DB.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
-	}
-
-	var mySQLError *mysql.MySQLError
-
-	res, err := tx.ExecContext(ctx, query, args...)
-	if err != nil {
+		var mySQLError *mysql.MySQLError
 		switch {
 		case errors.As(err, &mySQLError):
 			if mySQLError.Number == 1062 {
@@ -361,25 +388,6 @@ func (m UserModel) Update(user *User) error {
 	}
 	if rowsAffected == 0 {
 		return ErrRecordNotFound
-	}
-
-	query = `
-		SELECT Version
-		FROM users
-		WHERE Id_users = ? AND Version = ?;`
-
-	err = tx.QueryRowContext(ctx, query, user.ID, user.Version).Scan(&user.Version)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return ErrRecordNotFound
-		default:
-			return err
-		}
-	}
-
-	if err = tx.Commit(); err != nil {
-		return err
 	}
 
 	return nil

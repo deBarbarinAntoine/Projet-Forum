@@ -5,11 +5,20 @@ import (
 	"strings"
 )
 
+// Filters is the set of filter related information
 type Filters struct {
-	Page         int
-	PageSize     int
-	Sort         string
-	SortSafelist []string
+
+	// Page is the page number you want
+	Page int `form:"page"`
+
+	// PageSize is the number of items per page
+	PageSize int `form:"page_size"`
+
+	// Sort is the field by which the content is sorted
+	Sort string `form:"sort"`
+
+	// SortSafelist is the list of all possible fields for sorting (not in the query string)
+	SortSafelist []string `form:"-"`
 }
 
 func (f Filters) sortColumn() string {

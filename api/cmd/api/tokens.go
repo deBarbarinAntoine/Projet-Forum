@@ -4,16 +4,49 @@ import (
 	"ForumAPI/internal/data"
 	"ForumAPI/internal/validator"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
 
+func (app *application) cleanExpiredTokens(frequency time.Duration) {
+	defer func() {
+		if err := recover(); err != nil {
+			app.logger.Error(fmt.Sprintf("%v", err))
+		}
+	}()
+	for {
+		err := app.models.Tokens.DeleteExpired()
+		if err != nil {
+			app.logger.Error(err.Error())
+		}
+		time.Sleep(frequency)
+	}
+}
+
+func (app *application) newAuthenticationToken(user *data.User) (envelope, error) {
+
+	authToken, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.TokenScope.Authentication)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := app.models.Tokens.New(user.ID, 48*time.Hour, data.TokenScope.Refresh)
+	if err != nil {
+		return nil, err
+	}
+
+	return envelope{
+		"authentication_token": authToken,
+		"refresh_token":        refreshToken,
+	}, nil
+}
+
 func (app *application) createClientTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
-		Name     string `json:"username"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Name  string `json:"username"`
+		Email string `json:"email"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -25,19 +58,20 @@ func (app *application) createClientTokenHandler(w http.ResponseWriter, r *http.
 	user := &data.User{
 		Name:   input.Name,
 		Email:  input.Email,
-		Status: data.StatusClient,
-		Role:   data.RoleClient,
+		Status: data.UserStatus.Client,
+		Role:   data.UserRole.Client,
 	}
 
-	err = user.Password.Set(input.Password)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
+	user.NoLogin()
 
 	v := validator.New()
 
-	if user.Validate(v); !v.Valid() {
+	data.ValidateEmail(v, user.Email)
+	v.Check(user.Name != "", "name", "must be provided")
+	v.Check(len(user.Name) > 2, "name", "must be more than 2 bytes long")
+	v.Check(len(user.Name) <= 70, "name", "must not be more than 70 bytes long")
+
+	if !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
@@ -57,7 +91,7 @@ func (app *application) createClientTokenHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	token, err := app.models.Tokens.New(user.ID, data.MaxDuration, data.ScopeClient)
+	token, err := app.models.Tokens.New(user.ID, data.MaxDuration, data.TokenScope.Client)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -124,20 +158,53 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 		return
 	}
 
-	token, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.ScopeAuthentication)
+	token, err := app.newAuthenticationToken(user)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token}, nil)
+	err = app.writeJSON(w, http.StatusCreated, token, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
 }
 
 func (app *application) refreshAuthenticationTokenHandler(w http.ResponseWriter, r *http.Request) {
-	err := app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": "refreshed_token"}, nil)
+
+	var input struct {
+		RefreshToken string `json:"token"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	v := validator.New()
+
+	user, err := app.models.Users.GetForToken(data.TokenScope.Refresh, input.RefreshToken)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			v.AddError("token", "invalid or expired activation token")
+			app.failedValidationResponse(w, r, v.Errors)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = app.models.Tokens.DeleteAllForUser(data.TokenScope.Refresh, user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	token, err := app.newAuthenticationToken(user)
+
+	err = app.writeJSON(w, http.StatusCreated, token, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

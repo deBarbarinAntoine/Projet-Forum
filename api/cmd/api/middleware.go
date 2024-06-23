@@ -108,7 +108,7 @@ func (app *application) authenticateApiSecret(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := app.models.Users.GetForToken(data.ScopeHostSecret, token)
+		user, err := app.models.Users.GetForToken(data.TokenScope.HostSecret, token)
 		if err != nil {
 			switch {
 			case errors.Is(err, data.ErrRecordNotFound):
@@ -149,7 +149,7 @@ func (app *application) authenticateClient(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := app.models.Users.GetForToken(data.ScopeClient, token)
+		user, err := app.models.Users.GetForToken(data.TokenScope.Client, token)
 		if err != nil {
 			switch {
 			case errors.Is(err, data.ErrRecordNotFound):
@@ -197,7 +197,7 @@ func (app *application) authenticateUser(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := app.models.Users.GetForToken(data.ScopeAuthentication, token)
+		user, err := app.models.Users.GetForToken(data.TokenScope.Authentication, token)
 		if err != nil {
 			switch {
 			case errors.Is(err, data.ErrRecordNotFound):
@@ -214,8 +214,9 @@ func (app *application) authenticateUser(next http.Handler) http.Handler {
 	})
 }
 
-func (app *application) requireAuthenticatedUser(next http.HandlerFunc) http.HandlerFunc {
+func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		user := app.contextGetUser(r)
 
 		if user.IsAnonymous() {
@@ -227,7 +228,7 @@ func (app *application) requireAuthenticatedUser(next http.HandlerFunc) http.Han
 	})
 }
 
-func (app *application) requireActivatedUser(next http.HandlerFunc) http.HandlerFunc {
+func (app *application) requireActivatedUser(next http.Handler) http.Handler {
 	fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		user := app.contextGetUser(r)
@@ -243,8 +244,8 @@ func (app *application) requireActivatedUser(next http.HandlerFunc) http.Handler
 	return app.requireAuthenticatedUser(fn)
 }
 
-func (app *application) requirePermission(code string, next http.HandlerFunc) http.HandlerFunc {
-	fn := func(w http.ResponseWriter, r *http.Request) {
+func (app *application) requirePermission(code string, next http.Handler) http.Handler {
+	fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := app.contextGetUser(r)
 
 		permissions, err := app.models.Permissions.GetAllForUser(user.ID)
@@ -259,7 +260,7 @@ func (app *application) requirePermission(code string, next http.HandlerFunc) ht
 		}
 
 		next.ServeHTTP(w, r)
-	}
+	})
 
 	return app.requireActivatedUser(fn)
 }

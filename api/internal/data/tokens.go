@@ -15,12 +15,25 @@ import (
 )
 
 const (
-	ScopeActivation     = "activation"
-	ScopeAuthentication = "authentication"
-	ScopeClient         = "client"
-	ScopeHostSecret     = "host_secret"
-
 	MaxDuration time.Duration = 1<<63 - 1
+)
+
+type tokenScope struct {
+	Activation     string
+	Authentication string
+	Refresh        string
+	Client         string
+	HostSecret     string
+}
+
+var (
+	TokenScope = &tokenScope{
+		Activation:     "activation",
+		Authentication: "authentication",
+		Refresh:        "refresh",
+		Client:         "client",
+		HostSecret:     "host_secret",
+	}
 )
 
 type Token struct {

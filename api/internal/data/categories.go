@@ -16,7 +16,7 @@ type CategoryModel struct {
 	DB *sql.DB
 }
 
-func (m CategoryModel) Insert(category Category) error {
+func (m CategoryModel) Insert(category *Category) error {
 
 	args := []any{category.Name, category.Author.ID}
 	var parentCategory, value string
@@ -89,7 +89,79 @@ func (m CategoryModel) Insert(category Category) error {
 	return nil
 }
 
-func (m CategoryModel) Get(id int) (Category, error) {
+func (m CategoryModel) Get(search string, filters Filters) ([]*Category, Metadata, error) {
+
+	query := fmt.Sprintf(`
+		SELECT count(*) OVER(), c.Id_categories, c.Name, c.Id_author, u.Username, c.Id_parent_categories, pc.Name, c.Created_at, c.Updated_at, c.Version
+		FROM categories c
+		INNER JOIN users u ON u.Id_users = c.Id_author
+		LEFT OUTER JOIN categories pc ON pc.Id_categories = c.Id_parent_categories
+		WHERE c.Name LIKE ?
+		ORDER BY %s %s, Id_Categories ASC
+		LIMIT ? OFFSET ?;`, filters.sortColumn(), filters.sortDirection())
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	if search != "" {
+		search = fmt.Sprintf("%%%s%%", search)
+	} else {
+		search = "%"
+	}
+
+	rows, err := m.DB.QueryContext(ctx, query, search, filters.limit(), filters.offset())
+
+	if err != nil {
+		return nil, Metadata{}, err
+	}
+
+	defer rows.Close()
+
+	var totalRecords int
+	var categories []*Category
+
+	for rows.Next() {
+
+		var parentID sql.NullInt64
+		var parentName sql.NullString
+		var category Category
+
+		err = rows.Scan(
+			&totalRecords,
+			&category.ID,
+			&category.Name,
+			&category.Author.ID,
+			&category.Author.Name,
+			&parentID,
+			&parentName,
+			&category.CreatedAt,
+			&category.UpdatedAt,
+			&category.Version,
+		)
+		if err != nil {
+			return nil, Metadata{}, err
+		}
+
+		if parentID.Valid {
+			category.ParentCategory.ID = int(parentID.Int64)
+		}
+		if parentName.Valid {
+			category.ParentCategory.Name = parentName.String
+		}
+
+		categories = append(categories, &category)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, Metadata{}, err
+	}
+
+	metadata := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
+
+	return categories, metadata, nil
+}
+
+func (m CategoryModel) GetByID(id int) (Category, error) {
 
 	query := `
 		SELECT Id_categories, Name, Id_parent_categories, Created_at, Updated_at, Version
@@ -268,12 +340,12 @@ type Category struct {
 		Name string `json:"name"`
 	} `json:"author"`
 	ParentCategory struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"parent_category"`
+		ID   int    `json:"id,omitempty"`
+		Name string `json:"name,omitempty"`
+	} `json:"parent_category,omitempty"`
 	Version    int        `json:"version"`
-	Categories []Category `json:"categories"`
-	Threads    []Thread   `json:"threads"`
+	Categories []Category `json:"categories,omitempty"`
+	Threads    []Thread   `json:"threads,omitempty"`
 }
 
 func (category *Category) Validate(v *validator.Validator) {

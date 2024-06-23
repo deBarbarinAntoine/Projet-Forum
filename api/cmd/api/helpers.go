@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ForumAPI/internal/data"
 	"ForumAPI/internal/validator"
 	"encoding/json"
 	"errors"
@@ -14,11 +15,24 @@ import (
 	"strings"
 )
 
+var (
+	ErrUserIDNotFound = errors.New("user id not found")
+)
+
 type envelope map[string]any
 
 func newUserByIDForm() *userByIDForm {
 	return &userByIDForm{
 		Validator: *validator.New(),
+	}
+}
+
+func newGetCategoriesForm() *getCategoriesForm {
+	return &getCategoriesForm{
+		Validator: *validator.New(),
+		Filters: data.Filters{
+			SortSafelist: []string{"Created_at", "Updated_at", "Name", "Id_author", "Id_parent_categories", "-Created_at", "-Updated_at", "-Name", "-Id_author", "-Id_parent_categories"},
+		},
 	}
 }
 
@@ -45,7 +59,15 @@ func (app *application) decodeForm(r *http.Request, dst any) error {
 
 func (app *application) readIDParam(r *http.Request) (int, error) {
 
-	id, err := strconv.ParseInt(flow.Param(r.Context(), "id"), 10, 64)
+	idParam := flow.Param(r.Context(), "id")
+	if idParam == "me" {
+		id := app.contextGetUser(r).ID
+		if id == 0 {
+			return 0, ErrUserIDNotFound
+		}
+		return id, nil
+	}
+	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil || id < 1 {
 		return 0, errors.New("invalid id parameter")
 	}
