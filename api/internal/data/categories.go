@@ -107,6 +107,8 @@ func (m CategoryModel) Get(search string, filters Filters) ([]*Category, Metadat
 		ORDER BY %s %s, Id_Categories ASC
 		LIMIT ? OFFSET ?;`, filters.sortColumn(), filters.sortDirection())
 
+	args := []any{search, filters.limit(), filters.offset()}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -116,7 +118,7 @@ func (m CategoryModel) Get(search string, filters Filters) ([]*Category, Metadat
 		search = "%"
 	}
 
-	rows, err := m.DB.QueryContext(ctx, query, search, filters.limit(), filters.offset())
+	rows, err := m.DB.QueryContext(ctx, query, args...)
 
 	if err != nil {
 		return nil, Metadata{}, err

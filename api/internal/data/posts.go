@@ -121,7 +121,7 @@ func (m PostModel) Get(id int) (*Post, error) {
 	return &post, nil
 }
 
-func (m PostModel) GetPostsByAuthorID(id int) ([]Post, error) {
+func (m PostModel) GetByAuthorID(id int) ([]Post, error) {
 
 	query := `
 		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_threads, t.Title, p.Version
@@ -171,7 +171,7 @@ func (m PostModel) GetPostsByAuthorID(id int) ([]Post, error) {
 	return posts, nil
 }
 
-func (m PostModel) GetPostsByThreadID(id int) ([]Post, error) {
+func (m PostModel) GetByThread(id int) ([]Post, error) {
 
 	query := `
 		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, p.Version
@@ -319,11 +319,8 @@ type Post struct {
 }
 
 func (post *Post) Validate(v *validator.Validator) {
-	v.Check(post.Content != "", "content", "must be provided")
-	v.Check(len(post.Content) <= 1_020, "content", "must not be more than 1020 bytes long")
-	v.Check(post.Author.Name != "", "author.name", "must be provided")
-	v.Check(len(post.Author.Name) <= 30, "author.name", "must not be more than 30 bytes long")
+	v.StringCheck(post.Content, 2, 1_020, true, "content")
+	v.StringCheck(post.Author.Name, 2, 70, true, "author.name")
+	v.StringCheck(post.Thread.Title, 2, 125, true, "thread.title")
 	v.Check(post.Thread.ID != 0, "post.thread.id", "must be provided")
-	v.Check(post.Thread.Title != "", "post.thread.title", "must be provided")
-	v.Check(len(post.Thread.Title) <= 125, "post.thread.title", "must not be more than 125 bytes long")
 }

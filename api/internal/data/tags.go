@@ -113,7 +113,7 @@ func (m TagModel) Get(id int) (*Tag, error) {
 	return &tag, nil
 }
 
-func (m TagModel) GetOwnedTagsByUserID(id int) ([]Tag, error) {
+func (m TagModel) GetByAuthorID(id int) ([]Tag, error) {
 
 	query := `
 		SELECT Id_tags, Name, Created_at, Updated_at, Version
@@ -155,7 +155,7 @@ func (m TagModel) GetOwnedTagsByUserID(id int) ([]Tag, error) {
 	return tagsOwned, nil
 }
 
-func (m TagModel) GetTagsBySearch(search string) ([]Tag, error) {
+func (m TagModel) GetBySearch(search string) ([]Tag, error) {
 
 	query := `
 		SELECT t.Id_tags, t.Name, t.Created_at, t.Updated_at, t.Id_author, u.Username, t.Version
@@ -199,7 +199,51 @@ func (m TagModel) GetTagsBySearch(search string) ([]Tag, error) {
 	return tags, nil
 }
 
-func (m TagModel) GetFollowingTagsByUserID(id int) ([]struct {
+func (m TagModel) GetByThread(id int) ([]Tag, error) {
+
+	query := `
+		SELECT tt.Id_tags, t.Name, t.Id_author, u.Username
+		FROM threads_tags tt
+		INNER JOIN tags t ON tt.Id_tags = t.Id_tags
+		INNER JOIN users u ON t.Id_author = u.Id_users
+		WHERE tt.Id_threads = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	rows, err := m.DB.QueryContext(ctx, query, id)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+	defer rows.Close()
+
+	var tags []Tag
+
+	for rows.Next() {
+		var tag Tag
+		if err := rows.Scan(&tag.ID, &tag.Name, &tag.Author.ID, &tag.Author.Name); err != nil {
+			log.Fatal(err)
+		}
+		tags = append(tags, tag)
+	}
+	rerr := rows.Close()
+	if rerr != nil {
+		log.Fatal(rerr)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return tags, nil
+}
+
+func (m TagModel) GetByFollowingUserID(id int) ([]struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }, error) {
@@ -343,19 +387,17 @@ func (m TagModel) Delete(id int) error {
 type Tag struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	Author    struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
 	} `json:"author"`
-	Version int      `json:"version"`
-	Threads []Thread `json:"threads"`
+	Version int      `json:"version,omitempty"`
+	Threads []Thread `json:"threads,omitempty"`
 }
 
 func (tag *Tag) Validate(v *validator.Validator) {
-	v.Check(tag.Name != "", "name", "must be provided")
-	v.Check(len(tag.Name) <= 50, "name", "must not be more than 50 bytes long")
-	v.Check(tag.Author.Name != "", "author.name", "must be provided")
-	v.Check(len(tag.Author.Name) <= 30, "author.name", "must not be more than 30 bytes long")
+	v.StringCheck(tag.Name, 2, 50, true, "name")
+	v.StringCheck(tag.Author.Name, 2, 70, true, "author.name")
 }

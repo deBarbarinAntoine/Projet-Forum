@@ -14,6 +14,7 @@ var (
 	ErrDuplicateName     = errors.New("duplicate tag or category name")
 	ErrDuplicateTitle    = errors.New("duplicate thread title")
 	ErrDuplicateToken    = errors.New("duplicate token")
+	ErrDuplicateEntry    = errors.New("duplicate entry")
 )
 
 type Models struct {

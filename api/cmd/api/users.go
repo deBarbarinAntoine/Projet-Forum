@@ -199,7 +199,7 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if slices.Contains(form.Includes, "following_tags") {
-		user.FollowingTags, err = app.models.Tags.GetFollowingTagsByUserID(user.ID)
+		user.FollowingTags, err = app.models.Tags.GetByFollowingUserID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
@@ -220,7 +220,7 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 		}
 	}
 	if slices.Contains(form.Includes, "tags_owned") {
-		user.TagsOwned, err = app.models.Tags.GetOwnedTagsByUserID(user.ID)
+		user.TagsOwned, err = app.models.Tags.GetByAuthorID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
@@ -234,7 +234,7 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 		}
 	}
 	if slices.Contains(form.Includes, "posts") {
-		user.Posts, err = app.models.Posts.GetPostsByAuthorID(user.ID)
+		user.Posts, err = app.models.Posts.GetByAuthorID(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return

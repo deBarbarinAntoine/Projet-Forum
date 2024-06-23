@@ -80,9 +80,7 @@ func (app *application) createCategoryHandler(w http.ResponseWriter, r *http.Req
 
 	v := validator.New()
 
-	v.Check(input.Name != "", "name", "must be provided")
-	v.Check(len(input.Name) <= 70, "name", "must not be longer than 70 bytes")
-	v.Check(len(input.Name) > 2, "name", "must be longer than 2 bytes")
+	v.StringCheck(input.Name, 2, 70, true, "name")
 
 	if !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)

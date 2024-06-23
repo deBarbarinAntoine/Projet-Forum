@@ -43,6 +43,22 @@ func newGetCategoriesForm() *getCategoriesForm {
 	}
 }
 
+func newThreadByIDForm() *threadByIDForm {
+	return &threadByIDForm{
+		PermittedFields: []string{"posts", "tags", "popularity"},
+		Validator:       *validator.New(),
+	}
+}
+
+func newGetThreadsForm() *getThreadsForm {
+	return &getThreadsForm{
+		Validator: *validator.New(),
+		Filters: data.Filters{
+			SortSafelist: []string{"Created_at", "Updated_at", "Title", "Is_public", "Status", "Id_author", "Id_categories", "-Created_at", "-Updated_at", "-Title", "-Is_public", "-Status", "-Id_author", "-Id_categories"},
+		},
+	}
+}
+
 func (app *application) decodeForm(r *http.Request, dst any) error {
 
 	err := r.ParseForm()

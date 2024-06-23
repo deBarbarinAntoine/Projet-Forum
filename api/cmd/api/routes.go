@@ -119,8 +119,8 @@ func (app *application) routes() http.Handler {
 		mux.HandleFunc("/v1/threads/:id", app.updateThreadHandler, http.MethodPut)
 		mux.HandleFunc("/v1/threads/:id", app.deleteThreadHandler, http.MethodDelete)
 
-		mux.HandleFunc("/v1/threads/:id/follow", app.followThreadHandler, http.MethodPost)
-		mux.HandleFunc("/v1/threads/:id/follow", app.unfollowThreadHandler, http.MethodDelete)
+		mux.HandleFunc("/v1/threads/:id/follow", app.addToFavoritesThreadHandler, http.MethodPost)
+		mux.HandleFunc("/v1/threads/:id/follow", app.removeFromFavoritesThreadHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################
