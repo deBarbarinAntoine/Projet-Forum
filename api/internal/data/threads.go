@@ -133,6 +133,58 @@ func (m ThreadModel) Get(id int) (*Thread, error) {
 	return &thread, nil
 }
 
+func (m ThreadModel) GetByCategory(id int) ([]Thread, error) {
+
+	query := `
+		SELECT t.Id_threads, t.Title, t.Description, t.Is_public, t.Created_at, t.Updated_at, t.Id_author, u.Username, t.Status
+		FROM threads t
+		INNER JOIN forum.users u on t.Id_author = u.Id_users
+		WHERE t.Id_categories = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	rows, err := m.DB.QueryContext(ctx, query, id)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+	defer rows.Close()
+
+	var threads []Thread
+
+	for rows.Next() {
+		var thread Thread
+		if err := rows.Scan(
+			&thread.ID,
+			&thread.Title,
+			&thread.Description,
+			&thread.IsPublic,
+			&thread.CreatedAt,
+			&thread.UpdatedAt,
+			&thread.Author.ID,
+			&thread.Author.Name,
+			&thread.Status); err != nil {
+			log.Fatal(err)
+		}
+		threads = append(threads, thread)
+	}
+	rerr := rows.Close()
+	if rerr != nil {
+		log.Fatal(rerr)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return threads, nil
+}
+
 func (m ThreadModel) GetOwnedThreadsByUserID(id int) ([]Thread, error) {
 
 	query := `
@@ -331,12 +383,12 @@ type Thread struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
 	} `json:"category"`
-	Version int    `json:"version"`
-	Posts   []Post `json:"posts"`
+	Version int    `json:"version,omitempty"`
+	Posts   []Post `json:"posts,omitempty"`
 	Tags    []struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
-	} `json:"tags"`
+	} `json:"tags,omitempty"`
 }
 
 func (thread *Thread) Validate(v *validator.Validator) {

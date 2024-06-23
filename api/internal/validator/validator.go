@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"regexp"
 	"slices"
 )
@@ -32,6 +33,14 @@ func (v *Validator) Check(ok bool, key, message string) {
 	if !ok {
 		v.AddError(key, message)
 	}
+}
+
+func (v *Validator) StringCheck(str string, min, max int, isMandatory bool, key string) {
+	if isMandatory {
+		v.Check(str != "", key, "must be provided")
+	}
+	v.Check(len(str) > min, key, fmt.Sprintf("must be more than %d bytes long", min))
+	v.Check(len(str) <= max, key, fmt.Sprintf("must not be more than %d bytes long", max))
 }
 
 func PermittedValue[T comparable](value T, permittedValues ...T) bool {

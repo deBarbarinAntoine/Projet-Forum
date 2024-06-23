@@ -12,7 +12,7 @@ import (
 )
 
 type userByIDForm struct {
-	ID                  int      `form:"id"`
+	ID                  int      `form:"-"`
 	Includes            []string `form:"includes[]"`
 	validator.Validator `form:"-"`
 }
@@ -191,6 +191,10 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 
 	user, err := app.models.Users.GetByID(form.ID)
 	if err != nil {
+		if errors.Is(err, data.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
 		app.serverErrorResponse(w, r, err)
 		return
 	}

@@ -130,11 +130,13 @@ func (app *application) authenticateApiSecret(next http.Handler) http.Handler {
 func (app *application) authenticateClient(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Add("Vary", "X-API-KEY")
+		w.Header().Add("Vary", "Authorization")
 
-		xApiKeyHeader := r.Header.Get("X-API-KEY")
+		authorizationHeader := r.Header.Get("Authorization")
 
-		headerParts := strings.Split(xApiKeyHeader, " ")
+		authorizationParts := strings.Split(authorizationHeader, ",")
+
+		headerParts := strings.Split(authorizationParts[0], " ")
 		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
 			app.invalidClientTokenResponse(w, r)
 			return
@@ -163,6 +165,10 @@ func (app *application) authenticateClient(next http.Handler) http.Handler {
 		if user == nil || user.ID < 1 {
 			app.serverErrorResponse(w, r, errors.New("client not found"))
 			return
+		}
+
+		if len(authorizationParts) == 2 {
+			r.Header.Set("Authorization", authorizationParts[1])
 		}
 
 		next.ServeHTTP(w, r)

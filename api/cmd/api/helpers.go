@@ -27,6 +27,13 @@ func newUserByIDForm() *userByIDForm {
 	}
 }
 
+func newCategoryByIDForm() *categoryByIDForm {
+	return &categoryByIDForm{
+		PermittedFields: []string{"categories", "threads"},
+		Validator:       *validator.New(),
+	}
+}
+
 func newGetCategoriesForm() *getCategoriesForm {
 	return &getCategoriesForm{
 		Validator: *validator.New(),
