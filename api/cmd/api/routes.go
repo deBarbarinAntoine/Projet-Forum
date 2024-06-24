@@ -151,8 +151,8 @@ func (app *application) routes() http.Handler {
 		mux.HandleFunc("/v1/tags/:id", app.updateTagHandler, http.MethodPut)
 		mux.HandleFunc("/v1/tags/:id", app.deleteTagHandler, http.MethodDelete)
 
-		mux.HandleFunc("/v1/tags/:id/favorite", app.addFavoriteTagHandler, http.MethodPost)
-		mux.HandleFunc("/v1/tags/:id/favorite", app.removeFavoriteTagHandler, http.MethodDelete)
+		mux.HandleFunc("/v1/tags/:id/favorite", app.followTagHandler, http.MethodPost)
+		mux.HandleFunc("/v1/tags/:id/favorite", app.unfollowTagHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################

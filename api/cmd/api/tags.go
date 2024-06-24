@@ -37,15 +37,15 @@ func (app *application) deleteTagHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (app *application) addFavoriteTagHandler(w http.ResponseWriter, r *http.Request) {
-	err := app.writeJSON(w, http.StatusCreated, envelope{"tag": "add_favorite_tag"}, nil)
+func (app *application) followTagHandler(w http.ResponseWriter, r *http.Request) {
+	err := app.writeJSON(w, http.StatusCreated, envelope{"tag": "follow_tag"}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
 }
 
-func (app *application) removeFavoriteTagHandler(w http.ResponseWriter, r *http.Request) {
-	err := app.writeJSON(w, http.StatusOK, envelope{"tag": "remove_favorite_tag"}, nil)
+func (app *application) unfollowTagHandler(w http.ResponseWriter, r *http.Request) {
+	err := app.writeJSON(w, http.StatusOK, envelope{"tag": "unfollow_tag"}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
