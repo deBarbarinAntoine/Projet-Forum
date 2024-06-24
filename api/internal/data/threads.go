@@ -517,7 +517,7 @@ func (m ThreadModel) AddToFavorites(user *User, id int) error {
 		}, 0)
 	}
 
-	user.FavoriteThreads = append(user.FavoriteThreads)
+	user.FavoriteThreads = append(user.FavoriteThreads, favoriteThread)
 
 	return nil
 }

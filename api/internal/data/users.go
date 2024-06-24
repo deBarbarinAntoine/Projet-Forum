@@ -340,6 +340,9 @@ func (m UserModel) Activate(user *User) error {
 			return err
 		}
 	}
+
+	user.Status = UserStatus.Activated
+
 	return nil
 }
 

@@ -169,6 +169,8 @@ func (app *application) authenticateClient(next http.Handler) http.Handler {
 
 		if len(authorizationParts) == 2 {
 			r.Header.Set("Authorization", authorizationParts[1])
+		} else {
+			r.Header.Del("Authorization")
 		}
 
 		next.ServeHTTP(w, r)
