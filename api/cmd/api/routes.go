@@ -55,6 +55,15 @@ func (app *application) routes() http.Handler {
 
 	router.HandleFunc("/v1/tokens/refresh", app.refreshAuthenticationTokenHandler, http.MethodPost)
 
+	// ##################################
+	// PROTECTED ROUTES
+	// ##################################
+	router.Group(func(mux *flow.Mux) {
+		mux.Use(app.requireActivatedUser)
+
+		mux.HandleFunc("/v1/tokens/revoke", app.revokeTokensHandler, http.MethodPost)
+	})
+
 	/* #############################################################################
 	/* # USERS
 	/* ############################################################################# */

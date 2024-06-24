@@ -91,7 +91,7 @@ func main() {
 
 	secret := flag.String("secret", "", "API secret")
 
-	frequency := flag.Duration("frequency", time.Hour*2, "expired tokens cleaning frequency")
+	frequency := flag.Duration("frequency", time.Hour*2, "expired tokens and unactivated users cleaning frequency")
 
 	displayVersion := flag.Bool("version", false, "Display version and exit")
 
@@ -186,7 +186,10 @@ func main() {
 	// TODO <- END
 
 	// Clean expired tokens every N duration
-	go app.cleanExpiredTokens(*frequency)
+	go app.cleanExpiredTokens(*frequency, time.Hour*0)
+
+	// Clean expired unactivated users every N duration
+	go app.cleanExpiredUnactivatedUsers(*frequency, time.Hour)
 
 	err = app.serve()
 	if err != nil {

@@ -17,6 +17,22 @@ type userByIDForm struct {
 	validator.Validator `form:"-"`
 }
 
+func (app *application) cleanExpiredUnactivatedUsers(frequency, timeout time.Duration) {
+	defer func() {
+		if err := recover(); err != nil {
+			app.logger.Error(fmt.Sprintf("%v", err))
+		}
+	}()
+	time.Sleep(timeout)
+	for {
+		err := app.models.Users.DeleteExpired()
+		if err != nil {
+			app.logger.Error(err.Error())
+		}
+		time.Sleep(frequency)
+	}
+}
+
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
@@ -73,12 +89,12 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 
 	app.background(func() {
 
-		data := map[string]any{
+		mailData := map[string]any{
 			"activationToken": token.Plaintext,
 			"userID":          user.ID,
 		}
 
-		err = app.mailer.Send(user.Email, "user_welcome.tmpl", data)
+		err = app.mailer.Send(user.Email, "user_welcome.tmpl", mailData)
 		if err != nil {
 			app.logger.Error(err.Error())
 		}
@@ -155,6 +171,9 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (app *application) getUsersHandler(w http.ResponseWriter, r *http.Request) {
+
+	// TODO -> for administration purposes
+
 	err := app.writeJSON(w, http.StatusOK, envelope{"users": "get_users"}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
@@ -367,6 +386,9 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) deleteUserHandler(w http.ResponseWriter, r *http.Request) {
+
+	// TODO -> handle mySQL constraints redirecting all user categories, threads, tags and posts to default `deleted user`
+
 	err := app.writeJSON(w, http.StatusOK, envelope{"user": "user_removed"}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)

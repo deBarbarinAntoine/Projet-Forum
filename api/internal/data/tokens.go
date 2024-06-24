@@ -134,6 +134,15 @@ func (m TokenModel) DeleteAllForUser(scope string, userID int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	if scope == "*" {
+		query = `
+			DELETE FROM tokens
+       		WHERE Id_users = ?;`
+
+		_, err := m.DB.ExecContext(ctx, query, userID)
+		return err
+	}
+
 	_, err := m.DB.ExecContext(ctx, query, scope, userID)
 	return err
 }

@@ -9,12 +9,13 @@ import (
 	"time"
 )
 
-func (app *application) cleanExpiredTokens(frequency time.Duration) {
+func (app *application) cleanExpiredTokens(frequency, timeout time.Duration) {
 	defer func() {
 		if err := recover(); err != nil {
 			app.logger.Error(fmt.Sprintf("%v", err))
 		}
 	}()
+	time.Sleep(timeout)
 	for {
 		err := app.models.Tokens.DeleteExpired()
 		if err != nil {
@@ -209,6 +210,26 @@ func (app *application) refreshAuthenticationTokenHandler(w http.ResponseWriter,
 	}
 
 	err = app.writeJSON(w, http.StatusCreated, token, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
+func (app *application) revokeTokensHandler(w http.ResponseWriter, r *http.Request) {
+
+	user := app.contextGetUser(r)
+
+	err := app.models.Tokens.DeleteAllForUser("*", user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	response := envelope{
+		"message": fmt.Sprintf("tokens revoked for user %d", user.ID),
+	}
+
+	err = app.writeJSON(w, http.StatusOK, response, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

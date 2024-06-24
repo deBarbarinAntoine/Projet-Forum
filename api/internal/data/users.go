@@ -146,22 +146,17 @@ func ValidateEmail(v *validator.Validator, email string) {
 }
 
 func ValidatePasswordPlaintext(v *validator.Validator, password string) {
-	v.Check(password != "", "password", "must be provided")
-	v.Check(len(password) >= MinPasswordLength, "password", "must not be more than 8 bytes long")
-	v.Check(len(password) <= MaxPasswordLength, "password", "must not be more than 72 bytes long")
+	v.StringCheck(password, MinPasswordLength, MaxPasswordLength, true, "password")
 }
 
 func ValidateNewPassword(v *validator.Validator, newPassword, confirmationPassword string) {
-	v.Check(len(newPassword) >= MinPasswordLength, "new_password", "must not be more than 8 bytes long")
-	v.Check(len(newPassword) <= MaxPasswordLength, "new_password", "must not be more than 72 bytes long")
+	v.StringCheck(newPassword, MinPasswordLength, MaxPasswordLength, true, "new_password")
 	v.Check(confirmationPassword != "", "confirmation_password", "must be provided")
 	v.Check(newPassword == confirmationPassword, "confirmation_password", "must be the same")
 }
 
 func (u *User) Validate(v *validator.Validator) {
-	v.Check(u.Name != "", "name", "must be provided")
-	v.Check(len(u.Name) > 2, "name", "must be more than 2 bytes long")
-	v.Check(len(u.Name) <= 70, "name", "must not be more than 70 bytes long")
+	v.StringCheck(u.Name, 2, 70, true, "name")
 	v.Check(u.BirthDate.AddDate(MinAge, 0, 0).Before(time.Now()), "birth", fmt.Sprintf("must be at least %d years old", MinAge))
 
 	ValidateEmail(v, u.Email)
@@ -436,4 +431,29 @@ func (m UserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error)
 	}
 
 	return &user, nil
+}
+
+func (m UserModel) DeleteExpired() error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		DELETE u
+		FROM users u
+		LEFT JOIN tokens t ON u.Id_users = t.Id_users
+		WHERE u.Status = ? AND (t.Expiry IS NULL OR t.Expiry < CURRENT_TIMESTAMP);`
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare query: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, UserStatus.ToConfirm)
+	if err != nil {
+		return fmt.Errorf("failed to delete expired users: %w", err)
+	}
+
+	return nil
 }
