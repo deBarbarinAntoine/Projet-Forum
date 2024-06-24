@@ -345,7 +345,7 @@ func (m UserModel) Update(user *User) error {
 
 	query := `
 		UPDATE users
-		SET Username = ?, Email = ?, Hashed_password = ?, Avatar_path = ?, Birth_date = ?, Bio = ?, Signature = ?, Version = Version + 1
+		SET Username = ?, Email = ?, Hashed_password = ?, Avatar_path = ?, Birth_date = ?, Bio = ?, Signature = ?, Updated_at = CURRENT_TIMESTAMP, Version = Version + 1
 		WHERE Id_users = ? AND Version = ?;`
 
 	args := []any{

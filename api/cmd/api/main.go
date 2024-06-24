@@ -191,6 +191,31 @@ func main() {
 	// Clean expired unactivated users every N duration
 	go app.cleanExpiredUnactivatedUsers(*frequency, time.Hour)
 
+	// TODO -> remove when leaving development phase
+	err = app.generatePEM()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	dataJSON := `
+		{
+			"email": "api@api.com",
+			"password": "Pa55word"
+		}`
+	cipher, err := app.encryptPEM([]byte(dataJSON))
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	app.logger.Debug(fmt.Sprintf("cipher: %s", string(cipher)))
+	plaintext, err := app.decryptPEM(cipher)
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	app.logger.Debug(fmt.Sprintf("plaintext: %s", string(plaintext)))
+	// TODO <- END
+
 	err = app.serve()
 	if err != nil {
 		logger.Error(err.Error())

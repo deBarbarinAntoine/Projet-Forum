@@ -4,6 +4,7 @@
 # API files
 api/.envrc
 api/tls/*.pem
+api/pem
 
 # backend files
 backend/.envrc

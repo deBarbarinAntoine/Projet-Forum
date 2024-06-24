@@ -59,6 +59,22 @@ func newGetThreadsForm() *getThreadsForm {
 	}
 }
 
+func newTagByIDForm() *tagByIDForm {
+	return &tagByIDForm{
+		PermittedFields: []string{"threads", "popularity"},
+		Validator:       *validator.New(),
+	}
+}
+
+func newGetTagsForm() *getTagsForm {
+	return &getTagsForm{
+		Validator: *validator.New(),
+		Filters: data.Filters{
+			SortSafelist: []string{"Created_at", "Updated_at", "Name", "Id_author", "-Created_at", "-Updated_at", "-Name", "-Id_author"},
+		},
+	}
+}
+
 func (app *application) decodeForm(r *http.Request, dst any) error {
 
 	err := r.ParseForm()

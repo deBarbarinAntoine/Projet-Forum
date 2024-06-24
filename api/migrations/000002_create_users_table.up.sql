@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS users(
                       Birth_date DATE,
                       Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                      Visited_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                       Bio VARCHAR(255) NOT NULL DEFAULT '',
                       Signature VARCHAR(255) NOT NULL DEFAULT '',
                       Status VARCHAR(20) NOT NULL DEFAULT 'to-confirm',
