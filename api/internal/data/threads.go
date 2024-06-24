@@ -100,6 +100,12 @@ func (m ThreadModel) Insert(thread *Thread) error {
 
 func (m ThreadModel) Get(search string, filters Filters) ([]*Thread, Metadata, error) {
 
+	if search != "" {
+		search = fmt.Sprintf("%%%s%%", search)
+	} else {
+		search = "%"
+	}
+
 	query := fmt.Sprintf(`
 		SELECT count(*) OVER(), t.Id_threads, t.Title, t.Description, t.Is_public, t.Created_at, t.Updated_at, t.Id_author, u.Username, t.Id_categories, c.Name, t.Status
 		FROM threads t
@@ -115,12 +121,6 @@ func (m ThreadModel) Get(search string, filters Filters) ([]*Thread, Metadata, e
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-
-	if search != "" {
-		search = fmt.Sprintf("%%%s%%", search)
-	} else {
-		search = "%"
-	}
 
 	rows, err := m.DB.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -350,7 +350,7 @@ func (m ThreadModel) GetFavoriteThreadsByUserID(id int) ([]struct {
 	return favoriteThreads, nil
 }
 
-func (m ThreadModel) Update(thread Thread) error {
+func (m ThreadModel) Update(thread *Thread) error {
 
 	query := `
 		UPDATE threads 
@@ -387,7 +387,7 @@ func (m ThreadModel) Update(thread Thread) error {
 		return err
 	}
 	if rowsAffected == 0 {
-		return ErrRecordNotFound
+		return ErrEditConflict
 	}
 
 	query = `
@@ -485,6 +485,9 @@ func (m ThreadModel) AddToFavorites(user *User, id int) error {
 			if mySQLError.Number == 1062 {
 				return ErrDuplicateEntry
 			}
+			if mySQLError.Number == 1452 {
+				return ErrRecordNotFound
+			}
 		default:
 			return err
 		}
@@ -533,9 +536,18 @@ func (m ThreadModel) RemoveFromFavorites(user *User, id int) error {
 
 	args := []any{user.ID, id}
 
-	_, err := m.DB.ExecContext(ctx, query, args...)
+	res, err := m.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
+	}
+
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affectedRows == 0 {
+		return ErrRecordNotFound
 	}
 
 	if user.FavoriteThreads != nil {

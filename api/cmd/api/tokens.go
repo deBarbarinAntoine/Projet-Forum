@@ -203,6 +203,10 @@ func (app *application) refreshAuthenticationTokenHandler(w http.ResponseWriter,
 	}
 
 	token, err := app.newAuthenticationToken(user)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 
 	err = app.writeJSON(w, http.StatusCreated, token, nil)
 	if err != nil {

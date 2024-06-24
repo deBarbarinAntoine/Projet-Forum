@@ -21,7 +21,7 @@ func (app *application) routes() http.Handler {
 	/* ############################################################################# */
 
 	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.authenticateApiSecret)
+		mux.Use(app.authenticateAPISecret)
 		mux.HandleFunc("/v1/tokens/client", app.createClientTokenHandler, http.MethodPost)
 	})
 

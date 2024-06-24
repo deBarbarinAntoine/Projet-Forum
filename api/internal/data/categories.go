@@ -98,6 +98,12 @@ func (m CategoryModel) Insert(category *Category) error {
 
 func (m CategoryModel) Get(search string, filters Filters) ([]*Category, Metadata, error) {
 
+	if search != "" {
+		search = fmt.Sprintf("%%%s%%", search)
+	} else {
+		search = "%"
+	}
+
 	query := fmt.Sprintf(`
 		SELECT count(*) OVER(), c.Id_categories, c.Name, c.Id_author, u.Username, c.Id_parent_categories, pc.Name, c.Created_at, c.Updated_at, c.Version
 		FROM categories c
@@ -112,14 +118,7 @@ func (m CategoryModel) Get(search string, filters Filters) ([]*Category, Metadat
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if search != "" {
-		search = fmt.Sprintf("%%%s%%", search)
-	} else {
-		search = "%"
-	}
-
 	rows, err := m.DB.QueryContext(ctx, query, args...)
-
 	if err != nil {
 		return nil, Metadata{}, err
 	}
