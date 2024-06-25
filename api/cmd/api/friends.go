@@ -23,7 +23,7 @@ func (app *application) getFriendsByUser(user *data.User) error {
 		case data.FriendStatus.Accepted:
 			user.Friends = append(user.Friends, friend)
 		case data.FriendStatus.Rejected:
-			break
+			continue
 		default:
 			return errors.New("invalid friend status")
 		}
@@ -36,7 +36,7 @@ func (app *application) getFriendsByUser(user *data.User) error {
 		case data.FriendStatus.Accepted:
 			user.Friends = append(user.Friends, friend)
 		case data.FriendStatus.Rejected:
-			break
+			continue
 		default:
 			return errors.New("invalid friend status")
 		}
