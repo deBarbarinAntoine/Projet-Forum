@@ -357,3 +357,150 @@
          }
     }
  }
+
+
+ /* THREAD */
+
+ .container-inthread-row {
+    font-family: 'Varela';
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    .container-inthread {
+        height: 100%;
+        padding-top: 30px;
+        margin-left: 5px;
+        padding-left: 50px;
+        width: 935px;
+        margin-top: 130px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Varela';
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 20px;
+        h4 {
+            font-size: 20px;
+            font-weight: normal;
+        }
+        .container-search-filter {
+            margin-top: 30px;
+            width: 600px;
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            input {
+                height: 40px;
+                width: 263px;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+                border: none;
+                padding-left: 5px;
+                font-size: 12px;
+                position: relative;
+            }
+            p {
+                margin-left: 20px;
+                font-size: 15px;
+            }
+            .search-icon {
+                position: absolute;
+                transform: translateX(950%);
+                opacity: 0.5;
+
+            }
+        }
+        .container-post {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            border-radius: 5px;
+            padding-left: 15px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            width: 780px;
+            .first-line {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                h3 {
+                    font-size: 20px;
+                    margin-left: 10px;
+                }
+                p {
+                    font-size: 14px;
+                    margin-left: 24vw;
+                    font-style: italic;
+                    margin-right: 1.5vw;
+                }
+                .img-inthread {
+                    margin-left: 0.4vw;
+                    opacity: 0.7;
+                    &:hover {
+                        cursor: pointer;
+                        opacity: 1;
+                    }
+                }
+            }
+            .second-line {
+                padding-left: 10px;
+                padding-right: 10px;
+                margin-top: 18px;
+            }
+            .third-line {
+                margin-top: 10px;
+                display: flex;
+                justify-content: end;
+                padding-right: 20px;
+                align-items: center;
+                p {
+                    font-size: 15px;
+                    font-style: italic;
+                }
+                img {
+                    opacity: 0.7;
+                    &:hover {
+                        cursor: pointer;
+                        opacity: 1;
+                    }     
+                }
+                .emoji {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+        } 
+        .container-response {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            height: 100%;
+            width: 795px;
+            border-radius: 5px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+
+            input {
+                height: 100%;
+                min-height: 60px;
+                border: none;
+                padding-left: 10px;
+            }
+            img {
+                position: absolute;
+                height: 24px;
+                width: 24px;
+                bottom : 5px;
+                right: 10px;
+                opacity: 0.7;
+                &:hover {
+                    cursor: pointer;
+                    opacity: 1;
+                }
+            }
+        }  
+    }
+ } 
