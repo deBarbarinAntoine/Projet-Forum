@@ -6,7 +6,10 @@
     border-bottom: 2px solid rgba($color: #000000, $alpha: 0.2);
     border-right: 2px solid rgba($color: #000000, $alpha: 0.2);
     border-left: 2px solid rgba($color: #000000, $alpha: 0.2);
+    border-top: 0;
     box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.1);
+    border-radius: 0 0 10px 10px;
+    background-color: var(--background-color);
 }
 
 
@@ -504,141 +507,166 @@ header {
 
 // A COPIER COLLER DANS STYLE.SCSS PLUS TARD //
 
-.login-container {
+.center-page {
+    z-index: 3;
     width: 100vw;
     height: 100vh;
-
-    backdrop-filter: blur(3px);
-
     display: flex;
-
     justify-content: center;
     align-items: center;
+    position: absolute;
+}
+
+.blur-underlay {
+    z-index: 2;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(2px) ;
+}
+
+.container {
+    width: 425px;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+
+    box-shadow: 0px 8px 8px rgba($color: #000000, $alpha: 0.5);
 
     .login {
-        width: 450px;
-        height: 50%;
+        width: 100%;
+        height: auto;
 
         display: flex;
-        flex-flow: column nowrap;
-        justify-content: flex-start;
+        flex-direction: column;
+        justify-content: start;
         align-items: center;
-        border-radius: 0 0 10px 10px;
+
+        margin: 20px;
 
         .login-title {
             font-size: 30px;
             font-family: Varela-Round;
-            margin-bottom: 15px;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
-        .formulaire {
-            width: 75%;
-            height: 55%;
+        .input-fields {
+            width: 100%;
+            height: auto;
 
             display: flex;
-            flex-flow: column nowrap;
-            justify-content: space-evenly;
+            flex-direction: column;
+            justify-content: start;
             align-items: center;
 
-            .login-input {
-                width: calc(100% - 20px);
-                height: 20px;
+            label {
+                display: none;
+            }
 
+            .input {
+                width: calc(75% - 20px);
+                height: 20px;
+                margin-bottom: 20px;
                 padding: 10px;
-                border-top: 0;
-                margin-bottom: 10px;
-                border-radius: 0 0 10px 10px;
-                appearance: none;
                 outline: none;
+                appearance: none;
                 font-family: Varela-Round;
-                transition: .3s;
 
                 &:focus {
-                    box-shadow: 0px 4px 5px rgba($color: #000000, $alpha: 0.5);
+                    box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
                 }
             }
-
-            .login-button {
-                width: 100%;
-                height: auto;
-
-                display: flex;
-                flex-direction: column;
-                justify-content: start;
-                align-items: center;
-
-                .forgot {
-                    width: 100%;
-                    height: 20px;
-                    font-size: 10px;
-                    font-family: Varela-Round;
-                    margin-top: 10px;
-                    text-align: left;
-                    color: rgba($color: #000000, $alpha: 0.5);
-
-
-                    &:hover {
-                        cursor: pointer;
-                        text-decoration: underline;
-                    }
-                }
-            }
-        }
-        
-        .separation {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .line {
-                width: 45%;
-                height: 1px;
-                background-color: rgba($color: #000000, $alpha: 0.5);
-            }
-
-            .or {
-                font-family: Varela-Round;
-                font-size: 12px;
-                color: black;
-            
-            }
-        }
-        
-        .register {
-            width: 75%;
-            height: 20px;
-            font-size: 10px;
-            font-family: Varela-Round;
-            margin-top: 40px;
-            text-align: center;
-            color: rgba($color: #000000, $alpha: 0.5);
-
         }
 
         .submit {
-            width: 100%;
-            height: 40px;
+            width: 75%;
+            height: auto;
 
-            border-top: 0;
-            margin-bottom: 20px;
-            border-radius: 0 0 10px 10px;
-            font-family: Varela-Round;
-            font-size: 17px;
-            font-weight: 600;
-            transition: .3s;
-        
-            &:hover {
-                cursor: pointer;
-                box-shadow: 0px 4px 5px rgba($color: #000000, $alpha: 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: center;
+            gap: 5px;
+
+            .classic-link {
+                font-family: Varela-Round;
+                font-size: 10px;
+                margin-top: 20px;
+                align-self: flex-start;
+
+                &:hover {
+                    cursor: pointer;
+                    text-decoration: underline;
+                }
+            }
+
+            .button {
+                width: 100%;
+                height: 40px;
+
+                font-family: Varela-Round;
+                font-weight: 500;
+                font-size: 17px;
+
+                &:hover {
+                    cursor: pointer;
+                    box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
+                }
             }
         }
-
-
-
     }
 
+    .separation {
+        width: 100%;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
+        .line {
+            width: 40%;
+            height: 1px;
+            background-color: rgba($color: #000000, $alpha: 0.2);
+        }
 
+        .or {
+            font-family: Varela-Round;
+            font-size: 15px;
+            margin-left: 10px;
+            margin-right: 10px;
+            opacity: 0.5;
+        }
+    }
+
+    .switch {
+        width: 75%;
+        height: 40px;
+
+        margin-top: 25px;
+        margin-bottom: 25px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        font-family: Varela-Round;
+        font-weight: 500;
+        font-size: 17px;
+
+        &:hover {
+            cursor: pointer;
+            box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
+        }
+    }
+}
+
+.mail-outset {
+    margin-bottom: 30px !important;
+}
+
+.register-outset {
+    margin-top: 30px;
 }
