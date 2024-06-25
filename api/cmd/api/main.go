@@ -3,7 +3,6 @@ package main
 import (
 	"ForumAPI/internal/data"
 	"ForumAPI/internal/mailer"
-	"ForumAPI/internal/vcs"
 	"context"
 	"crypto/sha256"
 	"database/sql"
@@ -23,7 +22,7 @@ import (
 )
 
 var (
-	version = vcs.Version()
+	version = "v1"
 )
 
 type config struct {
@@ -106,10 +105,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     slog.Level(-4),
-	}))
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.Level(-4)}))
 
 	db, err := openDB(cfg)
 	if err != nil {

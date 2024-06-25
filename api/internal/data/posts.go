@@ -20,12 +20,14 @@ type Post struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
 	} `json:"author"`
-	IDParentPost int `json:"id_parent_post"`
+	IDParentPost int `json:"id_parent_post,omitempty"`
 	Thread       struct {
 		ID    int    `json:"id"`
 		Title string `json:"title"`
 	} `json:"thread"`
-	Version int `json:"version"`
+	Reactions  map[string]int `json:"reactions,omitempty"`
+	Popularity int            `json:"popularity,omitempty"`
+	Version    int            `json:"version,omitempty"`
 }
 
 func (post *Post) Validate(v *validator.Validator) {
@@ -39,9 +41,9 @@ type PostModel struct {
 	DB *sql.DB
 }
 
-func (m PostModel) Insert(post Post) error {
+func (m PostModel) Insert(post *Post) error {
 
-	args := []any{post.Content, post.Author.ID}
+	args := []any{post.Content, post.Author.ID, post.Thread.ID}
 	var parentPost, value string
 
 	if post.IDParentPost != 0 {
@@ -51,14 +53,21 @@ func (m PostModel) Insert(post Post) error {
 	}
 
 	query := fmt.Sprintf(`
-		INSERT INTO posts (Content, Id_author%s)
-		VALUES (?, ?%s);`, parentPost, value)
+		INSERT INTO posts (Content, Id_author, Id_threads%s)
+		VALUES (?, ?, ?%s);`, parentPost, value)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	tx, err := m.DB.BeginTx(ctx, nil)
 	if err != nil {
+		var mySQLError *mysql.MySQLError
+		switch {
+		case errors.As(err, &mySQLError):
+			if mySQLError.Number == 1452 {
+				return ErrRecordNotFound
+			}
+		}
 		return err
 	}
 	defer tx.Rollback()
@@ -387,6 +396,73 @@ func (m PostModel) Delete(id int) error {
 
 	if rowsAffected == 0 {
 		return ErrRecordNotFound
+	}
+
+	return nil
+}
+
+func (m PostModel) GetReactions(posts []*Post) error {
+
+	query := `
+	SELECT p.Id_posts, e.Emoji, COUNT(*) AS Count
+	FROM posts_users pu
+	INNER JOIN posts p ON pu.Id_posts = p.Id_posts
+	INNER JOIN (
+		SELECT DISTINCT Emoji
+		FROM posts_users
+	) AS e ON pu.Emoji = e.Emoji
+	WHERE p.Id_posts IN (?)
+	GROUP BY p.Id_posts, e.Emoji
+	ORDER BY p.Id_posts, e.Emoji;`
+
+	var IDs []int
+
+	for _, post := range posts {
+		IDs = append(IDs, post.ID)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	results := make(map[int]map[string]int)
+	rows, err := stmt.QueryContext(ctx, IDs)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var postID int
+		var emoji string
+		var count int
+		err := rows.Scan(&postID, &emoji, &count)
+		if err != nil {
+			return err
+		}
+
+		if _, ok := results[postID]; !ok {
+			results[postID] = make(map[string]int)
+		}
+
+		results[postID][emoji] = count
+	}
+
+	for _, post := range posts {
+		post.Reactions = results[post.ID]
+		for _, i := range results[post.ID] {
+			post.Popularity += i
+		}
 	}
 
 	return nil

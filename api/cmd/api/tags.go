@@ -59,7 +59,7 @@ func (app *application) getTagsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"_metadata": metadata, "threads": tags}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"_metadata": metadata, "tags": tags}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -187,7 +187,7 @@ func (app *application) getSingleTagHandler(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"tag": "get_single_tag"}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"tag": tag}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

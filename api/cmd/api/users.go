@@ -220,6 +220,10 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 	if slices.Contains(form.Includes, "following_tags") {
 		user.FollowingTags, err = app.models.Tags.GetByFollowingUserID(user.ID)
 		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -227,6 +231,10 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 	if slices.Contains(form.Includes, "favorite_threads") {
 		user.FavoriteThreads, err = app.models.Threads.GetFavoriteThreadsByUserID(user.ID)
 		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -234,6 +242,10 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 	if slices.Contains(form.Includes, "categories_owned") {
 		user.CategoriesOwned, err = app.models.Categories.GetOwnedCategoriesByUserID(user.ID)
 		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -241,6 +253,10 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 	if slices.Contains(form.Includes, "tags_owned") {
 		user.TagsOwned, err = app.models.Tags.GetByAuthorID(user.ID)
 		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -248,6 +264,10 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 	if slices.Contains(form.Includes, "threads_owned") {
 		user.ThreadsOwned, err = app.models.Threads.GetOwnedThreadsByUserID(user.ID)
 		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -255,13 +275,21 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 	if slices.Contains(form.Includes, "posts") {
 		user.Posts, err = app.models.Posts.GetByAuthorID(user.ID)
 		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 	}
 	if slices.Contains(form.Includes, "friends") {
-		user.Friends, err = app.models.Users.GetFriendsByUserID(user.ID)
+		err = app.getFriendsByUser(user)
 		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -387,7 +415,7 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 
 func (app *application) deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	// TODO -> handle mySQL constraints redirecting all user categories, threads, tags and posts to default `deleted user`
+	// TODO -> handle MySQL constraints redirecting all user categories, threads, tags and posts to default `deleted user`
 
 	err := app.writeJSON(w, http.StatusOK, envelope{"user": "user_removed"}, nil)
 	if err != nil {

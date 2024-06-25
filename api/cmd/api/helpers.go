@@ -21,6 +21,10 @@ var (
 
 type envelope map[string]any
 
+/* #######################################################################
+/* # Query form models
+/* ####################################################################### */
+
 func newUserByIDForm() *userByIDForm {
 	return &userByIDForm{
 		Validator: *validator.New(),
@@ -74,6 +78,26 @@ func newGetTagsForm() *getTagsForm {
 		},
 	}
 }
+
+func newPostByIDForm() *postByIDForm {
+	return &postByIDForm{
+		PermittedFields: []string{"reactions", "popularity"},
+		Validator:       *validator.New(),
+	}
+}
+
+func newGetPostsForm() *getPostsForm {
+	return &getPostsForm{
+		Validator: *validator.New(),
+		Filters: data.Filters{
+			SortSafelist: []string{"Created_at", "Updated_at", "Id_author", "Id_threads", "-Created_at", "-Updated_at", "-Id_author", "-Id_threads"},
+		},
+	}
+}
+
+/* #######################################################################
+/* # Other helper functions
+/* ####################################################################### */
 
 func (app *application) decodeForm(r *http.Request, dst any) error {
 

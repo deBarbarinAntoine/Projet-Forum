@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestPostModel_Get(t *testing.T) {
+func TestPostModel_GetByID(t *testing.T) {
 
 	db, err := OpenDBtest()
 	if err != nil {
@@ -67,7 +67,7 @@ func TestPostModel_Get(t *testing.T) {
 				DB: tt.fields.DB,
 			}
 			var t1 = time.Now()
-			got, _ := p.Get(tt.args.id)
+			got, _ := p.GetByID(tt.args.id)
 			//if (err != nil) != tt.wantErr {
 			//	t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 			//	return

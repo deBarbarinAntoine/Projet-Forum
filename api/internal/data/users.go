@@ -81,8 +81,8 @@ type User struct {
 	Posts           []Post     `json:"posts,omitempty"`
 	Friends         []Friend   `json:"friends,omitempty"`
 	Invitations     struct {
-		Received []Friend `json:"received"`
-		Sent     []Friend `json:"sent"`
+		Received []Friend `json:"received,omitempty"`
+		Sent     []Friend `json:"sent,omitempty"`
 	} `json:"invitations,omitempty"`
 }
 

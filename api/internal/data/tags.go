@@ -476,21 +476,11 @@ func (m TagModel) Update(tag *Tag, removeThreads []int) error {
 
 	if len(removeThreads) > 0 {
 
-		var ids []any
+		ids := []any{tag.ID, removeThreads}
 
-		ids = append(ids, tag.ID)
-
-		for _, thread := range removeThreads {
-			ids = append(ids, thread)
-		}
-
-		value := fmt.Sprintf(` ?,`, tag.ID)
-		values := strings.Repeat(value, len(removeThreads))
-		values = values[:len(values)-1]
-
-		query = fmt.Sprintf(`
+		query = `
 		DELETE FROM threads_tags
-		WHERE Id_tags = ? AND Id_threads IN (%s);`, values)
+		WHERE Id_tags = ? AND Id_threads IN (?);`
 
 		rs, err = tx.ExecContext(ctx, query, ids...)
 		if err != nil {

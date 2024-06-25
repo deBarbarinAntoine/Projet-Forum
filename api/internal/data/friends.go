@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/go-sql-driver/mysql"
-	"log"
 	"strings"
 	"time"
 )
@@ -108,7 +107,38 @@ func (m UserModel) RejectFriend(idFrom int, user *User) error {
 	return nil
 }
 
-func (m UserModel) GetFriendsByUserID(id int) ([]Friend, error) {
+func (m UserModel) RemoveFriend(user *User, id int) error {
+
+	query := `
+		DELETE f1, f2 FROM friends f1, friends f2
+		WHERE (f1.Id_users_from = ? AND f1.Id_users_to = ?) OR (f2.Id_users_to = ? AND f2.Id_users_from = ?);`
+
+	args := []any{user.ID, id, user.ID, id}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, query, args)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m UserModel) GetFriendsByUserID(id int) (sentFriends, receivedFriends []Friend, err error) {
 
 	query := `
 		SELECT users.Id_users, users.Username, f1.Status, f2.Status
@@ -125,36 +155,40 @@ func (m UserModel) GetFriendsByUserID(id int) ([]Friend, error) {
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return nil, ErrRecordNotFound
+			return nil, nil, ErrRecordNotFound
 		default:
-			return nil, err
+			return nil, nil, err
 		}
 	}
 	defer rows.Close()
-
-	var friends []Friend
 
 	for rows.Next() {
 		var friend Friend
 		var status1, status2 *string
 		if err := rows.Scan(&friend.ID, &friend.Name, &status1, &status2); err != nil {
-			log.Fatal(err)
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				return nil, nil, ErrRecordNotFound
+			default:
+				return nil, nil, err
+			}
 		}
 		switch {
 		case status1 != nil:
 			friend.Status = *status1
+			sentFriends = append(sentFriends, friend)
 		case status2 != nil:
 			friend.Status = *status2
+			receivedFriends = append(receivedFriends, friend)
 		}
-		friends = append(friends, friend)
 	}
 	rerr := rows.Close()
 	if rerr != nil {
-		log.Fatal(rerr)
+		return nil, nil, rerr
 	}
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		return nil, nil, err
 	}
 
-	return friends, nil
+	return sentFriends, receivedFriends, nil
 }

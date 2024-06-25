@@ -8,7 +8,19 @@ import (
 	"os"
 )
 
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
 func (app *application) generatePEM() error {
+
+	if fileExists("./pem/private.pem") && fileExists("./pem/public.pem") {
+		return nil
+	}
 
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
