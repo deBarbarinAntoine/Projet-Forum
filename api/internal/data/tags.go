@@ -379,7 +379,7 @@ func (m TagModel) GetByFollowingUserID(id int) ([]struct {
 	return followingTags, nil
 }
 
-func (m TagModel) Update(tag Tag) error {
+func (m TagModel) Update(tag *Tag, removeThreads []int) error {
 
 	query := `
 		UPDATE tags 
@@ -432,6 +432,84 @@ func (m TagModel) Update(tag Tag) error {
 			return ErrRecordNotFound
 		default:
 			return err
+		}
+	}
+
+	if len(tag.Threads) > 0 {
+
+		var ids []any
+		for _, thread := range tag.Threads {
+			ids = append(ids, thread.ID)
+		}
+
+		value := fmt.Sprintf(`(?, %d),`, tag.ID)
+		values := strings.Repeat(value, len(tag.Threads))
+		values = values[:len(values)-1]
+
+		query = fmt.Sprintf(`
+		INSERT INTO threads_tags (Id_threads, Id_tags)
+		VALUES %s;`, values)
+
+		rs, err = tx.ExecContext(ctx, query, ids...)
+		if err != nil {
+			var mySQLError *mysql.MySQLError
+			switch {
+			case errors.As(err, &mySQLError):
+				if mySQLError.Number == 1062 {
+					return ErrDuplicateEntry
+				}
+				if mySQLError.Number == 1452 {
+					return ErrRecordNotFound
+				}
+			default:
+				return err
+			}
+		}
+		rowsAffected, err := rs.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rowsAffected == 0 {
+			return ErrRecordNotFound
+		}
+	}
+
+	if len(removeThreads) > 0 {
+
+		var ids []any
+
+		ids = append(ids, tag.ID)
+
+		for _, thread := range removeThreads {
+			ids = append(ids, thread)
+		}
+
+		value := fmt.Sprintf(` ?,`, tag.ID)
+		values := strings.Repeat(value, len(removeThreads))
+		values = values[:len(values)-1]
+
+		query = fmt.Sprintf(`
+		DELETE FROM threads_tags
+		WHERE Id_tags = ? AND Id_threads IN (%s);`, values)
+
+		rs, err = tx.ExecContext(ctx, query, ids...)
+		if err != nil {
+			var mySQLError *mysql.MySQLError
+			switch {
+			case errors.As(err, &mySQLError):
+				if mySQLError.Number == 1452 {
+					return ErrRecordNotFound
+				}
+			default:
+				return err
+			}
+		}
+		rowsAffected, err := rs.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rowsAffected == 0 {
+			return ErrRecordNotFound
 		}
 	}
 

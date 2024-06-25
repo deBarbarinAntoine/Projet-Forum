@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
+	"strconv"
 )
 
 type getTagsForm struct {
@@ -194,9 +195,75 @@ func (app *application) getSingleTagHandler(w http.ResponseWriter, r *http.Reque
 
 func (app *application) updateTagHandler(w http.ResponseWriter, r *http.Request) {
 
-	// TODO
+	id, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
 
-	err := app.writeJSON(w, http.StatusOK, envelope{"tag": "update_tag"}, nil)
+	tag, err := app.models.Tags.GetByID(id)
+	if err != nil {
+		if errors.Is(err, data.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if r.Header.Get("X-Expected-Version") != "" {
+		if strconv.Itoa(tag.Version) != r.Header.Get("X-Expected-Version") {
+			app.editConflictResponse(w, r)
+			return
+		}
+	}
+
+	var input struct {
+		Name          *string `json:"name"`
+		AddThreads    *[]int  `json:"add_threads"`
+		RemoveThreads *[]int  `json:"remove_threads"`
+	}
+	var addThreads []data.Thread
+
+	err = app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	v := validator.New()
+
+	if input.Name != nil {
+		v.StringCheck(*input.Name, 2, 125, true, "name")
+		tag.Name = *input.Name
+	}
+	if input.AddThreads != nil {
+		for _, id := range *input.AddThreads {
+			addThreads = append(addThreads, data.Thread{ID: id})
+		}
+		tag.Threads = addThreads
+	}
+
+	if !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	err = app.models.Tags.Update(tag, *input.RemoveThreads)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrDuplicateName):
+			v.AddError("name", "a tag with this name already exists")
+			app.failedValidationResponse(w, r, v.Errors)
+		case errors.Is(err, data.ErrEditConflict):
+			app.editConflictResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"tag": tag}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

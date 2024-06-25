@@ -7,5 +7,9 @@ api/tls/*.pem
 api/pem
 
 # backend files
+backend/config
+backend/data
+backend/logs
+backend/.env
 backend/.envrc
 backend/tls/*.pem
