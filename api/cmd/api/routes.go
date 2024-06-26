@@ -23,6 +23,7 @@ func (app *application) routes() http.Handler {
 	router.Group(func(mux *flow.Mux) {
 		mux.Use(app.authenticateAPISecret)
 		mux.HandleFunc("/v1/tokens/client", app.createClientTokenHandler, http.MethodPost)
+		mux.HandleFunc("/v1/tokens/public-key", app.getPublicKeyPEM, http.MethodGet)
 	})
 
 	/* #############################################################################
@@ -51,9 +52,16 @@ func (app *application) routes() http.Handler {
 	/* # TOKENS
 	/* ############################################################################# */
 
-	router.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
-
 	router.HandleFunc("/v1/tokens/refresh", app.refreshAuthenticationTokenHandler, http.MethodPost)
+
+	// ##################################
+	// ENCRYPTED ROUTES
+	// ##################################
+	router.Group(func(mux *flow.Mux) {
+		mux.Use(app.decryptRSA)
+
+		mux.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
+	})
 
 	// ##################################
 	// PROTECTED ROUTES
@@ -68,9 +76,16 @@ func (app *application) routes() http.Handler {
 	/* # USERS
 	/* ############################################################################# */
 
-	router.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
-
 	router.HandleFunc("/v1/users/activated", app.activateUserHandler, http.MethodPut)
+
+	// ##################################
+	// ENCRYPTED ROUTES
+	// ##################################
+	router.Group(func(mux *flow.Mux) {
+		mux.Use(app.decryptRSA)
+
+		mux.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
+	})
 
 	// ##################################
 	// PROTECTED ROUTES
@@ -81,12 +96,16 @@ func (app *application) routes() http.Handler {
 		mux.HandleFunc("/v1/users", app.getUsersHandler, http.MethodGet)
 
 		mux.HandleFunc("/v1/users/:id", app.getSingleUserHandler, http.MethodGet)
-		mux.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
 		mux.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
 
 		mux.HandleFunc("/v1/users/:id/friend", app.friendRequestHandler, http.MethodPost)
 		mux.HandleFunc("/v1/users/:id/friend", app.friendResponseHandler, http.MethodPut)
 		mux.HandleFunc("/v1/users/:id/friend", app.friendDeleteHandler, http.MethodDelete)
+
+		// PROTECTED ROUTE
+		mux.Use(app.decryptRSA)
+		mux.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
+
 	})
 
 	/* #############################################################################

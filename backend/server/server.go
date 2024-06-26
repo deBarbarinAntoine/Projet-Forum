@@ -1,7 +1,6 @@
 package server
 
 import (
-	"Projet-Forum/internal/db"
 	"Projet-Forum/internal/utils"
 	"Projet-Forum/router"
 	"github.com/joho/godotenv"
@@ -16,13 +15,6 @@ func Run() {
 	if err != nil {
 		log.Println("Error loading .envrc file", err)
 	}
-
-	// Connecting to MySQL database
-	err = db.Connect()
-	if err != nil {
-		log.Println("Error connecting to MySQL database", err)
-	}
-	defer db.Close()
 
 	// Initializing the routes
 	router.Init()

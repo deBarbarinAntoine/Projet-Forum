@@ -9,12 +9,18 @@ import (
 	"log/slog"
 )
 
+type config struct {
+	pemKey      []byte
+	clientToken string
+}
+
 type application struct {
 	logger         *slog.Logger
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
 	models         models.Models
+	config         *config
 }
 
 type templateData struct {

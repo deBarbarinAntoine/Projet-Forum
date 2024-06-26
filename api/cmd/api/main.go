@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"expvar"
 	"flag"
@@ -48,6 +49,10 @@ type config struct {
 	}
 	cors struct {
 		trustedOrigins []string
+	}
+	pem struct {
+		privateKey []byte
+		publicKey  []byte
 	}
 	apiUserID int
 }
@@ -187,30 +192,19 @@ func main() {
 	// Clean expired unactivated users every N duration
 	go app.cleanExpiredUnactivatedUsers(*frequency, time.Hour)
 
-	// TODO -> remove when leaving development phase
-	err = app.generatePEM()
+	// Retrieving or generating RSA keys
+	err = app.getPEM()
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-	dataJSON := `
-		{
-			"email": "api@api.com",
-			"password": "Pa55word"
-		}`
-	cipher, err := app.encryptPEM([]byte(dataJSON))
+
+	credentials, err := app.encryptPEM([]byte(`{"email": "yellow@storm.com", "password": "Pa55word"}`))
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-	app.logger.Debug(fmt.Sprintf("cipher: %s", string(cipher)))
-	plaintext, err := app.decryptPEM(cipher)
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
-	app.logger.Debug(fmt.Sprintf("plaintext: %s", string(plaintext)))
-	// TODO <- END
+	fmt.Printf("credentials: %s\n", hex.EncodeToString(credentials))
 
 	err = app.serve()
 	if err != nil {

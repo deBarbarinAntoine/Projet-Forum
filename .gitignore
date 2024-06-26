@@ -12,4 +12,5 @@ backend/data
 backend/logs
 backend/.env
 backend/.envrc
+backend/pem
 backend/tls/*.pem
