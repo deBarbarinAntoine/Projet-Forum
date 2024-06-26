@@ -70,28 +70,6 @@ func (app *application) getPEM() (err error) {
 	return nil
 }
 
-func (app *application) encryptPEM(data []byte) ([]byte, error) {
-
-	publicKeyPEM, err := os.ReadFile("./pem/public.pem")
-	if err != nil {
-		return nil, err
-	}
-
-	publicKeyBlock, _ := pem.Decode(publicKeyPEM)
-
-	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBlock.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	ciphertext, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey.(*rsa.PublicKey), data)
-	if err != nil {
-		return nil, err
-	}
-
-	return ciphertext, nil
-}
-
 func (app *application) decryptPEM(data []byte) ([]byte, error) {
 
 	privateKeyBlock, _ := pem.Decode(app.config.pem.privateKey)

@@ -6,7 +6,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
-	"encoding/hex"
 	"errors"
 	"expvar"
 	"flag"
@@ -198,13 +197,6 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-
-	credentials, err := app.encryptPEM([]byte(`{"email": "yellow@storm.com", "password": "Pa55word"}`))
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
-	fmt.Printf("credentials: %s\n", hex.EncodeToString(credentials))
 
 	err = app.serve()
 	if err != nil {
