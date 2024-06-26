@@ -293,6 +293,26 @@ func (app *application) requireActivatedUser(next http.Handler) http.Handler {
 	return app.requireAuthenticatedUser(fn)
 }
 
+func (app *application) guardUserHandlers(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		id, err := app.readIDParam(r)
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		user := app.contextGetUser(r)
+
+		if user.Role != data.UserRole.Admin && user.ID != id {
+			app.notPermittedResponse(w, r)
+			return
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+
 func (app *application) enableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

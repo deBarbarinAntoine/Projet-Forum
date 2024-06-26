@@ -221,6 +221,12 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	user := app.contextGetUser(r)
+	if !user.HasPermission(post.Author.ID) {
+		app.notPermittedResponse(w, r)
+		return
+	}
+
 	if r.Header.Get("X-Expected-Version") != "" {
 		if strconv.Itoa(post.Version) != r.Header.Get("X-Expected-Version") {
 			app.editConflictResponse(w, r)
@@ -276,6 +282,23 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 	id, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	post, err := app.models.Posts.GetByID(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	user := app.contextGetUser(r)
+	if !user.HasPermission(post.Author.ID) {
+		app.notPermittedResponse(w, r)
 		return
 	}
 

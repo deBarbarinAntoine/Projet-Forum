@@ -204,11 +204,18 @@ func (app *application) updateCategoryHandler(w http.ResponseWriter, r *http.Req
 
 	category, err := app.models.Categories.GetByID(id)
 	if err != nil {
-		if errors.Is(err, data.ErrRecordNotFound) {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
 			app.notFoundResponse(w, r)
-			return
+		default:
+			app.serverErrorResponse(w, r, err)
 		}
-		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	user := app.contextGetUser(r)
+	if !user.HasPermission(category.Author.ID) {
+		app.notPermittedResponse(w, r)
 		return
 	}
 
@@ -271,6 +278,23 @@ func (app *application) deleteCategoryHandler(w http.ResponseWriter, r *http.Req
 	id, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	category, err := app.models.Categories.GetByID(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	user := app.contextGetUser(r)
+	if !user.HasPermission(category.Author.ID) {
+		app.notPermittedResponse(w, r)
 		return
 	}
 

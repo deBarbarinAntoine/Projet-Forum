@@ -225,6 +225,12 @@ func (app *application) updateThreadHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	user := app.contextGetUser(r)
+	if !user.HasPermission(thread.Author.ID) {
+		app.notPermittedResponse(w, r)
+		return
+	}
+
 	if r.Header.Get("X-Expected-Version") != "" {
 		if strconv.Itoa(thread.Version) != r.Header.Get("X-Expected-Version") {
 			app.editConflictResponse(w, r)
@@ -290,6 +296,23 @@ func (app *application) deleteThreadHandler(w http.ResponseWriter, r *http.Reque
 	id, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	thread, err := app.models.Threads.GetByID(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	user := app.contextGetUser(r)
+	if !user.HasPermission(thread.Author.ID) {
+		app.notPermittedResponse(w, r)
 		return
 	}
 

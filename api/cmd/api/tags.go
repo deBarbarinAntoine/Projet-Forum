@@ -211,6 +211,12 @@ func (app *application) updateTagHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	user := app.contextGetUser(r)
+	if !user.HasPermission(tag.Author.ID) {
+		app.notPermittedResponse(w, r)
+		return
+	}
+
 	if r.Header.Get("X-Expected-Version") != "" {
 		if strconv.Itoa(tag.Version) != r.Header.Get("X-Expected-Version") {
 			app.editConflictResponse(w, r)
@@ -274,6 +280,23 @@ func (app *application) deleteTagHandler(w http.ResponseWriter, r *http.Request)
 	id, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	tag, err := app.models.Tags.GetByID(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	user := app.contextGetUser(r)
+	if !user.HasPermission(tag.Author.ID) {
+		app.notPermittedResponse(w, r)
 		return
 	}
 

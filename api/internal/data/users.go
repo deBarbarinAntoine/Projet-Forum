@@ -102,6 +102,17 @@ func (u *User) IsAnonymous() bool {
 	return u == AnonymousUser
 }
 
+func (u *User) HasPermission(authorID int) bool {
+	switch u.Role {
+	case UserRole.Admin, UserRole.Moderator:
+		return true
+	case UserRole.Normal:
+		return u.ID == authorID
+	default:
+		return false
+	}
+}
+
 func (u *User) NoLogin() {
 	u.Password = password{
 		plaintext: nil,
@@ -453,6 +464,93 @@ func (m UserModel) DeleteExpired() error {
 	_, err = stmt.ExecContext(ctx, UserStatus.ToConfirm)
 	if err != nil {
 		return fmt.Errorf("failed to delete expired users: %w", err)
+	}
+
+	return nil
+}
+
+func (m UserModel) Delete(id int) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	tx, err := m.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// categories: set Id_author to 1 (deleted user)
+	query := `
+		UPDATE categories
+		SET Id_author = 1
+		WHERE Id_author = ?;`
+
+	_, err = tx.ExecContext(ctx, query, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrRecordNotFound
+		}
+		return err
+	}
+
+	// threads: set Id_author to 1 (deleted user)
+	query = `
+		UPDATE threads
+		SET Id_author = 1
+		WHERE Id_author = ?;`
+
+	_, err = tx.ExecContext(ctx, query, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrRecordNotFound
+		}
+		return err
+	}
+
+	// tags: set Id_author to 1 (deleted user)
+	query = `
+		UPDATE tags
+		SET Id_author = 1
+		WHERE Id_author = ?;`
+
+	_, err = tx.ExecContext(ctx, query, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrRecordNotFound
+		}
+		return err
+	}
+
+	// posts: set Id_author to 1 (deleted user)
+	query = `
+		UPDATE posts
+		SET Id_author = 1
+		WHERE Id_author = ?;`
+
+	_, err = tx.ExecContext(ctx, query, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrRecordNotFound
+		}
+		return err
+	}
+
+	// users: delete user
+	query = `
+		DELETE FROM users
+		WHERE Id_users = ?;`
+
+	_, err = tx.ExecContext(ctx, query, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrRecordNotFound
+		}
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
 	}
 
 	return nil

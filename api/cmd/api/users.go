@@ -415,9 +415,39 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 
 func (app *application) deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	// TODO -> handle MySQL constraints redirecting all user categories, threads, tags and posts to default `deleted user`
+	id, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
 
-	err := app.writeJSON(w, http.StatusOK, envelope{"user": "user_removed"}, nil)
+	err = app.models.Tokens.DeleteAllForUser("*", id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = app.models.Users.Delete(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	response := envelope{
+		"message": fmt.Sprintf("user with id %d deleted", id),
+	}
+
+	err = app.writeJSON(w, http.StatusOK, response, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

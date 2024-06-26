@@ -37,13 +37,13 @@ func (app *application) routes() http.Handler {
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
 	/* #############################################################################
-	/* # DEBUG
+	/* # DEBUG (ONLY FOR DEVELOPMENT PHASE OR RESTRICT ACCESS THROUGH REVERSE PROXY)
 	/* ############################################################################# */
 
 	router.Handle("/debug/vars", expvar.Handler(), http.MethodGet)
 
 	/* #############################################################################
-	/* # HEALTHCHECK
+	/* # HEALTHCHECK (OPTIONAL)
 	/* ############################################################################# */
 
 	router.HandleFunc("/v1/healthcheck", app.healthcheckHandler, http.MethodGet)
@@ -67,7 +67,7 @@ func (app *application) routes() http.Handler {
 	// PROTECTED ROUTES
 	// ##################################
 	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser)
+		mux.Use(app.requireActivatedUser, app.guardUserHandlers)
 
 		mux.HandleFunc("/v1/tokens/revoke", app.revokeTokensHandler, http.MethodPost)
 	})
@@ -96,13 +96,16 @@ func (app *application) routes() http.Handler {
 		mux.HandleFunc("/v1/users", app.getUsersHandler, http.MethodGet)
 
 		mux.HandleFunc("/v1/users/:id", app.getSingleUserHandler, http.MethodGet)
-		mux.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
 
 		mux.HandleFunc("/v1/users/:id/friend", app.friendRequestHandler, http.MethodPost)
 		mux.HandleFunc("/v1/users/:id/friend", app.friendResponseHandler, http.MethodPut)
 		mux.HandleFunc("/v1/users/:id/friend", app.friendDeleteHandler, http.MethodDelete)
 
-		// PROTECTED ROUTE
+		// CHECK PERMISSIONS FOR USER MANIPULATION
+		mux.Use(app.guardUserHandlers)
+		mux.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
+
+		// ENCRYPTED ROUTE
 		mux.Use(app.decryptRSA)
 		mux.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
 
