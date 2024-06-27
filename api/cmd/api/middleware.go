@@ -225,8 +225,6 @@ func (app *application) authenticateClient(next http.Handler) http.Handler {
 func (app *application) authenticateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Add("Vary", "Authorization")
-
 		authorizationHeader := r.Header.Get("Authorization")
 
 		if authorizationHeader == "" {
