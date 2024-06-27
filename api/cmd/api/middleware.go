@@ -120,6 +120,10 @@ func (app *application) decryptRSA(next http.Handler) http.Handler {
 		}
 
 		payload, err = app.decryptPEM(payload)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
 
 		r.Body = io.NopCloser(bytes.NewReader(payload))
 

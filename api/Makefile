@@ -29,24 +29,6 @@ run/api:
 db/mysql:
 	@mysql -u ${DB_USER} -p${DB_PASSWORD}
 
-## db/migrations/new name=$1: create a new database migration
-.PHONY: db/migrations/new
-db/migrations/new:
-	@echo 'Creating migration files for ${name}'
-	migrate create -seq -ext .sql -dir ./migrations ${name}
-
-## db/migrations/up: apply all up database migrations
-.PHONY: db/migrations/up
-db/migrations/up: confirm
-	@echo 'Running up migrations...'
-	@migrate -path ./migrations -database ${DB_DSN} up
-
-## db/migrations/drop: drop database migrations
-.PHONY: db/migrations/drop
-db/migrations/drop: confirm
-	@echo 'Dropping migrations...'
-	@migrate -path ./migrations -database ${DB_DSN} drop
-
 # =================================================================================== #
 # QUALITY CONTROL
 # =================================================================================== #
