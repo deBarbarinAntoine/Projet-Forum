@@ -91,7 +91,7 @@ func main() {
 	app.mysql.admin.username = app.readLine("Admin username:")
 	fmt.Println()
 	fmt.Print("Password: ")
-	app.mysql.admin.password, err = term.ReadPassword(0)
+	app.mysql.admin.password, err = term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		fmt.Printf("Error reading password: %v\n", err)
 		os.Exit(1)
@@ -121,7 +121,7 @@ func main() {
 	app.mysql.app.username = app.readLine("API username:")
 	fmt.Println()
 	fmt.Print("Password: ")
-	app.mysql.app.password, err = term.ReadPassword(0)
+	app.mysql.app.password, err = term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		fmt.Printf("Error reading password: %v\n", err)
 		os.Exit(1)
@@ -161,7 +161,7 @@ func main() {
 	app.smtp.username = app.readLine("SMTP Username:")
 	fmt.Println()
 	fmt.Print("SMTP Password: ")
-	app.smtp.password, err = term.ReadPassword(0)
+	app.smtp.password, err = term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		fmt.Printf("Error reading password: %v\n", err)
 		os.Exit(1)
