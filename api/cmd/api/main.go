@@ -122,9 +122,7 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-
 	defer db.Close()
-
 	logger.Info("database connection pool established")
 
 	expvar.NewString("version").Set(version)

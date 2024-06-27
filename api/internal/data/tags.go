@@ -219,6 +219,55 @@ func (m TagModel) GetPopularity(id int) (int, error) {
 	return popularity, nil
 }
 
+func (m TagModel) GetPopular() ([]*Tag, error) {
+
+	query := `
+		SELECT t.Id_tags, t.Name, t.Id_author, u.Username, t.Created_at, t.Updated_at, (SELECT COUNT(*)
+																						FROM tags_users tu
+																						WHERE tu.Id_tags = t.Id_tags) AS popularity
+		FROM tags t
+		INNER JOIN users u on t.Id_author = u.Id_users
+		ORDER BY popularity DESC, Id_tags ASC
+		LIMIT 10;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []*Tag
+
+	for rows.Next() {
+		var tag Tag
+
+		err := rows.Scan(&tag.ID, &tag.Name, &tag.Author.ID, &tag.Author.Name, &tag.CreatedAt, &tag.UpdatedAt, &tag.Popularity)
+		if err != nil {
+			return nil, err
+		}
+
+		tags = append(tags, &tag)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
 func (m TagModel) Get(search string, filters Filters) ([]*Tag, Metadata, error) {
 
 	if search != "" {

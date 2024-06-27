@@ -33,7 +33,6 @@ func (app *application) routes() http.Handler {
 	router.Use(app.authenticateClient, app.authenticateUser)
 
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
-
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
 	/* #############################################################################
@@ -77,6 +76,7 @@ func (app *application) routes() http.Handler {
 	/* ############################################################################# */
 
 	router.HandleFunc("/v1/users/activated", app.activateUserHandler, http.MethodPut)
+	router.HandleFunc("/v1/users/forgot-password", app.forgotPasswordHandler, http.MethodPost)
 
 	// ##################################
 	// ENCRYPTED ROUTES
@@ -85,6 +85,7 @@ func (app *application) routes() http.Handler {
 		mux.Use(app.decryptRSA)
 
 		mux.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
+		mux.HandleFunc("/v1/users/password", app.resetPasswordHandler, http.MethodPut)
 	})
 
 	// ##################################
@@ -206,8 +207,8 @@ func (app *application) routes() http.Handler {
 	/* ############################################################################# */
 
 	router.HandleFunc("/v1/popular", app.getPopularHandler, http.MethodGet)
-	router.HandleFunc("/v1/recommendations/:id", app.getRecommendations, http.MethodGet)
-	router.HandleFunc("/v1/search", app.searchHandler, http.MethodGet)
+	//router.HandleFunc("/v1/recommendations/:id", app.getRecommendations, http.MethodGet)
+	//router.HandleFunc("/v1/search", app.searchHandler, http.MethodGet)
 
 	return router
 }

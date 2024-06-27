@@ -413,6 +413,135 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+func (app *application) forgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
+
+	var input struct {
+		Email *string `json:"email"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	v := validator.New()
+
+	data.ValidateEmail(v, *input.Email)
+
+	if !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	var isFound bool
+
+	user, err := app.models.Users.GetByEmail(*input.Email)
+	if err != nil {
+		switch {
+		case !errors.Is(err, data.ErrRecordNotFound):
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+	} else {
+		isFound = true
+	}
+
+	if isFound {
+		token, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.TokenScope.UpdatePassword)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		app.background(func() {
+
+			mailData := map[string]any{
+				"username": user.Name,
+				"token":    token.Plaintext,
+			}
+
+			err = app.mailer.Send(user.Email, "forgot_password.tmpl", mailData)
+			if err != nil {
+				app.logger.Error(err.Error())
+			}
+		})
+	}
+
+	response := envelope{
+		"message": fmt.Sprintf("a mail has been sent to %s", *input.Email),
+	}
+
+	err = app.writeJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
+func (app *application) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
+
+	var input struct {
+		Token           *string `json:"token"`
+		Password        *string `json:"password"`
+		ConfirmPassword *string `json:"confirm_password"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	v := validator.New()
+
+	data.ValidateNewPassword(v, *input.Password, *input.ConfirmPassword)
+	data.ValidateTokenPlaintext(v, *input.Token)
+
+	if !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	user, err := app.models.Users.GetForToken(data.TokenScope.UpdatePassword, *input.Token)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = user.Password.Set(*input.Password)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.models.Users.Update(user)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrEditConflict):
+			app.editConflictResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = app.models.Tokens.DeleteAllForUser(data.TokenScope.UpdatePassword, user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"message": "your password has been updated successfully"}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
 func (app *application) deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := app.readIDParam(r)
