@@ -146,10 +146,10 @@ func main() {
 		mailer:      mailer.New(cfg.smtp.host, int(cfg.smtp.port), cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
 
-	// Clean expired tokens every N duration
+	// Clean expired tokens every N duration with no timeout
 	go app.cleanExpiredTokens(*frequency, time.Hour*0)
 
-	// Clean expired unactivated users every N duration
+	// Clean expired unactivated users every N duration with 1 hour timeout
 	go app.cleanExpiredUnactivatedUsers(*frequency, time.Hour)
 
 	// Retrieving or generating RSA keys
