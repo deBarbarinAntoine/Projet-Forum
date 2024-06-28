@@ -5,6 +5,9 @@
     src: url(../font/VarelaRound-Regular.ttf);
 }
 
+* {
+    background-color: var(--background-color);
+}
     /* Mentions Légales */
 
 .container-mentions-row{
@@ -65,8 +68,9 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            width: 824px;
+            width: 320px;   
             font-size: 20px;
+            margin-bottom: 10px;;
             .your-search {
                 display: flex;
                 align-items: center;
@@ -92,6 +96,7 @@
                 border-radius: 5px;
                 margin-top: 20px;
                 padding-left: 10px;
+                margin-bottom: 5px;
                 .search-text {
                     display: flex;
                     justify-content: space-between;
@@ -109,6 +114,66 @@
                     p {
                         font-size: 15px;
                     }
+                }
+            }
+        }
+        .container-row {
+            display: flex;
+            flex-direction: row;
+            width: 750px;
+            justify-content: space-between;
+        }
+        .container-search-category {
+            margin-top: 50px;
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;;
+            .container-spe-category {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 30px;
+                border-bottom: 2px solid rgba($color: #000000, $alpha: 0.1);
+                border-right: 2px solid rgba($color: #000000, $alpha: 0.1);
+                border-left: 2px solid rgba($color: #000000, $alpha: 0.1);
+                box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.2);
+                width: 200px;
+                height: 30px;
+                border-radius: 5px;
+                h5 {
+                    font-size: 12px;
+                    font-weight: normal;
+                }
+                &:hover {
+                    cursor: pointer;
+                    box-shadow: 0px 4px 5px rgba($color: #000000, $alpha: 0.5);
+                }
+            }
+        }
+        .container-tags-search {
+            margin-left: 50px;
+            margin-top: 50px;
+            width:150px;
+            .container-spe-category {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 30px;
+                border-bottom: 2px solid rgba($color: #000000, $alpha: 0.1);
+                border-right: 2px solid rgba($color: #000000, $alpha: 0.1);
+                border-left: 2px solid rgba($color: #000000, $alpha: 0.1);
+                box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.2);
+                width: 200px;
+                height: 30px;
+                border-radius: 5px;
+                h5 {
+                    font-size: 12px;
+                    font-weight: normal;
+                }
+                &:hover {
+                    cursor: pointer;
+                    box-shadow: 0px 4px 5px rgba($color: #000000, $alpha: 0.5);
                 }
             }
         }
@@ -626,6 +691,7 @@
                 padding-left: 20px;
                 padding-top: 15px;
                 padding-bottom: 20px;
+                margin-bottom: 5px;
                 h4 {
                     font-size: 20px;
                     font-weight: normal;
@@ -674,6 +740,7 @@
             display: flex;
             flex-direction: row;
             .container-mythread {
+                margin-bottom: 5px;
                 margin-top: 40px;
                 display: flex;
                 flex-direction: column;
@@ -716,7 +783,8 @@
                     margin-left: 40px;
                     margin-top: 40px;
                     width: 427px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+                    margin-bottom: 5px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
                     .friends {
                         margin-top: 15px;
                         display: flex;
