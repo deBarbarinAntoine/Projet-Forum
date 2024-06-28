@@ -589,13 +589,14 @@ header {
             flex-direction: column;
             justify-content: start;
             align-items: center;
-            gap: 5px;
+            gap: 10px;
 
             .classic-link {
                 font-family: Varela-Round;
                 font-size: 10px;
                 margin-top: 20px;
                 align-self: flex-start;
+                font-style: italic;
 
                 &:hover {
                     cursor: pointer;
@@ -663,10 +664,16 @@ header {
     }
 }
 
-.mail-outset {
+.bottom-outset {
     margin-bottom: 30px !important;
 }
 
-.register-outset {
-    margin-top: 30px;
+.top-outset {
+    margin-top: 30px !important;
+}
+
+textarea.description {
+    height: 200px !important;
+    resize: none;
+    scrollbar-width: thin;
 }
