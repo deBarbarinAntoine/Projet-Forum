@@ -3,6 +3,7 @@ module database
 go 1.22
 
 require (
+	github.com/deatil/go-encoding v1.0.2006
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	golang.org/x/term v0.21.0

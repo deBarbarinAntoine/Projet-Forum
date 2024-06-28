@@ -11,6 +11,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"github.com/deatil/go-encoding/base62"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"
@@ -120,12 +121,14 @@ func main() {
 	fmt.Println()
 	app.mysql.app.username = app.readLine("API username:")
 	fmt.Println()
-	fmt.Print("Password: ")
-	app.mysql.app.password, err = term.ReadPassword(int(os.Stdin.Fd()))
+	fmt.Print("Generating password...")
+	randomPassword := make([]byte, 12)
+	_, err = rand.Read(randomPassword)
 	if err != nil {
-		fmt.Printf("Error reading password: %v\n", err)
+		fmt.Printf("Error generating password: %v\n", err)
 		os.Exit(1)
 	}
+	app.mysql.app.password = base62.StdEncoding.Encode(randomPassword)
 	fmt.Println()
 
 	fmt.Println("Creating empty API database...")
@@ -182,7 +185,6 @@ func main() {
 	fmt.Println("Writing configurations to .envrc file...")
 
 	switch app.os {
-
 	case "windows":
 		app.genEnvFile()
 	case "linux":
