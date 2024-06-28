@@ -16,8 +16,8 @@ type Session struct {
 }
 
 type Credentials struct {
-	Username string
-	Password string
+	Username string `json:"email"`
+	Password string `json:"password"`
 }
 
 type TempUser struct {

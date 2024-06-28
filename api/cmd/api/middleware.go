@@ -3,11 +3,14 @@ package main
 import (
 	"ForumAPI/internal/data"
 	"ForumAPI/internal/validator"
+	"bytes"
+	"encoding/hex"
 	"errors"
 	"expvar"
 	"fmt"
 	"github.com/tomasen/realip"
 	"golang.org/x/time/rate"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -81,6 +84,48 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 
 			mu.Unlock()
 		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) decryptRSA(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Add("Vary", "X-Encryption")
+
+		encryptionMethod := r.Header.Get("X-Encryption")
+
+		if encryptionMethod != "RSA" {
+			app.badRequestResponse(w, r, errors.New("X-Encryption header is not RSA"))
+			return
+		}
+
+		payload, err := io.ReadAll(r.Body)
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+		defer r.Body.Close()
+
+		if len(payload) == 0 {
+			app.badRequestResponse(w, r, errors.New("missing body"))
+			return
+		}
+
+		payload, err = hex.DecodeString(string(payload))
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		payload, err = app.decryptPEM(payload)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		r.Body = io.NopCloser(bytes.NewReader(payload))
 
 		next.ServeHTTP(w, r)
 	})
@@ -180,8 +225,6 @@ func (app *application) authenticateClient(next http.Handler) http.Handler {
 func (app *application) authenticateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Add("Vary", "Authorization")
-
 		authorizationHeader := r.Header.Get("Authorization")
 
 		if authorizationHeader == "" {
@@ -252,25 +295,24 @@ func (app *application) requireActivatedUser(next http.Handler) http.Handler {
 	return app.requireAuthenticatedUser(fn)
 }
 
-func (app *application) requirePermission(code string, next http.Handler) http.Handler {
-	fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (app *application) guardUserHandlers(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		id, err := app.readIDParam(r)
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
 		user := app.contextGetUser(r)
 
-		permissions, err := app.models.Permissions.GetAllForUser(user.ID)
-		if err != nil {
-			app.serverErrorResponse(w, r, err)
-			return
-		}
-
-		if !permissions.Include(code) {
+		if user.Role != data.UserRole.Admin && user.ID != id {
 			app.notPermittedResponse(w, r)
 			return
+		} else {
+			next.ServeHTTP(w, r)
 		}
-
-		next.ServeHTTP(w, r)
 	})
-
-	return app.requireActivatedUser(fn)
 }
 
 func (app *application) enableCORS(next http.Handler) http.Handler {

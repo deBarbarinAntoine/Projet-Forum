@@ -114,6 +114,15 @@ func (app *application) createClientTokenHandler(w http.ResponseWriter, r *http.
 	}
 }
 
+func (app *application) getPublicKeyPEM(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/x-pem-file")
+	w.WriteHeader(http.StatusOK)
+	_, err := w.Write(app.config.pem.publicKey)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
 func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {

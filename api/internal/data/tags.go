@@ -219,6 +219,55 @@ func (m TagModel) GetPopularity(id int) (int, error) {
 	return popularity, nil
 }
 
+func (m TagModel) GetPopular() ([]*Tag, error) {
+
+	query := `
+		SELECT t.Id_tags, t.Name, t.Id_author, u.Username, t.Created_at, t.Updated_at, (SELECT COUNT(*)
+																						FROM tags_users tu
+																						WHERE tu.Id_tags = t.Id_tags) AS popularity
+		FROM tags t
+		INNER JOIN users u on t.Id_author = u.Id_users
+		ORDER BY popularity DESC, Id_tags ASC
+		LIMIT 10;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []*Tag
+
+	for rows.Next() {
+		var tag Tag
+
+		err := rows.Scan(&tag.ID, &tag.Name, &tag.Author.ID, &tag.Author.Name, &tag.CreatedAt, &tag.UpdatedAt, &tag.Popularity)
+		if err != nil {
+			return nil, err
+		}
+
+		tags = append(tags, &tag)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
 func (m TagModel) Get(search string, filters Filters) ([]*Tag, Metadata, error) {
 
 	if search != "" {
@@ -379,7 +428,7 @@ func (m TagModel) GetByFollowingUserID(id int) ([]struct {
 	return followingTags, nil
 }
 
-func (m TagModel) Update(tag Tag) error {
+func (m TagModel) Update(tag *Tag, removeThreads []int) error {
 
 	query := `
 		UPDATE tags 
@@ -432,6 +481,74 @@ func (m TagModel) Update(tag Tag) error {
 			return ErrRecordNotFound
 		default:
 			return err
+		}
+	}
+
+	if len(tag.Threads) > 0 {
+
+		var ids []any
+		for _, thread := range tag.Threads {
+			ids = append(ids, thread.ID)
+		}
+
+		value := fmt.Sprintf(`(?, %d),`, tag.ID)
+		values := strings.Repeat(value, len(tag.Threads))
+		values = values[:len(values)-1]
+
+		query = fmt.Sprintf(`
+		INSERT INTO threads_tags (Id_threads, Id_tags)
+		VALUES %s;`, values)
+
+		rs, err = tx.ExecContext(ctx, query, ids...)
+		if err != nil {
+			var mySQLError *mysql.MySQLError
+			switch {
+			case errors.As(err, &mySQLError):
+				if mySQLError.Number == 1062 {
+					return ErrDuplicateEntry
+				}
+				if mySQLError.Number == 1452 {
+					return ErrRecordNotFound
+				}
+			default:
+				return err
+			}
+		}
+		rowsAffected, err := rs.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rowsAffected == 0 {
+			return ErrRecordNotFound
+		}
+	}
+
+	if len(removeThreads) > 0 {
+
+		ids := []any{tag.ID, removeThreads}
+
+		query = `
+		DELETE FROM threads_tags
+		WHERE Id_tags = ? AND Id_threads IN (?);`
+
+		rs, err = tx.ExecContext(ctx, query, ids...)
+		if err != nil {
+			var mySQLError *mysql.MySQLError
+			switch {
+			case errors.As(err, &mySQLError):
+				if mySQLError.Number == 1452 {
+					return ErrRecordNotFound
+				}
+			default:
+				return err
+			}
+		}
+		rowsAffected, err := rs.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rowsAffected == 0 {
+			return ErrRecordNotFound
 		}
 	}
 

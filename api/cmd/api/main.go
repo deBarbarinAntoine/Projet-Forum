@@ -3,31 +3,30 @@ package main
 import (
 	"ForumAPI/internal/data"
 	"ForumAPI/internal/mailer"
-	"ForumAPI/internal/vcs"
 	"context"
-	"crypto/sha256"
 	"database/sql"
-	"errors"
 	"expvar"
 	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 var (
-	version = vcs.Version()
+	version = "v1"
 )
 
 type config struct {
-	port int
+	port int64
 	env  string
 	db   struct {
 		dsn          string
@@ -42,13 +41,17 @@ type config struct {
 	}
 	smtp struct {
 		host     string
-		port     int
+		port     int64
 		username string
 		password string
 		sender   string
 	}
 	cors struct {
 		trustedOrigins []string
+	}
+	pem struct {
+		privateKey []byte
+		publicKey  []byte
 	}
 	apiUserID int
 }
@@ -65,7 +68,7 @@ type application struct {
 func main() {
 	var cfg config
 
-	flag.IntVar(&cfg.port, "port", 4000, "API server port")
+	flag.Int64Var(&cfg.port, "port", 4000, "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 
 	flag.StringVar(&cfg.db.dsn, "dsn", "", "MySQL Database DSN")
@@ -79,17 +82,15 @@ func main() {
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
 	flag.StringVar(&cfg.smtp.host, "smtp-host", "", "SMTP host")
-	flag.IntVar(&cfg.smtp.port, "smtp-port", 2525, "SMTP port")
+	flag.Int64Var(&cfg.smtp.port, "smtp-port", 2525, "SMTP port")
 	flag.StringVar(&cfg.smtp.username, "smtp-username", "", "SMTP username")
 	flag.StringVar(&cfg.smtp.password, "smtp-password", "", "SMTP password")
-	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Threadive <no-reply@adebarbarin.com>", "SMTP sender")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "", "SMTP sender")
 
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
 		cfg.cors.trustedOrigins = strings.Fields(val)
 		return nil
 	})
-
-	secret := flag.String("secret", "", "API secret")
 
 	frequency := flag.Duration("frequency", time.Hour*2, "expired tokens and unactivated users cleaning frequency")
 
@@ -98,27 +99,30 @@ func main() {
 	flag.Parse()
 
 	if *displayVersion {
-		fmt.Printf("Threadive API version:\t%s\n", version)
+		fmt.Printf("Threadive API current version:\t%s\n", version)
 		os.Exit(0)
 	}
 	if cfg.smtp.username == "" || cfg.smtp.password == "" || cfg.smtp.host == "" {
-		fmt.Println("SMTP credentials are required")
-		os.Exit(1)
+		if runtime.GOOS == "windows" {
+			err := cfg.loadEnv()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error loading environment variables: %s\n", err)
+				os.Exit(1)
+			}
+		} else {
+			fmt.Println("SMTP credentials are required")
+			os.Exit(1)
+		}
 	}
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     slog.Level(-4),
-	}))
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.Level(-4)}))
 
 	db, err := openDB(cfg)
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-
 	defer db.Close()
-
 	logger.Info("database connection pool established")
 
 	expvar.NewString("version").Set(version)
@@ -137,84 +141,21 @@ func main() {
 		logger:      logger,
 		models:      data.NewModels(db),
 		formDecoder: form.NewDecoder(),
-		mailer:      mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
+		mailer:      mailer.New(cfg.smtp.host, int(cfg.smtp.port), cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
 
-	// TODO -> remove when leaving development phase
-	if cfg.env == "development" && *secret != "" {
-		user, err := app.models.Users.GetByEmail("api@api.com")
-		if err != nil {
-			if errors.Is(err, data.ErrRecordNotFound) {
-				logger.Info("creating API user...")
-				user = &data.User{
-					Name:   "API",
-					Email:  "api@api.com",
-					Role:   data.UserRole.Secret,
-					Status: data.UserStatus.HostSecret,
-				}
-				user.NoLogin()
-				err = app.models.Users.Insert(user)
-				if err != nil {
-					logger.Error(err.Error())
-					os.Exit(1)
-				}
-				hash := sha256.Sum256([]byte(*secret))
-				token := data.Token{
-					Plaintext: "",
-					Hash:      hash[:],
-					UserID:    user.ID,
-					Expiry:    time.Now().Add(data.MaxDuration),
-					Scope:     data.TokenScope.HostSecret,
-				}
-				err = app.models.Tokens.Insert(&token)
-				if err != nil {
-					logger.Error(err.Error())
-					os.Exit(1)
-				}
-			} else {
-				logger.Error(err.Error())
-				os.Exit(1)
-			}
-		}
-		if user == nil || user.ID < 1 {
-			logger.Error("could not retrieve API user")
-			os.Exit(1)
-		}
-		app.config.apiUserID = user.ID
-	}
-	*secret = ""
-	// TODO <- END
-
-	// Clean expired tokens every N duration
+	// Clean expired tokens every N duration with no timeout
 	go app.cleanExpiredTokens(*frequency, time.Hour*0)
 
-	// Clean expired unactivated users every N duration
+	// Clean expired unactivated users every N duration with 1 hour timeout
 	go app.cleanExpiredUnactivatedUsers(*frequency, time.Hour)
 
-	// TODO -> remove when leaving development phase
-	err = app.generatePEM()
+	// Retrieving or generating RSA keys
+	err = app.getPEM()
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-	dataJSON := `
-		{
-			"email": "api@api.com",
-			"password": "Pa55word"
-		}`
-	cipher, err := app.encryptPEM([]byte(dataJSON))
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
-	app.logger.Debug(fmt.Sprintf("cipher: %s", string(cipher)))
-	plaintext, err := app.decryptPEM(cipher)
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
-	app.logger.Debug(fmt.Sprintf("plaintext: %s", string(plaintext)))
-	// TODO <- END
 
 	err = app.serve()
 	if err != nil {
@@ -244,4 +185,28 @@ func openDB(cfg config) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func (cfg *config) loadEnv() error {
+
+	err := godotenv.Load()
+	if err != nil {
+		return err
+	}
+
+	cfg.port, err = strconv.ParseInt(os.Getenv("PORT"), 10, 64)
+	if err != nil {
+		return err
+	}
+	cfg.db.dsn = os.Getenv("DB_DSN")
+	cfg.smtp.sender = os.Getenv("SMTP_SENDER")
+	cfg.smtp.username = os.Getenv("SMTP_USERNAME")
+	cfg.smtp.password = os.Getenv("SMTP_PASS")
+	cfg.smtp.host = os.Getenv("SMTP_HOST")
+	cfg.smtp.port, err = strconv.ParseInt(os.Getenv("SMTP_PORT"), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -403,6 +403,66 @@ func (m ThreadModel) GetFavoriteThreadsByUserID(id int) ([]struct {
 	return favoriteThreads, nil
 }
 
+func (m ThreadModel) GetPopular() ([]*Thread, error) {
+
+	query := `
+		SELECT t.Id_threads, t.Title, t.Id_author, u.Username, t.Id_categories, c.Name, t.Created_at, t.Updated_at, (SELECT COUNT(*)
+																						FROM threads_users tu
+																						WHERE tu.Id_threads = t.Id_threads) AS popularity
+		FROM threads t
+		INNER JOIN users u ON t.Id_author = u.Id_users
+		INNER JOIN categories c ON t.Id_categories = c.Id_categories
+		ORDER BY popularity DESC, Id_threads ASC
+		LIMIT 10;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	var threads []*Thread
+
+	for rows.Next() {
+		var thread Thread
+
+		err := rows.Scan(
+			&thread.ID,
+			&thread.Title,
+			&thread.Author.ID,
+			&thread.Author.Name,
+			&thread.Category.ID,
+			&thread.Category.Name,
+			&thread.CreatedAt,
+			&thread.UpdatedAt,
+			&thread.Popularity)
+
+		if err != nil {
+			return nil, err
+		}
+
+		threads = append(threads, &thread)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return threads, nil
+}
+
 func (m ThreadModel) Update(thread *Thread) error {
 
 	query := `

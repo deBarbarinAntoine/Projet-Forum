@@ -23,6 +23,7 @@ func (app *application) routes() http.Handler {
 	router.Group(func(mux *flow.Mux) {
 		mux.Use(app.authenticateAPISecret)
 		mux.HandleFunc("/v1/tokens/client", app.createClientTokenHandler, http.MethodPost)
+		mux.HandleFunc("/v1/tokens/public-key", app.getPublicKeyPEM, http.MethodGet)
 	})
 
 	/* #############################################################################
@@ -32,17 +33,16 @@ func (app *application) routes() http.Handler {
 	router.Use(app.authenticateClient, app.authenticateUser)
 
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
-
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
 	/* #############################################################################
-	/* # DEBUG
+	/* # DEBUG (ONLY FOR DEVELOPMENT PHASE OR RESTRICT ACCESS THROUGH REVERSE PROXY)
 	/* ############################################################################# */
 
 	router.Handle("/debug/vars", expvar.Handler(), http.MethodGet)
 
 	/* #############################################################################
-	/* # HEALTHCHECK
+	/* # HEALTHCHECK (OPTIONAL)
 	/* ############################################################################# */
 
 	router.HandleFunc("/v1/healthcheck", app.healthcheckHandler, http.MethodGet)
@@ -51,15 +51,22 @@ func (app *application) routes() http.Handler {
 	/* # TOKENS
 	/* ############################################################################# */
 
-	router.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
-
 	router.HandleFunc("/v1/tokens/refresh", app.refreshAuthenticationTokenHandler, http.MethodPost)
+
+	// ##################################
+	// ENCRYPTED ROUTES
+	// ##################################
+	router.Group(func(mux *flow.Mux) {
+		mux.Use(app.decryptRSA)
+
+		mux.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
+	})
 
 	// ##################################
 	// PROTECTED ROUTES
 	// ##################################
 	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser)
+		mux.Use(app.requireActivatedUser, app.guardUserHandlers)
 
 		mux.HandleFunc("/v1/tokens/revoke", app.revokeTokensHandler, http.MethodPost)
 	})
@@ -68,9 +75,18 @@ func (app *application) routes() http.Handler {
 	/* # USERS
 	/* ############################################################################# */
 
-	router.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
-
 	router.HandleFunc("/v1/users/activated", app.activateUserHandler, http.MethodPut)
+	router.HandleFunc("/v1/users/forgot-password", app.forgotPasswordHandler, http.MethodPost)
+
+	// ##################################
+	// ENCRYPTED ROUTES
+	// ##################################
+	router.Group(func(mux *flow.Mux) {
+		mux.Use(app.decryptRSA)
+
+		mux.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
+		mux.HandleFunc("/v1/users/password", app.resetPasswordHandler, http.MethodPut)
+	})
 
 	// ##################################
 	// PROTECTED ROUTES
@@ -81,12 +97,19 @@ func (app *application) routes() http.Handler {
 		mux.HandleFunc("/v1/users", app.getUsersHandler, http.MethodGet)
 
 		mux.HandleFunc("/v1/users/:id", app.getSingleUserHandler, http.MethodGet)
-		mux.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
-		mux.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
 
 		mux.HandleFunc("/v1/users/:id/friend", app.friendRequestHandler, http.MethodPost)
 		mux.HandleFunc("/v1/users/:id/friend", app.friendResponseHandler, http.MethodPut)
 		mux.HandleFunc("/v1/users/:id/friend", app.friendDeleteHandler, http.MethodDelete)
+
+		// CHECK PERMISSIONS FOR USER MANIPULATION
+		mux.Use(app.guardUserHandlers)
+		mux.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
+
+		// ENCRYPTED ROUTE
+		mux.Use(app.decryptRSA)
+		mux.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
+
 	})
 
 	/* #############################################################################
@@ -184,8 +207,8 @@ func (app *application) routes() http.Handler {
 	/* ############################################################################# */
 
 	router.HandleFunc("/v1/popular", app.getPopularHandler, http.MethodGet)
-	router.HandleFunc("/v1/recommendations/:id", app.getRecommendations, http.MethodGet)
-	router.HandleFunc("/v1/search", app.searchHandler, http.MethodGet)
+	//router.HandleFunc("/v1/recommendations/:id", app.getRecommendations, http.MethodGet)
+	//router.HandleFunc("/v1/search", app.searchHandler, http.MethodGet)
 
 	return router
 }

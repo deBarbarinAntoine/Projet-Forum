@@ -22,6 +22,7 @@ type tokenScope struct {
 	Activation     string
 	Authentication string
 	Refresh        string
+	UpdatePassword string
 	Client         string
 	HostSecret     string
 }
@@ -31,6 +32,7 @@ var (
 		Activation:     "activation",
 		Authentication: "authentication",
 		Refresh:        "refresh",
+		UpdatePassword: "update_password",
 		Client:         "client",
 		HostSecret:     "host_secret",
 	}

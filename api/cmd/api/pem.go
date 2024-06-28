@@ -8,7 +8,27 @@ import (
 	"os"
 )
 
-func (app *application) generatePEM() error {
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
+func (app *application) getPEM() (err error) {
+
+	if fileExists("./pem/private.pem") && fileExists("./pem/public.pem") {
+		app.config.pem.publicKey, err = os.ReadFile("./pem/public.pem")
+		if err != nil {
+			return err
+		}
+		app.config.pem.privateKey, err = os.ReadFile("./pem/private.pem")
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -44,39 +64,15 @@ func (app *application) generatePEM() error {
 		return err
 	}
 
+	app.config.pem.privateKey = privateKeyPEM
+	app.config.pem.publicKey = publicKeyPEM
+
 	return nil
-}
-
-func (app *application) encryptPEM(data []byte) ([]byte, error) {
-
-	publicKeyPEM, err := os.ReadFile("./pem/public.pem")
-	if err != nil {
-		return nil, err
-	}
-
-	publicKeyBlock, _ := pem.Decode(publicKeyPEM)
-
-	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBlock.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	ciphertext, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey.(*rsa.PublicKey), data)
-	if err != nil {
-		return nil, err
-	}
-
-	return ciphertext, nil
 }
 
 func (app *application) decryptPEM(data []byte) ([]byte, error) {
 
-	privateKeyPEM, err := os.ReadFile("./pem/private.pem")
-	if err != nil {
-		return nil, err
-	}
-
-	privateKeyBlock, _ := pem.Decode(privateKeyPEM)
+	privateKeyBlock, _ := pem.Decode(app.config.pem.privateKey)
 
 	privateKey, err := x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
 	if err != nil {

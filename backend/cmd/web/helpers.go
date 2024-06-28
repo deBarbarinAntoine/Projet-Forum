@@ -1,19 +1,61 @@
 package main
 
 import (
+	"Projet-Forum/internal/models"
 	"Projet-Forum/internal/validator"
 	"bytes"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/go-playground/form/v4"
 	"github.com/justinas/nosurf"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"runtime/debug"
 	"strconv"
+	"strings"
 	"time"
 )
+
+func (app *application) sendAuthPEM(credentials *models.Credentials) error {
+
+	// mock data only for testing purposes
+	authJson, err := json.Marshal(credentials)
+	if err != nil {
+		return err
+	}
+
+	cipher, err := app.encryptPEM(authJson)
+	if err != nil {
+		//app.serverErrorResponse(w, r, err)
+		return err
+	}
+	client := http.Client{Timeout: 5 * time.Second}
+
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/v1/tokens/authentication", strings.NewReader(hex.EncodeToString(cipher)))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", app.config.clientToken))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Encryption", "RSA")
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	responseBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	app.logger.Debug(fmt.Sprintf("response: %s", string(responseBody)))
+	return nil
+}
 
 func (app *application) decodePostForm(r *http.Request, dst any) error {
 

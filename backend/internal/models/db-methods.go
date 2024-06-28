@@ -1,7 +1,5 @@
 package models
 
-import "Projet-Forum/internal/db"
-
 // User methods
 
 func (user *User) GetSqlRows() []any {
@@ -28,20 +26,7 @@ func (user *User) Fetch(a any) {
 }
 
 func (user *User) GetId(a any) int {
-	var login string
-	switch a.(type) {
-	case string:
-		login = a.(string)
-	default:
-		// todo handle error
-		return -1
-	}
-	id, err := db.GetUserByLogin(login)
-	if err != nil {
-		// todo handle error
-		return -1
-	}
-	return id.Id
+	panic("implement me")
 }
 
 func (user *User) Exists(a any) bool {

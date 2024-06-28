@@ -2,10 +2,20 @@
 .idea/
 
 # API files
+api/.env
 api/.envrc
 api/tls/*.pem
 api/pem
 
 # backend files
+backend/config
+backend/data
+backend/logs
+backend/.env
 backend/.envrc
+backend/pem
 backend/tls/*.pem
+
+# data files
+data/.envrc
+data/.env

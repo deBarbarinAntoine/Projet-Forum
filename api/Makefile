@@ -22,30 +22,12 @@ confirm:
 ## run/api: run the cmd/api application
 .PHONY: run/api
 run/api:
-	@go run ./cmd/api -port=${PORT} -dsn=${DB_DSN} -smtp-username=${SMTP_USERNAME} -smtp-password=${SMTP_PASS} -smtp-host=${SMTP_HOST} -smtp-port=${SMTP_PORT} -secret=${API_HOST_SECRET}
+	@go run ./cmd/api -port=${PORT} -dsn=${DB_DSN} -smtp-sender=${SMTP_SENDER} -smtp-username=${SMTP_USERNAME} -smtp-password=${SMTP_PASS} -smtp-host=${SMTP_HOST} -smtp-port=${SMTP_PORT} -secret=${API_HOST_SECRET}
 
 ## db/mysql: connect to the database using mysql
 .PHONY: db/mysql
 db/mysql:
 	@mysql -u ${DB_USER} -p${DB_PASSWORD}
-
-## db/migrations/new name=$1: create a new database migration
-.PHONY: db/migrations/new
-db/migrations/new:
-	@echo 'Creating migration files for ${name}'
-	migrate create -seq -ext .sql -dir ./migrations ${name}
-
-## db/migrations/up: apply all up database migrations
-.PHONY: db/migrations/up
-db/migrations/up: confirm
-	@echo 'Running up migrations...'
-	@migrate -path ./migrations -database ${DB_DSN} up
-
-## db/migrations/drop: drop database migrations
-.PHONY: db/migrations/drop
-db/migrations/drop: confirm
-	@echo 'Dropping migrations...'
-	@migrate -path ./migrations -database ${DB_DSN} drop
 
 # =================================================================================== #
 # QUALITY CONTROL

@@ -87,8 +87,8 @@ func TestUserModel_GetByID(t *testing.T) {
 				Posts:           nil,
 				Friends:         nil,
 				Invitations: struct {
-					Received []Friend `json:"received"`
-					Sent     []Friend `json:"sent"`
+					Received []Friend `json:"received,omitempty"`
+					Sent     []Friend `json:"sent,omitempty"`
 				}{
 					Received: nil,
 					Sent:     nil,
