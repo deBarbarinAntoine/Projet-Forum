@@ -71,7 +71,7 @@ Here is the procedure for a new client:
 
 3. Consequently, all requests to the API *must* contain the `client` token in the `Authorization: Bearer {client_token}` form.
 4. For a user to manipulate/modify data in the API, an `authentication` token is needed. In that case, the **Header** will be built that way:
-   ```http request
+   ```
    METHOD /v1/path HTTP/1.1
    Authorization: Bearer {client_token},Bearer {authentication_token}
    ```
