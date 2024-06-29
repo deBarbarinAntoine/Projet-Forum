@@ -10,35 +10,42 @@ type Models struct {
 	TagModel      *TagModel
 }
 
-func NewModels(clientToken string, pemKey []byte) Models {
+func NewModels(uri, clientToken string, pemKey []byte) Models {
 	return Models{
 		UserModel: &UserModel{
+			uri:         uri,
 			endpoint:    "/users",
 			clientToken: clientToken,
 			pemKey:      pemKey,
 		},
 		CategoryModel: &CategoryModel{
+			uri:         uri,
 			endpoint:    "/categories",
 			clientToken: clientToken,
 			pemKey:      pemKey,
 		},
 		ThreadModel: &ThreadModel{
+			uri:         uri,
 			endpoint:    "/threads",
 			clientToken: clientToken,
 			pemKey:      pemKey,
 		},
 		PostModel: &PostModel{
+			uri:         uri,
 			endpoint:    "/posts",
 			clientToken: clientToken,
 			pemKey:      pemKey,
 		},
 		TagModel: &TagModel{
+			uri:         uri,
 			endpoint:    "/tags",
 			clientToken: clientToken,
 			pemKey:      pemKey,
 		},
 	}
 }
+
+type envelope map[string]any
 
 type Token struct {
 	Plaintext string    `json:"token"`

@@ -3,6 +3,7 @@ package data
 import "net/http"
 
 type UserModel struct {
+	uri         string
 	endpoint    string
 	clientToken string
 	pemKey      []byte

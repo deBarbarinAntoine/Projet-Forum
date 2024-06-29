@@ -1,6 +1,7 @@
 package data
 
 type ThreadModel struct {
+	uri         string
 	endpoint    string
 	clientToken string
 	pemKey      []byte

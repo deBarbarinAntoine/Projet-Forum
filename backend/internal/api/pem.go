@@ -7,9 +7,9 @@ import (
 	"encoding/pem"
 )
 
-func (app *main.application) encryptPEM(data []byte) ([]byte, error) {
+func (api *API) encryptPEM(data []byte) ([]byte, error) {
 
-	publicKeyBlock, _ := pem.Decode(app.config.pemKey)
+	publicKeyBlock, _ := pem.Decode(api.pemKey)
 
 	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBlock.Bytes)
 	if err != nil {
