@@ -223,9 +223,7 @@ Here are the possible errors sent back by the API:
 
 For now only version 1 exists, but later versions will be available changing the URLs from `/v1/` to the wanted version (`/v2/` for example).
 
-
-
-
+---
 
 ## Setting up the project for contributors
 
