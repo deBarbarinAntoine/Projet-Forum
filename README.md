@@ -133,89 +133,89 @@ Here are the possible errors sent back by the API:
 > `400 Bad Request`
 > ```json
 > {
-> "error": "error_message"
+>   "error": "error_message"
 > }
 > ```
 
 > `401 Unauthorized`
 > ```json
 > {
-> "error": "invalid authentication credentials"
+>   "error": "invalid authentication credentials"
 > }
 > ```
 > **_OR_**
 > ```json
 > {
-> "error": "invalid or missing client token"
+>   "error": "invalid or missing client token"
 > }
 > ```
 > **_OR_**
 > ```json
 > {
-> "error": "invalid or missing authentication token"
+>   "error": "invalid or missing authentication token"
 > }
 > ```
 > **_OR_**
 > ```json
 > {
-> "error": "you must be authenticated in to access this resource"
+>   "error": "you must be authenticated in to access this resource"
 > }
 > ```
 
 > `403 Forbidden`
 > ```json
 > {
-> "error": "your user account must be activated to access this resource"
+>   "error": "your user account must be activated to access this resource"
 > }
 > ```
 > **_OR_**
 > ```json
 > {
-> "error": "your user account doesn't have the necessary permissions to access this resource"
+>   "error": "your user account doesn't have the necessary permissions to access this resource"
 > }
 > ```
 
 > `404 Not Found`
 > ```json
 > {
-> "error": "the requested resource could not be found"
+>   "error": "the requested resource could not be found"
 > }
 > ```
 
 > `405 Method Not Allowed`
 > ```json
 > {
-> "error": "the {method_name} method is not supported for this resource"
+>   "error": "the {method_name} method is not supported for this resource"
 > }
 > ```
 
 > `409 Conflict`
 > ```json
 > {
-> "error": "unable to update the record due to an edit conflict, please try again"
+>   "error": "unable to update the record due to an edit conflict, please try again"
 > }
 > ```
 
 > `422 Unprocessable Entity`
 > ```json
 > {
-> "errors": {
-> "field_name": "error_message"
-> }
+>   "errors": {
+>     "field_name": "error_message"
+>     }
 > }
 > ```
 
 > `429 Too Many Requests`
 > ```json
 > {
-> "error": "rate limit exceeded"
+>   "error": "rate limit exceeded"
 > }
 > ```
 
 > `500 Server Internal Error`
 > ```json
 > {
-> "error": "the server encountered a problem and could not process your request"
+>   "error": "the server encountered a problem and could not process your request"
 > }
 > ```
 
