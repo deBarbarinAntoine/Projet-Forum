@@ -212,7 +212,7 @@ Here are the possible errors sent back by the API:
 > }
 > ```
 
-> `500 Server Internal Error`
+> `500 Internal Server Error`
 > ```json
 > {
 >   "error": "the server encountered a problem and could not process your request"
