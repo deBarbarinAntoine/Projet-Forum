@@ -27,11 +27,19 @@ func (app *application) cleanExpiredTokens(frequency, timeout time.Duration) {
 
 func (app *application) newAuthenticationToken(user *data.User) (envelope, error) {
 
+	// deleting all user's current tokens
+	err := app.models.Tokens.DeleteAllForUser("*", user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// generating new authentication token
 	authToken, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.TokenScope.Authentication)
 	if err != nil {
 		return nil, err
 	}
 
+	// generating new refresh token
 	refreshToken, err := app.models.Tokens.New(user.ID, 48*time.Hour, data.TokenScope.Refresh)
 	if err != nil {
 		return nil, err
@@ -203,12 +211,6 @@ func (app *application) refreshAuthenticationTokenHandler(w http.ResponseWriter,
 		default:
 			app.serverErrorResponse(w, r, err)
 		}
-		return
-	}
-
-	err = app.models.Tokens.DeleteAllForUser(data.TokenScope.Refresh, user.ID)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
 		return
 	}
 

@@ -1,8 +1,11 @@
-package models
+package data
 
 import "net/http"
 
 type UserModel struct {
+	endpoint    string
+	clientToken string
+	pemKey      []byte
 }
 
 func (m *UserModel) Exists(id int) (bool, error) {

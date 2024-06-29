@@ -142,10 +142,16 @@ func (m TokenModel) DeleteAllForUser(scope string, userID int) error {
        		WHERE Id_users = ?;`
 
 		_, err := m.DB.ExecContext(ctx, query, userID)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil
+		}
 		return err
 	}
 
 	_, err := m.DB.ExecContext(ctx, query, scope, userID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil
+	}
 	return err
 }
 

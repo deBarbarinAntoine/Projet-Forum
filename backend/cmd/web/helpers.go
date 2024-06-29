@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Projet-Forum/internal/models"
+	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/validator"
 	"bytes"
 	"encoding/hex"
@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-func (app *application) sendAuthPEM(credentials *models.Credentials) error {
+func (app *application) sendAuthPEM(credentials *data.Credentials) error {
 
 	// mock data only for testing purposes
 	authJson, err := json.Marshal(credentials)

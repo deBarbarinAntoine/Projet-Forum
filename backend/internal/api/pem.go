@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"crypto/rand"
@@ -7,7 +7,7 @@ import (
 	"encoding/pem"
 )
 
-func (app *application) encryptPEM(data []byte) ([]byte, error) {
+func (app *main.application) encryptPEM(data []byte) ([]byte, error) {
 
 	publicKeyBlock, _ := pem.Decode(app.config.pemKey)
 

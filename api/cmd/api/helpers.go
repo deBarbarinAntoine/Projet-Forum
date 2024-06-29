@@ -22,7 +22,7 @@ var (
 type envelope map[string]any
 
 /* #######################################################################
-/* # Query form models
+/* # Query form data
 /* ####################################################################### */
 
 func newUserByIDForm() *userByIDForm {

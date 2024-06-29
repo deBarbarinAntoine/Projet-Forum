@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Projet-Forum/internal/models"
+	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/validator"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
@@ -10,8 +10,9 @@ import (
 )
 
 type config struct {
-	pemKey      []byte
-	clientToken string
+	isHTTPS bool
+	apiURL  string
+	port    int
 }
 
 type application struct {
@@ -19,7 +20,7 @@ type application struct {
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
-	models         models.Models
+	models         data.Models
 	config         *config
 }
 
@@ -30,14 +31,14 @@ type templateData struct {
 	Flash           string
 	IsAuthenticated bool
 	CSRFToken       string
-	User            models.User
-	CategoryList    []models.Category
-	ThreadList      []models.Thread
-	PostList        []models.Post
-	TagList         []models.Tag
-	Category        models.Category
-	Thread          models.Thread
-	Tag             models.Tag
+	User            data.User
+	CategoryList    []data.Category
+	ThreadList      []data.Thread
+	PostList        []data.Post
+	TagList         []data.Tag
+	Category        data.Category
+	Thread          data.Thread
+	Tag             data.Tag
 }
 
 type userLoginForm struct {

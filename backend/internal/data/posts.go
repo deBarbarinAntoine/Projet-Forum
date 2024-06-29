@@ -1,6 +1,9 @@
-package models
+package data
 
 type PostModel struct {
+	endpoint    string
+	clientToken string
+	pemKey      []byte
 }
 
 func (p *PostModel) Create(content, author string, threadId, parentPostId int) int {
