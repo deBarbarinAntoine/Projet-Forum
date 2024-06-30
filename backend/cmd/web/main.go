@@ -1,7 +1,9 @@
 package main
 
 import (
+	"Projet-Forum/internal/api"
 	"Projet-Forum/internal/data"
+	"Projet-Forum/internal/validator"
 	"crypto/tls"
 	"database/sql"
 	"flag"
@@ -28,7 +30,7 @@ func main() {
 
 	dsn := flag.String("dsn", "", "MySQL DSN (data source name)")
 
-	//secretAPI := flag.String("secret", "", "Secret API")
+	secret := flag.String("secret", "", "Secret API")
 
 	flag.Parse()
 
@@ -36,10 +38,25 @@ func main() {
 
 	addr := fmt.Sprintf(":%d", cfg.port)
 
+	if secret == nil || *secret == "" {
+		logger.Error("secret is required")
+		os.Exit(1)
+	}
+	if pemFilePath == nil || *pemFilePath == "" {
+		logger.Error("pem file path is required")
+		os.Exit(1)
+	}
 	var pemKey []byte
+	var err error
+	if clientToken == nil || *clientToken == "" {
+		clientToken, pemKey, err = getClientCredentials(cfg.apiURL, *secret, *pemFilePath)
+		if err != nil {
+			logger.Error(err.Error())
+			os.Exit(1)
+		}
+	}
 
-	if *pemFilePath != "" {
-		var err error
+	if pemKey == nil {
 		pemKey, err = os.ReadFile(*pemFilePath)
 		if err != nil {
 			logger.Error(err.Error())
@@ -74,7 +91,7 @@ func main() {
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		config:         &cfg,
-		models:         data.NewModels(*clientToken, pemKey),
+		models:         data.NewModels(cfg.apiURL, *clientToken, pemKey),
 	}
 
 	server := http.Server{
@@ -128,4 +145,46 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func getClientCredentials(urlAPI, secret, pemFilePath string) (*string, []byte, error) {
+
+	// creating connection to API
+	apiClient := api.GetForClient(urlAPI, secret)
+
+	// building request body with client credentials
+	credentials := make(map[string]string)
+	credentials["username"] = "Threadive Web"
+	credentials["email"] = "web@threadive.com"
+	v := validator.New()
+
+	// getting client token
+	clientToken, err := apiClient.GetClient(secret, credentials, v)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// fetching PEM public key
+	var pem []byte
+	if !fileExists(pemFilePath) {
+		pem, err = apiClient.GetPEM(secret, pemFilePath, v)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		pem, err = os.ReadFile(pemFilePath)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return clientToken, pem, nil
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }

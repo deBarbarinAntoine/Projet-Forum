@@ -14,7 +14,7 @@ type Validator struct {
 
 var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-func NewValidator() *Validator {
+func New() *Validator {
 	return &Validator{
 		FieldErrors: make(map[string]string),
 	}

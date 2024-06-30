@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"slices"
 	"sync"
 	"time"
@@ -45,6 +46,73 @@ func GetInstance(url, clientToken string, pemKey []byte) *API {
 		}
 	}
 	return apiInstance
+}
+
+func GetForClient(url, secret string) *API {
+	return &API{
+		url:         url,
+		clientToken: secret,
+		pemKey:      nil,
+	}
+}
+
+func (api *API) GetClient(secret string, credentials map[string]string, v *validator.Validator) (*string, error) {
+
+	// converting the body to JSON format
+	reqBody, err := json.Marshal(credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	// making the request
+	res, status, err := api.Request(secret, http.MethodPost, "tokens/client", reqBody, false)
+	if err != nil {
+		return nil, err
+	}
+
+	// checking for errors
+	err = GetErr(status, res, v)
+	if err != nil {
+		return nil, err
+	}
+	var token *string
+	if v.Valid() {
+
+		// retrieving the tokens
+		response := make(map[string]map[string]*string)
+		err = json.Unmarshal(res, &response)
+		if err != nil {
+			return nil, err
+		}
+		token = response["client_token"]["token"]
+	}
+
+	return token, nil
+}
+
+func (api *API) GetPEM(secret, pemFilePath string, v *validator.Validator) ([]byte, error) {
+
+	// making the request
+	res, status, err := api.Get(secret, "tokens/public-key", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// checking for errors
+	err = GetErr(status, res, v)
+	if err != nil {
+		return nil, err
+	}
+	var pemkey []byte
+	if v.Valid() {
+		pemkey = res
+		err = os.WriteFile(pemFilePath, pemkey, 0644)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return pemkey, nil
 }
 
 func (api *API) Get(userToken, endpoint string, query url.Values) ([]byte, int, error) {

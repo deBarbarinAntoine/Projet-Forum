@@ -3,6 +3,7 @@ package data
 import "time"
 
 type Models struct {
+	TokenModel    *TokenModel
 	UserModel     *UserModel
 	CategoryModel *CategoryModel
 	ThreadModel   *ThreadModel
@@ -12,6 +13,12 @@ type Models struct {
 
 func NewModels(uri, clientToken string, pemKey []byte) Models {
 	return Models{
+		TokenModel: &TokenModel{
+			uri:         uri,
+			endpoint:    "/tokens",
+			clientToken: clientToken,
+			pemKey:      pemKey,
+		},
 		UserModel: &UserModel{
 			uri:         uri,
 			endpoint:    "/users",
@@ -55,10 +62,14 @@ type Metadata struct {
 
 type envelope map[string]any
 
+type Tokens struct {
+	Authentication Token `json:"authentication_token"`
+	Refresh        Token `json:"refresh_token"`
+}
+
 type Token struct {
-	Plaintext string    `json:"token"`
-	Expiry    time.Time `json:"expiry"`
-	Scope     string    `json:"scope,omitempty"`
+	Token  string    `json:"token"`
+	Expiry time.Time `json:"expiry"`
 }
 
 type User struct {

@@ -191,4 +191,4 @@ func (m *UserModel) GetByID(token string, id string, query url.Values, v *valida
 	return user, nil
 }
 
-// FIXME -> ADD FRIENDS RELATED FUNCTIONS
+// FIXME -> ADD FRIENDS RELATED FUNCTIONS & ACTIVATION/FORGOT-PASSWORD HANDLERS

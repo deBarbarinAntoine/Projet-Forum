@@ -20,10 +20,10 @@ func (app *application) routes() http.Handler {
 	/* # CLIENT TOKEN
 	/* ############################################################################# */
 
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.authenticateAPISecret)
-		mux.HandleFunc("/v1/tokens/client", app.createClientTokenHandler, http.MethodPost)
-		mux.HandleFunc("/v1/tokens/public-key", app.getPublicKeyPEM, http.MethodGet)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.authenticateAPISecret)
+		group.HandleFunc("/v1/tokens/client", app.createClientTokenHandler, http.MethodPost)
+		group.HandleFunc("/v1/tokens/public-key", app.getPublicKeyPEM, http.MethodGet)
 	})
 
 	/* #############################################################################
@@ -56,19 +56,19 @@ func (app *application) routes() http.Handler {
 	// ##################################
 	// ENCRYPTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.decryptRSA)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.decryptRSA)
 
-		mux.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
+		group.HandleFunc("/v1/tokens/authentication", app.createAuthenticationTokenHandler, http.MethodPost)
 	})
 
 	// ##################################
 	// PROTECTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser, app.guardUserHandlers)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.requireActivatedUser, app.guardUserHandlers)
 
-		mux.HandleFunc("/v1/tokens/revoke", app.revokeTokensHandler, http.MethodPost)
+		group.HandleFunc("/v1/tokens/revoke", app.revokeTokensHandler, http.MethodPost)
 	})
 
 	/* #############################################################################
@@ -81,34 +81,34 @@ func (app *application) routes() http.Handler {
 	// ##################################
 	// ENCRYPTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.decryptRSA)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.decryptRSA)
 
-		mux.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
-		mux.HandleFunc("/v1/users/password", app.resetPasswordHandler, http.MethodPut)
+		group.HandleFunc("/v1/users", app.registerUserHandler, http.MethodPost)
+		group.HandleFunc("/v1/users/password", app.resetPasswordHandler, http.MethodPut)
 	})
 
 	// ##################################
 	// PROTECTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.requireActivatedUser)
 
-		mux.HandleFunc("/v1/users", app.getUsersHandler, http.MethodGet)
+		group.HandleFunc("/v1/users", app.getUsersHandler, http.MethodGet)
 
-		mux.HandleFunc("/v1/users/:id", app.getSingleUserHandler, http.MethodGet)
+		group.HandleFunc("/v1/users/:id", app.getSingleUserHandler, http.MethodGet)
 
-		mux.HandleFunc("/v1/users/:id/friend", app.friendRequestHandler, http.MethodPost)
-		mux.HandleFunc("/v1/users/:id/friend", app.friendResponseHandler, http.MethodPut)
-		mux.HandleFunc("/v1/users/:id/friend", app.friendDeleteHandler, http.MethodDelete)
+		group.HandleFunc("/v1/users/:id/friend", app.friendRequestHandler, http.MethodPost)
+		group.HandleFunc("/v1/users/:id/friend", app.friendResponseHandler, http.MethodPut)
+		group.HandleFunc("/v1/users/:id/friend", app.friendDeleteHandler, http.MethodDelete)
 
 		// CHECK PERMISSIONS FOR USER MANIPULATION
-		mux.Use(app.guardUserHandlers)
-		mux.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
+		group.Use(app.guardUserHandlers)
+		group.HandleFunc("/v1/users/:id", app.deleteUserHandler, http.MethodDelete)
 
 		// ENCRYPTED ROUTE
-		mux.Use(app.decryptRSA)
-		mux.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
+		group.Use(app.decryptRSA)
+		group.HandleFunc("/v1/users/:id", app.updateUserHandler, http.MethodPut)
 
 	})
 
@@ -123,13 +123,13 @@ func (app *application) routes() http.Handler {
 	// ##################################
 	// PROTECTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.requireActivatedUser)
 
-		mux.HandleFunc("/v1/categories", app.createCategoryHandler, http.MethodPost)
+		group.HandleFunc("/v1/categories", app.createCategoryHandler, http.MethodPost)
 
-		mux.HandleFunc("/v1/categories/:id", app.updateCategoryHandler, http.MethodPut)
-		mux.HandleFunc("/v1/categories/:id", app.deleteCategoryHandler, http.MethodDelete)
+		group.HandleFunc("/v1/categories/:id", app.updateCategoryHandler, http.MethodPut)
+		group.HandleFunc("/v1/categories/:id", app.deleteCategoryHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################
@@ -143,16 +143,16 @@ func (app *application) routes() http.Handler {
 	// ##################################
 	// PROTECTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.requireActivatedUser)
 
-		mux.HandleFunc("/v1/threads", app.createThreadHandler, http.MethodPost)
+		group.HandleFunc("/v1/threads", app.createThreadHandler, http.MethodPost)
 
-		mux.HandleFunc("/v1/threads/:id", app.updateThreadHandler, http.MethodPut)
-		mux.HandleFunc("/v1/threads/:id", app.deleteThreadHandler, http.MethodDelete)
+		group.HandleFunc("/v1/threads/:id", app.updateThreadHandler, http.MethodPut)
+		group.HandleFunc("/v1/threads/:id", app.deleteThreadHandler, http.MethodDelete)
 
-		mux.HandleFunc("/v1/threads/:id/follow", app.addToFavoritesThreadHandler, http.MethodPost)
-		mux.HandleFunc("/v1/threads/:id/follow", app.removeFromFavoritesThreadHandler, http.MethodDelete)
+		group.HandleFunc("/v1/threads/:id/follow", app.addToFavoritesThreadHandler, http.MethodPost)
+		group.HandleFunc("/v1/threads/:id/follow", app.removeFromFavoritesThreadHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################
@@ -166,16 +166,16 @@ func (app *application) routes() http.Handler {
 	// ##################################
 	// PROTECTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.requireActivatedUser)
 
-		mux.HandleFunc("/v1/tags", app.createTagHandler, http.MethodPost)
+		group.HandleFunc("/v1/tags", app.createTagHandler, http.MethodPost)
 
-		mux.HandleFunc("/v1/tags/:id", app.updateTagHandler, http.MethodPut)
-		mux.HandleFunc("/v1/tags/:id", app.deleteTagHandler, http.MethodDelete)
+		group.HandleFunc("/v1/tags/:id", app.updateTagHandler, http.MethodPut)
+		group.HandleFunc("/v1/tags/:id", app.deleteTagHandler, http.MethodDelete)
 
-		mux.HandleFunc("/v1/tags/:id/favorite", app.followTagHandler, http.MethodPost)
-		mux.HandleFunc("/v1/tags/:id/favorite", app.unfollowTagHandler, http.MethodDelete)
+		group.HandleFunc("/v1/tags/:id/favorite", app.followTagHandler, http.MethodPost)
+		group.HandleFunc("/v1/tags/:id/favorite", app.unfollowTagHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################
@@ -189,17 +189,17 @@ func (app *application) routes() http.Handler {
 	// ##################################
 	// PROTECTED ROUTES
 	// ##################################
-	router.Group(func(mux *flow.Mux) {
-		mux.Use(app.requireActivatedUser)
+	router.Group(func(group *flow.Mux) {
+		group.Use(app.requireActivatedUser)
 
-		mux.HandleFunc("/v1/posts", app.createPostHandler, http.MethodPost)
+		group.HandleFunc("/v1/posts", app.createPostHandler, http.MethodPost)
 
-		mux.HandleFunc("/v1/posts/:id", app.updatePostHandler, http.MethodPut)
-		mux.HandleFunc("/v1/posts/:id", app.deletePostHandler, http.MethodDelete)
+		group.HandleFunc("/v1/posts/:id", app.updatePostHandler, http.MethodPut)
+		group.HandleFunc("/v1/posts/:id", app.deletePostHandler, http.MethodDelete)
 
-		mux.HandleFunc("/v1/posts/:id/react", app.reactToPostHandler, http.MethodPost)
-		mux.HandleFunc("/v1/posts/:id/react", app.changeReactionPostHandler, http.MethodPatch)
-		mux.HandleFunc("/v1/posts/:id/react", app.removeReactionPostHandler, http.MethodDelete)
+		group.HandleFunc("/v1/posts/:id/react", app.reactToPostHandler, http.MethodPost)
+		group.HandleFunc("/v1/posts/:id/react", app.changeReactionPostHandler, http.MethodPatch)
+		group.HandleFunc("/v1/posts/:id/react", app.removeReactionPostHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################
