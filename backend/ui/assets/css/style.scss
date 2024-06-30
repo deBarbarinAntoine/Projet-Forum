@@ -886,4 +886,35 @@
     }
 
   }
+
+/* Error 404 */ 
+
+.container-error-row {
+    font-family: 'Varela';
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    .container-error {
+        height: 400px;
+        padding-top: 30px;
+        margin-left: 5px;
+        padding-left: 50px;
+        width: 935px;
+        margin-top: 130px;
+        font-family: 'Varela';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding-bottom: 20px;
+        h4  {
+            font-size: 80px;
+        }
+        p {
+            margin-top: 40px;
+            font-size: 20px;
+        }
+    }
+}
  
