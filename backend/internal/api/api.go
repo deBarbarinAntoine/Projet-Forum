@@ -21,7 +21,7 @@ const (
 
 var (
 	client                = http.Client{Timeout: time.Second * 5}
-	permittedMethods      = []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete}
+	permittedMethods      = []string{http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete}
 	lock                  = &sync.Mutex{}
 	ErrUnmarshallAPIError = errors.New("error unmarshalling API error response")
 )

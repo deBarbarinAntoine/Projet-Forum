@@ -45,6 +45,14 @@ func NewModels(uri, clientToken string, pemKey []byte) Models {
 	}
 }
 
+type Metadata struct {
+	CurrentPage  int `json:"current_page,omitempty"`
+	PageSize     int `json:"page_size,omitempty"`
+	FirstPage    int `json:"first_page,omitempty"`
+	LastPage     int `json:"last_page,omitempty"`
+	TotalRecords int `json:"total_records,omitempty"`
+}
+
 type envelope map[string]any
 
 type Token struct {
@@ -53,17 +61,12 @@ type Token struct {
 	Scope     string    `json:"scope,omitempty"`
 }
 
-type password struct {
-	plaintext *string
-	hash      []byte
-}
-
 type User struct {
 	ID            int       `json:"id"`
 	CreatedAt     time.Time `json:"created_at"`
 	Name          string    `json:"name"`
 	Email         string    `json:"email"`
-	Password      password  `json:"-"`
+	Password      string    `json:"-"`
 	Role          string    `json:"role"`
 	BirthDate     time.Time `json:"birth_date"`
 	Bio           string    `json:"bio,omitempty"`
