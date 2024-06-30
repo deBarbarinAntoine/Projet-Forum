@@ -31,20 +31,20 @@
                     <div class="activity"></div>
                 </div>
                 <div class="name-rank">
-                    <p> Poupi Poupo </p>
-                    <p> Administrator </p>
+                    <p> Poupi Poupo </p> <!--{{ nom de l'utilisateur }}-->
+                    <p> Administrator </p> <!--{{ role de l'utilisateur }}-->
                 </div>
             </div>
 
             <div class="stats">
                 <div class="member-since">
                     <p> Member since </p>
-                    <p> 01/01/0001 </p>
+                    <p> 01/01/0001 </p> <!--{{ date d'inscription de l'utilisateur }}-->
                 </div>
 
                 <div class="posts">
                     <p> Post(s) </p>
-                    <p> 100M </p>
+                    <p> 100M </p> <!--{{ nombre de post de l'utilisateur }}-->
                 </div>
             </div>
         </div>
@@ -67,7 +67,7 @@
 
             <div class="link">
                 <img class="link-icon" src="../assets/img/icons/categories-icon.svg">
-                <p class="link-text"> Categories </p>
+                <p class="link-text"> Categories </p> 
                 <img class="link-icon" src="../assets/img/icons/down-arrow-icon.svg">    
             </div>
 
@@ -75,17 +75,17 @@
 
                 <div class="category">
                     <img class="category-icon" src="../assets/img/icons/hardware-icon.svg">
-                    <p class="category-text"> Hardware </p>
+                    <p class="category-text"> Hardware </p> <!--{{ Partie répétée autant de fois qu'il y a de catégories }}-->
                 </div>
 
                 <div class="category">
                     <img class="category-icon" src="../assets/img/icons/languages-icon.svg">
-                    <p class="category-text"> Languages </p>
+                    <p class="category-text"> Languages </p> 
                 </div>
 
                 <div class="category">
                     <img class="category-icon" src="../assets/img/icons/tech-icon.svg">
-                    <p class="category-text"> Tech </p>
+                    <p class="category-text"> Tech </p> <!--{{ Fin des catégories }}-->
                 </div>
             </div>
         </div>
@@ -93,7 +93,7 @@
         <div class="footer">
             <div class="legal-notice">
                 <img class="legal-notice-icon" src="../assets/img/icons/legal-notice-icon.svg">
-                <p class="legal-notice-text"> Legal Notice </p>
+                <p class="legal-notice-text"> Legal Notice </p> 
             </div>
 
             <div class="privacy-policy">
@@ -116,13 +116,13 @@
        </div>
        
        <div class="container-accueil-content">
-            <h4> Hot topics </h4>
+            <h4> Hot topics </h4> <!--{{ Tous les hot topics}}-->
             <div class="container-hottopic">
-                <img src="../assets/img/icons/greenfolder.svg">
+                <img src="../assets/img/icons/greenfolder.svg"> <!--{{folder vert si ouvert, jaune si terminé et rouge si fermé }}-->
                 <div class="container-thread-text">
-                <h3> Aide Golang ! </h3>
-                <h5> Bruno Saltor </h5>
-                <p> 09:27:56</p>
+                <h3> Aide Golang ! </h3> <!--{{ Titre du thread }}-->
+                <h5> Bruno Saltor </h5> <!--{{ Auteur }}-->
+                <p> 09:27:56</p> <!--{{ Date création }}-->
                 </div>
             </div>
             <div class="container-hottopic">
@@ -139,42 +139,45 @@
                 <h3> Aide Golang ! </h3>
                 <h5> Bruno Saltor </h5>
                 <p> 09:27:56</p>
+                <!--{{ Fin des hots topics }}-->
                 </div>
             </div>
        </div>
        <div class="container-accueil-content">
        <h4>  Category </h4>
-       <div class="container-category">
+       <div class="container-category"> <!--{{ Categories qui vont être affichés sur l'accueil du site}}-->
             <div class="rectangle-category">
                 <img src="../assets/img/icons/languages-icon.svg">
-                <h5> Languages </h5>
+                <h5> Languages </h5> <!--{{ categorie }}-->
             </div>
             <div class="rectangle-category">
                 <img src="../assets/img/icons/hardware-icon.svg">
-                <h5> Hardware</h5>
+                <h5> Hardware</h5> <!--{{ categorie }}-->
             </div>
             <div class="rectangle-category">
                 <img src="../assets/img/icons/tech-icon.svg">
-                <h5> Tech </h5>
+                <h5> Tech </h5> <!--{{ categorie }}-->
             </div>
             <div class="rectangle-category">
                 <img src="../assets/img/icons/AI-icon.svg">
-                <h5> AI </h5>
+                <h5> AI </h5> <!--{{ categorie }}-->
             </div>
             <div class="rectangle-category">
                 <img src="../assets/img/icons/Other-icon.svg">
                 <h5> Other </h5>
             </div>
+            <!--{{ fin des categories }}-->
        </div>
     </div>
     <div class="container-accueil-content">
         <h4>  Followed Thread </h4>
+        <!--{{ Threads suivis par l'user }}-->
         <div class="container-hottopic">
             <img src="../assets/img/icons/greenfolder.svg">
                 <div class="container-thread-text">
-                <h3> Aide Golang ! </h3>
-                <h5> Bruno Saltor </h5>
-                <p> 09:27:56</p>
+                <h3> Aide Golang ! </h3> <!--{{ titre du thread }}-->
+                <h5> Bruno Saltor </h5> <!--{{ auteur }}-->
+                <p> 09:27:56</p> <!--{{ date de création }}-->
                 </div>
             </div>
             <div class="container-hottopic">
@@ -186,12 +189,15 @@
                 </div>
             </div>
         </div>
+        <!--{{ Fin de sThreads suivis par l'user }}-->
         <div class="container-accueil-content">
             <h4> Fav Tag </h4>
+             <!--{{ Tags suivis par l'user }}-->
             <div class="container-favtag">
                 <div class="favtag">
-                    <h5> Golang </h5>
+                    <h5> Golang </h5>  <!--{{ Tag }}-->
                 </div>
+                 <!--{{  Fin des Tags suivis par l'user }}-->
             </div>
         </div>
     </div>

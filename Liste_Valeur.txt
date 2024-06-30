@@ -20,7 +20,7 @@
 
     -- Valeur -- 
 
- - Topics Populaires
+ - Topics Populaires 
  - Les catégories
  - Les threads suivis par l'utilisateur 
  - les tags liké par l'utilisateur
@@ -50,7 +50,7 @@
 
  - Tous les posts du thread 
  - Auteur du post / Date du post 
- - Nombre de like du post
+ - Nombre de like du post (emoji)
  
     -- Fonction -- 
 
