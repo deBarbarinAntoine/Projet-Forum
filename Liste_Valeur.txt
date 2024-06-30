@@ -1,0 +1,130 @@
+ -- Header -- 
+
+    -- Valeur -- 
+
+ - Nom d'utilisateur
+ - Rôle (Admin / Modo / Membre)
+ - Date d'inscription 
+ - Nombre de posts 
+ - Savoir si l'utilisateur est connecté ou non 
+ - Les différentes catégories
+ - Les tags populaires
+
+    -- Fonction -- 
+
+ - Fonction de recherche 
+
+
+
+ -- Accueil -- 
+
+    -- Valeur -- 
+
+ - Topics Populaires
+ - Les catégories
+ - Les threads suivis par l'utilisateur 
+ - les tags liké par l'utilisateur
+
+
+
+-- Liste des threads d'une catégorie -- 
+
+    -- Valeur -- 
+
+  - Threads appartenant à la catégorie en question 
+  - Titre du thread / Auteur du thread / Date de création du thread 
+  - Savoir si le thread est Fermé / Ouvert 
+  
+    -- Fonction -- 
+
+  - Fonction de recherche dans la liste des threads
+  - Possibilité de mettre en favoris un thread
+  - Possibilité de créer un thread 
+  - Si admin : possibilité de supprimer le thread 
+
+
+
+-- Post dans un thread -- 
+    
+    -- Valeur -- 
+
+ - Tous les posts du thread 
+ - Auteur du post / Date du post 
+ - Nombre de like du post
+ 
+    -- Fonction -- 
+
+ - Fonction de recherche dans le thread 
+ - Possiblité de mettre en fav un post 
+ - Possibilité de like un post 
+ - Réponse à un post précis
+ - Ecrire une réponse à la suite des autres posts
+ - Pagination 
+
+
+
+ -- Création d'un thread -- 
+    
+ - Titre du thread 
+ - Message du thread (équivalent au 1er post)
+ - Bouton de création du thread
+
+
+
+ -- Page de recherche -- 
+
+    -- Valeur -- 
+
+ - Thread par rapport à la recherche 
+ - Catégories par rapport à la recherche
+ - Tags par rapport à la recherche
+ - Utilisateur par rapport à la recherche 
+
+
+
+ -- Dashboard -- 
+
+    -- Valeur --
+
+ - Nom de l'utilisateur
+ - Rôle (Admin / Modo / Membre)
+ - Date d'inscription 
+ - Nombre de posts 
+ - Nombre d'amis 
+ - Les requêtes d'amis en attente 
+ - La liste d'amis
+ - Les threads postés par l'utilisateur
+ - Les posts de l'utilisateur 
+ 
+
+
+ -- Dashboard Admin -- 
+
+     -- Valeur --
+
+ - Dernier user inscrit 
+ - Dernière catégories créées 
+ - Dernier tags 
+ - Dernier Threads
+
+ -- Login -- 
+ 
+ - Addresse mail 
+ - Mot de passe 
+ - Bouton de login 
+
+
+ -- Register -- 
+
+ - Addresse mail 
+ - Mot de passe 
+ - Confirmation mdp 
+ - Bouton de login 
+
+
+
+ -- Mentions légales -- 
+
+ - Static 
+
+
