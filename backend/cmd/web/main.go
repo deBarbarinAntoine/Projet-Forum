@@ -56,14 +56,6 @@ func main() {
 		}
 	}
 
-	if pemKey == nil {
-		pemKey, err = os.ReadFile(*pemFilePath)
-		if err != nil {
-			logger.Error(err.Error())
-			os.Exit(1)
-		}
-	}
-
 	db, err := openDB(*dsn)
 	if err != nil {
 		logger.Error(err.Error())

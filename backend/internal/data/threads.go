@@ -188,4 +188,42 @@ func (m *ThreadModel) GetByID(token string, id int, query url.Values, v *validat
 	return thread, nil
 }
 
-// FIXME -> ADD THREAD FAVORITE HANDLING!!!
+func (m *TagModel) AddToFavorite(token string, id int, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/favorite", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodPost, endpoint, nil, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *TagModel) RemoveFromFavorite(token string, id int, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/favorite", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodDelete, endpoint, nil, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -15,6 +15,20 @@ import (
 	"time"
 )
 
+func (app *application) logout(r *http.Request) error {
+
+	err := app.sessionManager.Clear(r.Context())
+	if err != nil {
+		return err
+	}
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (app *application) decodePostForm(r *http.Request, dst any) error {
 
 	err := r.ParseForm()

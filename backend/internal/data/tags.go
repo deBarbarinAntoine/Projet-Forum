@@ -181,4 +181,72 @@ func (m *TagModel) GetByID(token string, id int, query url.Values, v *validator.
 	return tag, nil
 }
 
-// FIXME -> ADD TAG FOLLOWING FUNCTIONS!!!
+func (m *TagModel) GetPopular(token string, v *validator.Validator) ([]*Tag, []*Thread, error) {
+
+	// making the request
+	res, status, err := m.api().Get(token, "/popular", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return nil, nil, err
+	}
+	var tags []*Tag
+	var threads []*Thread
+	if v.Valid() {
+
+		// retrieving the tags and threads
+		var response = make(map[string]map[string]any)
+		err = json.Unmarshal(res, &response)
+		if err != nil {
+			return nil, nil, err
+		}
+		tags = response["popular"]["tags"].([]*Tag)
+		threads = response["popular"]["threads"].([]*Thread)
+	}
+
+	return tags, threads, nil
+}
+
+func (m *TagModel) Follow(token string, id int, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/follow", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodPost, endpoint, nil, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *TagModel) Unfollow(token string, id int, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/follow", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodDelete, endpoint, nil, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

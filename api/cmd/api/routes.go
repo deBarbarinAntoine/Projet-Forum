@@ -151,8 +151,8 @@ func (app *application) routes() http.Handler {
 		group.HandleFunc("/v1/threads/:id", app.updateThreadHandler, http.MethodPut)
 		group.HandleFunc("/v1/threads/:id", app.deleteThreadHandler, http.MethodDelete)
 
-		group.HandleFunc("/v1/threads/:id/follow", app.addToFavoritesThreadHandler, http.MethodPost)
-		group.HandleFunc("/v1/threads/:id/follow", app.removeFromFavoritesThreadHandler, http.MethodDelete)
+		group.HandleFunc("/v1/threads/:id/favorite", app.addToFavoritesThreadHandler, http.MethodPost)
+		group.HandleFunc("/v1/threads/:id/favorite", app.removeFromFavoritesThreadHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################
@@ -174,8 +174,8 @@ func (app *application) routes() http.Handler {
 		group.HandleFunc("/v1/tags/:id", app.updateTagHandler, http.MethodPut)
 		group.HandleFunc("/v1/tags/:id", app.deleteTagHandler, http.MethodDelete)
 
-		group.HandleFunc("/v1/tags/:id/favorite", app.followTagHandler, http.MethodPost)
-		group.HandleFunc("/v1/tags/:id/favorite", app.unfollowTagHandler, http.MethodDelete)
+		group.HandleFunc("/v1/tags/:id/follow", app.followTagHandler, http.MethodPost)
+		group.HandleFunc("/v1/tags/:id/follow", app.unfollowTagHandler, http.MethodDelete)
 	})
 
 	/* #############################################################################
