@@ -26,7 +26,7 @@ body {
 }
 
 header {
-  z-index: 1;
+  z-index: 3;
   position: fixed;
   width: 100%;
   height: 100px;
@@ -158,7 +158,10 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 
 .navs {
+  z-index: 3;
+  position: fixed;
   display: flex;
+  flex-flow: row nowrap;
   justify-content: space-between;
 }
 
@@ -367,6 +370,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   gap: 12px;
   padding-left: 30px;
   font-family: Varela-Round;
+  transform: rotate(-90deg);
 }
 .nav-left .footer .footer-link .footer-icon {
   opacity: 0.5;
