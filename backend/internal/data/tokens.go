@@ -19,7 +19,7 @@ func (m *TokenModel) api() *api.API {
 	return api.GetInstance(m.uri, m.clientToken, m.pemKey)
 }
 
-func (m *TokenModel) Authenticate(token string, body envelope, v *validator.Validator) (*Tokens, error) {
+func (m *TokenModel) Authenticate(body map[string]string, v *validator.Validator) (*Tokens, error) {
 
 	// converting the body to JSON format
 	reqBody, err := json.Marshal(body)
@@ -31,7 +31,7 @@ func (m *TokenModel) Authenticate(token string, body envelope, v *validator.Vali
 	endpoint := fmt.Sprintf("%s/authentication", m.endpoint)
 
 	// making the request
-	res, status, err := m.api().Request(token, http.MethodPost, endpoint, reqBody, true)
+	res, status, err := m.api().Request("", http.MethodPost, endpoint, reqBody, true)
 	if err != nil {
 		return nil, err
 	}

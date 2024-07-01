@@ -37,7 +37,7 @@ func (app *application) getTagsHandler(w http.ResponseWriter, r *http.Request) {
 		form.Page = 1
 	}
 	if form.PageSize == 0 {
-		form.PageSize = 10
+		form.PageSize = 100
 	}
 	if form.Sort == "" {
 		form.Sort = form.SortSafelist[0]

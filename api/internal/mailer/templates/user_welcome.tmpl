@@ -7,11 +7,11 @@ Thanks for signing up for a Threadive account. We're excited to have you on boar
 
 For future reference, your user ID number is {{.userID}}.
 
-Please send a request to the `PUT /v1/users/activated` endpoint with the following JSON body to activate your account:
+Please follow the following link to activate your account:
 
-{"token": "{{.activationToken}}"}
+http://localhost:4000/confirm/{{.activationToken}}
 
-Please note that this is a one-time use token, and it will expire in 3 days.
+Please note that this is a one-time use opportunity, and it will expire in 3 days.
 
 After this delay, if you don't activate your account, it will be removed.
 
@@ -25,11 +25,9 @@ The Threadive Team
     <p>Hi,</p>
     <p>Thanks for signing up for a Threadive account. We're excited to have you on board!</p>
     <p>For future reference, your user ID number is {{.userID}}.</p>
-    <p>Please send a request to the <code>PUT /v1/users/activated</code> endpoint with the following JSON body to activate your account:</p>
-    <p><code>
-        {"token": "{{.activationToken}}"}
-    </code></p>
-    <p>Please note that this is a one-time use token, and it will expire in 3 days.</p>
+    <p>Please follow the following link to activate your account:</p>
+    <p><a href="http://localhost:4000/confirm/{{.activationToken}}">Activate your account</a></p>
+    <p>Please note that this is a one-time use opportunity, and it will expire in 3 days.</p>
     <p>After this delay, if you don't activate your account, it will be removed.</p>
     <p>Thanks,</p>
     <p>The Threadive Team</p>

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/validator"
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/alexedwards/flow"
 	"github.com/go-playground/form/v4"
 	"github.com/justinas/nosurf"
 	"log/slog"
@@ -75,14 +77,40 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 	return isAuthenticated
 }
 
+func (app *application) getToken(r *http.Request) string {
+	tokens, ok := app.sessionManager.Get(r.Context(), userTokenSessionManager).(*data.Tokens)
+	if !ok {
+		return ""
+	}
+	return tokens.Authentication.Token
+}
+
 func newUserRegisterForm() *userRegisterForm {
 	return &userRegisterForm{
 		Validator: *validator.New(),
 	}
 }
 
+func newUserConfirmForm() *userConfirmForm {
+	return &userConfirmForm{
+		Validator: *validator.New(),
+	}
+}
+
 func newUserLoginForm() *userLoginForm {
 	return &userLoginForm{
+		Validator: *validator.New(),
+	}
+}
+
+func newForgotPasswordForm() *forgotPasswordForm {
+	return &forgotPasswordForm{
+		Validator: *validator.New(),
+	}
+}
+
+func newResetPasswordForm() *resetPasswordForm {
+	return &resetPasswordForm{
 		Validator: *validator.New(),
 	}
 }
@@ -111,12 +139,42 @@ func newTagForm() *tagForm {
 	}
 }
 
-func (app *application) newTemplateData(r *http.Request) templateData {
+func (app *application) newTemplateData(r *http.Request, allUser bool) templateData {
+
+	// checking is the user is authenticated
+	isAuthenticated := app.isAuthenticated(r)
+	token := app.getToken(r)
+	// retrieving the user data
+	var user *data.User
+	v := validator.New()
+	if isAuthenticated {
+		var query url.Values
+		if !allUser {
+			query = url.Values{
+				"includes[]": {"posts"},
+			}
+		} else {
+			query = url.Values{
+				"includes[]": {"following_tags", "favorite_threads", "categories_owned", "tags_owned", "threads_owned", "friends", "posts"},
+			}
+		}
+		if token != "" {
+			user, _ = app.models.UserModel.GetByID(token, "me", query, v)
+		}
+	}
+	categories, _, _ := app.models.CategoryModel.Get(token, nil, v)
+	tags, threads, _ := app.models.TagModel.GetPopular(token, v)
+
+	// returning the templateData with all information
 	return templateData{
-		CurrentYear:     time.Now().Year(),
-		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
-		IsAuthenticated: app.isAuthenticated(r),
-		CSRFToken:       nosurf.Token(r),
+		CurrentYear:       time.Now().Year(),
+		Flash:             app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated:   isAuthenticated,
+		CSRFToken:         nosurf.Token(r),
+		User:              user,
+		PopularTags:       tags,
+		PopularThreads:    threads,
+		CategoriesNavLeft: categories,
 	}
 }
 
@@ -151,4 +209,27 @@ func getId(queryValues url.Values) (int, error) {
 		return strconv.Atoi(queryValues.Get("id"))
 	}
 	return -1, fmt.Errorf("id not found")
+}
+
+func getPathID(r *http.Request) (int, error) {
+
+	// fetching the id param from the URL
+	param := flow.Param(r.Context(), "id")
+
+	// looking for errors
+	if param == "" {
+		return 0, fmt.Errorf("id required")
+	}
+	if param != "me" {
+		id, err := strconv.Atoi(param)
+		if err != nil || id < 1 {
+			return 0, fmt.Errorf("invalid id")
+		}
+
+		// return the integer id
+		return id, nil
+	}
+
+	// return -1 when id == "me"
+	return -1, nil
 }

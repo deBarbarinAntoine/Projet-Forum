@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	userTokenSessionManager = "user_token"
+	userTokenSessionManager           = "user_token"
+	authenticatedUserIDSessionManager = "authenticated_user_id"
 )
 
 func commonHeaders(next http.Handler) http.Handler {
@@ -77,7 +78,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// getting the userID from the session
-		id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+		id := app.sessionManager.GetInt(r.Context(), authenticatedUserIDSessionManager)
 
 		// if user not authenticated
 		if id == 0 {
