@@ -9,6 +9,7 @@
  - Savoir si l'utilisateur est connecté ou non 
  - Les différentes catégories
  - Les tags populaires
+ - Photo de profil de l'utilisateur
 
     -- Fonction -- 
 
@@ -95,6 +96,7 @@
  - La liste d'amis
  - Les threads postés par l'utilisateur
  - Les posts de l'utilisateur 
+ - Photo de profil
  
 
 
