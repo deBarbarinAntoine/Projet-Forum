@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Projet-Forum/internal/models"
+	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/utils"
 	"Projet-Forum/internal/validator"
 	"errors"
@@ -56,7 +56,7 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 
 	err = app.models.UserModel.Register(form.Email, form.Password)
 	if err != nil {
-		if errors.Is(err, models.ErrDuplicateCredential) {
+		if errors.Is(err, data.ErrDuplicateCredential) {
 			form.AddNonFieldError("User already exists")
 
 			data := app.newTemplateData(r)
@@ -105,7 +105,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	var id int
 	id, err = app.models.UserModel.Authenticate(form.Email, form.Password)
 	if err != nil {
-		if errors.Is(err, models.ErrInvalidCredentials) {
+		if errors.Is(err, data.ErrInvalidCredentials) {
 			form.AddNonFieldError("Invalid credentials")
 
 			data := app.newTemplateData(r)

@@ -12,6 +12,34 @@ import (
 	"time"
 )
 
+type Category struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Author    struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	} `json:"author"`
+	ParentCategory struct {
+		ID   int    `json:"id,omitempty"`
+		Name string `json:"name,omitempty"`
+	} `json:"parent_category,omitempty"`
+	Version    int        `json:"version,omitempty"`
+	Categories []Category `json:"categories,omitempty"`
+	Threads    []Thread   `json:"threads,omitempty"`
+}
+
+func (category *Category) Validate(v *validator.Validator) {
+	v.StringCheck(category.Name, 2, 70, true, "name")
+	v.StringCheck(category.Author.Name, 2, 70, true, "author.name")
+
+	if category.ParentCategory.ID != 0 || category.ParentCategory.Name != "" {
+		v.Check(category.ParentCategory.ID != 0, "parent_category.id", "must be provided")
+		v.StringCheck(category.ParentCategory.Name, 2, 70, true, "parent_category.name")
+	}
+}
+
 type CategoryModel struct {
 	DB *sql.DB
 }
@@ -388,32 +416,4 @@ func (m CategoryModel) Delete(id int) error {
 	}
 
 	return nil
-}
-
-type Category struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Author    struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"author"`
-	ParentCategory struct {
-		ID   int    `json:"id,omitempty"`
-		Name string `json:"name,omitempty"`
-	} `json:"parent_category,omitempty"`
-	Version    int        `json:"version,omitempty"`
-	Categories []Category `json:"categories,omitempty"`
-	Threads    []Thread   `json:"threads,omitempty"`
-}
-
-func (category *Category) Validate(v *validator.Validator) {
-	v.StringCheck(category.Name, 2, 70, true, "name")
-	v.StringCheck(category.Author.Name, 2, 70, true, "author.name")
-
-	if category.ParentCategory.ID != 0 || category.ParentCategory.Name != "" {
-		v.Check(category.ParentCategory.ID != 0, "parent_category.id", "must be provided")
-		v.StringCheck(category.ParentCategory.Name, 2, 70, true, "parent_category.name")
-	}
 }

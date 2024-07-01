@@ -12,6 +12,37 @@ import (
 	"time"
 )
 
+type Thread struct {
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	IsPublic    bool      `json:"is_public"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Status      string    `json:"status"`
+	Author      struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	} `json:"author"`
+	Category struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	} `json:"category"`
+	Version    int    `json:"version,omitempty"`
+	Popularity int    `json:"popularity"`
+	Posts      []Post `json:"posts,omitempty"`
+	Tags       []Tag  `json:"tags,omitempty"`
+}
+
+func (thread *Thread) Validate(v *validator.Validator) {
+	v.StringCheck(thread.Title, 2, 125, true, "title")
+	v.StringCheck(thread.Description, 2, 1_020, true, "description")
+	v.Check(validator.PermittedValue(thread.Status, permittedStatuses...), "status", "must be a permitted value")
+	v.StringCheck(thread.Author.Name, 2, 70, true, "author.name")
+	v.StringCheck(thread.Category.Name, 2, 70, true, "parent_category.name")
+	v.Check(thread.Category.ID != 0, "parent_category.id", "must be provided")
+}
+
 type ThreadModel struct {
 	DB *sql.DB
 }
@@ -673,35 +704,4 @@ func (m ThreadModel) RemoveFromFavorites(user *User, id int) error {
 	}
 
 	return nil
-}
-
-type Thread struct {
-	ID          int       `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	IsPublic    bool      `json:"is_public"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Status      string    `json:"status"`
-	Author      struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"author"`
-	Category struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"category"`
-	Version    int    `json:"version,omitempty"`
-	Popularity int    `json:"popularity"`
-	Posts      []Post `json:"posts,omitempty"`
-	Tags       []Tag  `json:"tags,omitempty"`
-}
-
-func (thread *Thread) Validate(v *validator.Validator) {
-	v.StringCheck(thread.Title, 2, 125, true, "title")
-	v.StringCheck(thread.Description, 2, 1_020, true, "description")
-	v.Check(validator.PermittedValue(thread.Status, permittedStatuses...), "status", "must be a permitted value")
-	v.StringCheck(thread.Author.Name, 2, 70, true, "author.name")
-	v.StringCheck(thread.Category.Name, 2, 70, true, "parent_category.name")
-	v.Check(thread.Category.ID != 0, "parent_category.id", "must be provided")
 }

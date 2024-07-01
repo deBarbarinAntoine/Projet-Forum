@@ -52,10 +52,17 @@ type application struct {
 			username string
 			password []byte
 		}
-		app struct {
+		api struct {
 			username string
 			password []byte
 		}
+		backend struct {
+			username string
+			password []byte
+		}
+	}
+	backend struct {
+		port string
 	}
 }
 
@@ -119,7 +126,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("Create a user to connect the API to the database:")
 	fmt.Println()
-	app.mysql.app.username = app.readLine("API username:")
+	app.mysql.api.username = app.readLine("API username:")
 	fmt.Println()
 	fmt.Print("Generating password...")
 	randomPassword := make([]byte, 12)
@@ -128,7 +135,7 @@ func main() {
 		fmt.Printf("Error generating password: %v\n", err)
 		os.Exit(1)
 	}
-	app.mysql.app.password = base62.StdEncoding.Encode(randomPassword)
+	app.mysql.api.password = base62.StdEncoding.Encode(randomPassword)
 	fmt.Println()
 
 	fmt.Println("Creating empty API database...")
@@ -182,13 +189,70 @@ func main() {
 	app.generateSecret()
 	fmt.Println()
 
-	fmt.Println("Writing configurations to .envrc file...")
+	fmt.Println("Writing configurations to environment file...")
 
 	switch app.os {
 	case "windows":
 		app.genEnvFile()
 	case "linux":
 		app.genEnvrcFile()
+	default:
+		fmt.Println("Unsupported OS")
+		os.Exit(1)
+	}
+	fmt.Println()
+
+	fmt.Println("###########################################")
+	fmt.Println()
+	fmt.Println("Let's set the Backend:")
+	fmt.Println()
+	app.backend.port = app.readLine("Backend port:")
+	fmt.Println()
+	fmt.Println("Create a user to connect the Backend to the database: (to access the sessions Table)")
+	fmt.Println()
+	app.mysql.backend.username = app.readLine("Backend username:")
+	fmt.Println()
+	fmt.Print("Generating password...")
+	randomPassword = make([]byte, 12)
+	_, err = rand.Read(randomPassword)
+	if err != nil {
+		fmt.Printf("Error generating password: %v\n", err)
+		os.Exit(1)
+	}
+	app.mysql.backend.password = base62.StdEncoding.Encode(randomPassword)
+	fmt.Println()
+
+	fmt.Println("Writing configurations to environment file...")
+
+	var env strings.Builder
+	port := fmt.Sprintf("PORT=%s\n", app.backend.port)
+	apiURL := fmt.Sprintf("API_URL=\"http://localhost:%s\"\n", app.port)
+	secretToken := fmt.Sprintf("API_SECRET=\"%s\"\n", app.secretAPI)
+	dbDSN := fmt.Sprintf("DB_DSN=\"%s:%s@/%s?parseTime=true\"", app.mysql.backend.username, string(app.mysql.backend.password), app.mysql.name)
+
+	switch app.os {
+	case "windows":
+		env.WriteString(port)
+		env.WriteString(apiURL)
+		env.WriteString(secretToken)
+		env.WriteString(dbDSN)
+		err := os.WriteFile("backend.env", []byte(env.String()), 0644)
+		if err != nil {
+			fmt.Println("Error creating backend.env file")
+			os.Exit(1)
+		}
+
+		fmt.Println("backend.env file created successfully")
+	case "linux":
+		env.WriteString(fmt.Sprintf("export %s", port))
+		env.WriteString(fmt.Sprintf("export %s", apiURL))
+		env.WriteString(fmt.Sprintf("export %s", secretToken))
+		env.WriteString(fmt.Sprintf("export %s", dbDSN))
+		err := os.WriteFile("backend.envrc", []byte(env.String()), 0644)
+		if err != nil {
+			fmt.Println("Error creating backend.envrc file")
+			os.Exit(1)
+		}
 	default:
 		fmt.Println("Unsupported OS")
 		os.Exit(1)
@@ -236,13 +300,13 @@ func (app *application) genEnvFile() {
 	var env strings.Builder
 	env.WriteString("DB_HOST=\"localhost\"\n")
 	env.WriteString("DB_PORT=\"3306\"\n")
-	env.WriteString(fmt.Sprintf("DB_USER=\"%s\"\n", app.mysql.app.username))
-	env.WriteString(fmt.Sprintf("DB_PASSWORD=\"%s\"\n", string(app.mysql.app.password)))
+	env.WriteString(fmt.Sprintf("DB_USER=\"%s\"\n", app.mysql.api.username))
+	env.WriteString(fmt.Sprintf("DB_PASSWORD=\"%s\"\n", string(app.mysql.api.password)))
 	env.WriteString(fmt.Sprintf("DB_DATABASE=\"%s\"\n", app.mysql.name))
 	env.WriteString("DB_ARG=\"parseTime=true\"\n")
 	env.WriteString("DB_NETWORK=\"tcp\"\n")
 	env.WriteString(fmt.Sprintf("PORT=%s\n", app.port))
-	env.WriteString(fmt.Sprintf("DB_DSN=\"%s:%s@/%s?parseTime=true\"\n", app.mysql.app.username, string(app.mysql.app.password), app.mysql.name))
+	env.WriteString(fmt.Sprintf("DB_DSN=\"%s:%s@/%s?parseTime=true\"\n", app.mysql.api.username, string(app.mysql.api.password), app.mysql.name))
 	env.WriteString(fmt.Sprintf("SMTP_SENDER=\"%s\"\n", app.smtp.sender))
 	env.WriteString(fmt.Sprintf("SMTP_USERNAME=\"%s\"\n", app.smtp.username))
 	env.WriteString(fmt.Sprintf("SMTP_PASS=\"%s\"\n", string(app.smtp.password)))
@@ -263,13 +327,13 @@ func (app *application) genEnvrcFile() {
 	var env strings.Builder
 	env.WriteString("export DB_HOST=\"localhost\"\n")
 	env.WriteString("export DB_PORT=\"3306\"\n")
-	env.WriteString(fmt.Sprintf("export DB_USER=\"%s\"\n", app.mysql.app.username))
-	env.WriteString(fmt.Sprintf("export DB_PASSWORD=\"%s\"\n", string(app.mysql.app.password)))
+	env.WriteString(fmt.Sprintf("export DB_USER=\"%s\"\n", app.mysql.api.username))
+	env.WriteString(fmt.Sprintf("export DB_PASSWORD=\"%s\"\n", string(app.mysql.api.password)))
 	env.WriteString(fmt.Sprintf("export DB_DATABASE=\"%s\"\n", app.mysql.name))
 	env.WriteString("export DB_ARG=\"parseTime=true\"\n")
 	env.WriteString("export DB_NETWORK=\"tcp\"\n")
 	env.WriteString(fmt.Sprintf("export PORT=%s\n", app.port))
-	env.WriteString(fmt.Sprintf("export DB_DSN=\"%s:%s@/%s?parseTime=true\"\n", app.mysql.app.username, string(app.mysql.app.password), app.mysql.name))
+	env.WriteString(fmt.Sprintf("export DB_DSN=\"%s:%s@/%s?parseTime=true\"\n", app.mysql.api.username, string(app.mysql.api.password), app.mysql.name))
 	env.WriteString(fmt.Sprintf("export SMTP_SENDER=\"%s\"\n", app.smtp.sender))
 	env.WriteString(fmt.Sprintf("export SMTP_USERNAME=\"%s\"\n", app.smtp.username))
 	env.WriteString(fmt.Sprintf("export SMTP_PASS=\"%s\"\n", string(app.smtp.password)))
@@ -353,7 +417,7 @@ func (app *application) createDB() error {
 func (app *application) createUser() error {
 
 	query := fmt.Sprintf(`
-		CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';`, app.mysql.app.username, string(app.mysql.app.password))
+		CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';`, app.mysql.api.username, string(app.mysql.api.password))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -370,13 +434,61 @@ func (app *application) createUser() error {
 	}
 
 	query = fmt.Sprintf(`
-		GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost';`, app.mysql.name, app.mysql.app.username)
+		GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost';`, app.mysql.name, app.mysql.api.username)
 
 	_, err = tx.ExecContext(ctx, query)
 	if err != nil {
 		return err
 	}
 
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (app *application) createBackendUser() error {
+
+	query := fmt.Sprintf(`
+		CREATE USER '%s'@'localhost'
+    	IDENTIFIED BY '%s';`, app.mysql.backend.username, string(app.mysql.backend.password))
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	tx, err := app.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	query = fmt.Sprintf(`
+		GRANT SELECT, INSERT, UPDATE, DELETE
+    	ON %s.sessions
+    	TO '%s'@'localhost';`, app.mysql.name, app.mysql.backend.username)
+
+	stmt, err = tx.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx)
+	if err != nil {
+		return err
+	}
 	if err := tx.Commit(); err != nil {
 		return err
 	}

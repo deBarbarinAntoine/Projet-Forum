@@ -12,6 +12,25 @@ import (
 	"time"
 )
 
+type Tag struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	Author    struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	} `json:"author"`
+	Version    int      `json:"version,omitempty"`
+	Popularity int      `json:"popularity,omitempty"`
+	Threads    []Thread `json:"threads,omitempty"`
+}
+
+func (tag *Tag) Validate(v *validator.Validator) {
+	v.StringCheck(tag.Name, 2, 50, true, "name")
+	v.StringCheck(tag.Author.Name, 2, 70, true, "author.name")
+}
+
 type TagModel struct {
 	DB *sql.DB
 }
@@ -686,23 +705,4 @@ func (m TagModel) Delete(id int) error {
 	}
 
 	return nil
-}
-
-type Tag struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	Author    struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"author"`
-	Version    int      `json:"version,omitempty"`
-	Popularity int      `json:"popularity,omitempty"`
-	Threads    []Thread `json:"threads,omitempty"`
-}
-
-func (tag *Tag) Validate(v *validator.Validator) {
-	v.StringCheck(tag.Name, 2, 50, true, "name")
-	v.StringCheck(tag.Author.Name, 2, 70, true, "author.name")
 }

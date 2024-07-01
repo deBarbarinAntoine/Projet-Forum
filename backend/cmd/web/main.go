@@ -1,7 +1,10 @@
 package main
 
 import (
-	"Projet-Forum/internal/models"
+	"Projet-Forum/internal/api"
+	"Projet-Forum/internal/data"
+	"Projet-Forum/internal/validator"
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -18,32 +21,49 @@ import (
 func main() {
 	var cfg config
 
-	port := flag.Int("port", 4000, "HTTP service address")
+	flag.BoolVar(&cfg.isHTTPS, "https", false, "use https")
+	flag.IntVar(&cfg.port, "port", 4000, "HTTP service address")
+	flag.StringVar(&cfg.apiURL, "api-url", "http://localhost:3000", "API URL")
 
-	pemFilePath := flag.String("pem", "", "PEM file path")
-	flag.StringVar(&cfg.clientToken, "client_token", "", "Client token")
+	pemFilePath := flag.String("pem", "./pem/public.pem", "PEM file path")
+	clientToken := flag.String("client-token", "", "Client token")
 
-	// if you want to enable a MySQL database (mainly for the sessions management)
 	dsn := flag.String("dsn", "", "MySQL DSN (data source name)")
 
-	//secretAPI := flag.String("secret", "", "Secret API")
+	secret := flag.String("secret", "", "Secret API")
 
 	flag.Parse()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
-	addr := fmt.Sprintf(":%d", *port)
+	addr := fmt.Sprintf(":%d", cfg.port)
 
-	if *pemFilePath != "" {
-		var err error
-		cfg.pemKey, err = os.ReadFile(*pemFilePath)
+	if secret == nil || *secret == "" {
+		logger.Error("secret is required")
+		os.Exit(1)
+	}
+	if pemFilePath == nil || *pemFilePath == "" {
+		logger.Error("pem file path is required")
+		os.Exit(1)
+	}
+	var pemKey []byte
+	var err error
+	if clientToken == nil || *clientToken == "" {
+		clientToken, pemKey, err = getClientCredentials(cfg.apiURL, *secret, *pemFilePath)
 		if err != nil {
 			logger.Error(err.Error())
 			os.Exit(1)
 		}
 	}
 
-	// if you want a MySQL database linked to your web server (mainly for the sessions management)
+	if pemKey == nil {
+		pemKey, err = os.ReadFile(*pemFilePath)
+		if err != nil {
+			logger.Error(err.Error())
+			os.Exit(1)
+		}
+	}
+
 	db, err := openDB(*dsn)
 	if err != nil {
 		logger.Error(err.Error())
@@ -61,7 +81,6 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	sessionManager := scs.New()
-	// if you want to store the sessionIDs in a MySQL database, with db being the database pool
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 24 * time.Hour
 	sessionManager.Cookie.Secure = true
@@ -72,21 +91,13 @@ func main() {
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		config:         &cfg,
+		models:         data.NewModels(cfg.apiURL, *clientToken, pemKey),
 	}
-
-	// setting up the tls configuration
-	// the CurvePreferences setting chosen here are the elliptic curves with assembly implementations
-	// the MinVersion setting here specifies the minimum TLS version chosen (13 stands for 1.3 i.e. the last one at writing time)
-	//tlsConfig := &tls.Config{
-	//	CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-	//	MinVersion:       tls.VersionTLS13,
-	//}
 
 	server := http.Server{
 		Addr:     addr,
 		Handler:  app.routes(),
 		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
-		//TLSConfig: tlsConfig,
 
 		// timeouts setting, for security purposes. The server then automatically closes timed out connections
 		IdleTimeout:       time.Minute,
@@ -97,22 +108,25 @@ func main() {
 
 	logger.Info("Starting server", slog.String("addr", server.Addr))
 
-	// Debug
-	credentials := &models.Credentials{
-		Username: "yellow@storm.com",
-		Password: "Pa55word",
+	if app.config.isHTTPS {
+		// setting up the tls configuration
+		// the CurvePreferences setting chosen here are the elliptic curves with assembly implementations
+		// the MinVersion setting here specifies the minimum TLS version chosen (13 stands for 1.3 i.e. the last one at writing time)
+		tlsConfig := &tls.Config{
+			CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+			MinVersion:       tls.VersionTLS13,
+		}
+		server.TLSConfig = tlsConfig
+
+		// generate a signed certificate in tls folder for it to work
+		// (for development use mkcert, for production, use let's encrypt)
+		err = server.ListenAndServeTLS("./tls/localhost.pem", "./tls/localhost-key.pem")
+	} else {
+
+		// run the server through HTTP
+		err = server.ListenAndServe()
 	}
 
-	err = app.sendAuthPEM(credentials)
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
-
-	// generate a signed certificate in tls folder for it to work
-	// (for development use mkcert, for production, use let's encrypt)
-	//err = server.ListenAndServeTLS("./tls/localhost.pem", "./tls/localhost-key.pem")
-	err = server.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
 }
@@ -131,4 +145,46 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func getClientCredentials(urlAPI, secret, pemFilePath string) (*string, []byte, error) {
+
+	// creating connection to API
+	apiClient := api.GetForClient(urlAPI, secret)
+
+	// building request body with client credentials
+	credentials := make(map[string]string)
+	credentials["username"] = "Threadive Web"
+	credentials["email"] = "web@threadive.com"
+	v := validator.New()
+
+	// getting client token
+	clientToken, err := apiClient.GetClient(secret, credentials, v)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// fetching PEM public key
+	var pem []byte
+	if !fileExists(pemFilePath) {
+		pem, err = apiClient.GetPEM(secret, pemFilePath, v)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		pem, err = os.ReadFile(pemFilePath)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return clientToken, pem, nil
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
