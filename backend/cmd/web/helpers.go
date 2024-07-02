@@ -103,6 +103,12 @@ func newUserLoginForm() *userLoginForm {
 	}
 }
 
+func newUserUpdateForm() *userUpdateForm {
+	return &userUpdateForm{
+		Validator: *validator.New(),
+	}
+}
+
 func newForgotPasswordForm() *forgotPasswordForm {
 	return &forgotPasswordForm{
 		Validator: *validator.New(),

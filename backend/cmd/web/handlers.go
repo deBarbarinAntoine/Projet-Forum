@@ -621,33 +621,85 @@ func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	id, err := getId(r.URL.Query())
-	if err != nil {
-		app.clientError(w, http.StatusNotFound)
-		return
-	}
-
-	data.User.Fetch(id)
-
 	// render the template
 	app.render(w, r, http.StatusOK, "user.tmpl", data)
 }
 
 func (app *application) updateUserPost(w http.ResponseWriter, r *http.Request) {
 
-	// retrieving basic template data
-	data := app.newTemplateData(r, false)
-
-	id, err := getId(r.URL.Query())
+	// retrieving the form data
+	form := newUserUpdateForm()
+	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusNotFound)
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	data.User.Fetch(id)
+	// checking the data from the user
+	if form.Username != nil {
+		form.StringCheck(*form.Username, 2, 70, false, "username")
+	}
+	if form.Password != nil || form.NewPassword != nil || form.ConfirmationPassword != nil {
+		form.ValidateNewPassword(*form.NewPassword, *form.ConfirmationPassword)
+	}
+	if form.Email != nil {
+		form.ValidateEmail(*form.Email)
+	}
+	if form.Bio != nil {
+		form.StringCheck(*form.Bio, 2, 255, false, "bio")
+	}
+	if form.Birth != nil {
+		form.ValidateDate(*form.Birth, "birth")
+	}
+	if form.Signature != nil {
+		form.StringCheck(*form.Signature, 1, 255, false, "signature")
+	}
 
-	// render the template
-	app.render(w, r, http.StatusOK, "user.tmpl", data)
+	// looking for errors from the API
+	if !form.Valid() {
+
+		// retrieving basic template data
+		data := app.newTemplateData(r, false)
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "update-user.tmpl", data)
+		return
+	}
+
+	// building the API request body
+	body := map[string]string{
+		"token":            form.Token,
+		"new_password":     form.NewPassword,
+		"confirm_password": form.ConfirmPassword,
+	}
+
+	// API request to send a reset password token
+	v := validator.New()
+	err = app.models.UserModel.ResetPassword(body, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// retrieving basic template data
+		data := app.newTemplateData(r, false)
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "update-user.tmpl", data)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Your data has been updated successfully!")
+	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
 
 func (app *application) createCategory(w http.ResponseWriter, r *http.Request) {

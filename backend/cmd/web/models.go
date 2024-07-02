@@ -66,6 +66,19 @@ type userLoginForm struct {
 	validator.Validator `form:"-"`
 }
 
+type userUpdateForm struct {
+	Username             *string `form:"username,omitempty"`
+	Email                *string `form:"email,omitempty"`
+	Password             *string `form:"password,omitempty"`
+	NewPassword          *string `form:"new_password,omitempty"`
+	ConfirmationPassword *string `form:"confirmation_password,omitempty"`
+	Avatar               *string `form:"avatar,omitempty"`
+	Birth                *string `form:"birth,omitempty"`
+	Bio                  *string `form:"bio,omitempty"`
+	Signature            *string `form:"signature,omitempty"`
+	validator.Validator  `form:"-"`
+}
+
 type userRegisterForm struct {
 	Username            string `form:"username"`
 	Email               string `form:"email"`

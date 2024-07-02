@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -43,6 +44,13 @@ func (v *Validator) AddFieldError(key, message string) {
 func (v *Validator) Check(ok bool, key, message string) {
 	if !ok {
 		v.AddFieldError(key, message)
+	}
+}
+
+func (v *Validator) ValidateDate(date, fieldName string) {
+	_, err := time.Parse("01/02/2006", date)
+	if err != nil {
+		v.AddFieldError(fieldName, "invalid date")
 	}
 }
 
