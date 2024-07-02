@@ -107,7 +107,6 @@ header .notification-profile .profile .profile-picture {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: black;
 }
 header .notification-profile .profile .profile-icon-box {
   width: 50px;
@@ -120,6 +119,7 @@ header .notification-profile .profile .profile-icon {
   width: 30px;
   height: 30px;
   opacity: 0.5;
+  background-color: black;
 }
 header .notification-profile .profile .profile-icon-box:hover ~ .dropdown,
 header .notification-profile .profile .dropdown:hover {
