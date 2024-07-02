@@ -13,6 +13,15 @@
   background-color: var(--background-color);
 }
 
+.borders-hover {
+  transition: 0.3s;
+}
+
+.borders-hover:hover {
+  cursor: pointer;
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
+}
+
 @font-face {
   font-family: Varela-Round;
   src: url(../font/VarelaRound-Regular.ttf);
@@ -29,6 +38,7 @@ body {
 header {
   z-index: 3;
   position: fixed;
+  top: 0;
   width: 100%;
   height: 100px;
   display: flex;
@@ -145,6 +155,7 @@ header .notification-profile .profile .dropdown .item {
   padding-left: 10px;
   padding-bottom: 5px;
   padding-top: 5px;
+  transition: 0.3s;
 }
 header .notification-profile .profile .dropdown .item:hover {
   cursor: pointer;
@@ -158,24 +169,22 @@ header .notification-profile .profile .dropdown .item .item-text {
   font-family: Varela-Round;
 }
 
-.navs {
-  display: flex;
-  justify-content: space-between;
-}
-
 .nav-left {
+  position: fixed;
+  left: 0;
   top: 100px;
+  bottom: 0;
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
   align-items: center;
   background-color: var(--background-color);
   width: 280px;
-  height: auto;
-  position: relative;
   gap: 20px;
   padding-top: 30px;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 .nav-left .profile {
   width: 80%;
@@ -300,12 +309,14 @@ header .notification-profile .profile .dropdown .item .item-text {
   opacity: 0.5;
   transition: 0.3s;
   transform: rotate(0deg);
+  background-color: transparent;
 }
 .nav-left .page-link .link .link-icon.rotated {
   transform: rotate(-90deg);
 }
 .nav-left .page-link .link .link-text {
   font-size: 16px;
+  background-color: transparent;
 }
 .nav-left .page-link .category-list {
   position: relative;
@@ -368,6 +379,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   gap: 12px;
   padding-left: 30px;
   font-family: Varela-Round;
+  transition: 0.3s;
 }
 .nav-left .footer .footer-link .footer-icon {
   opacity: 0.5;
@@ -387,16 +399,19 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 
 .nav-right {
+  position: fixed;
+  right: 0;
+  bottom: 0;
   width: 200px;
-  height: auto;
   background-color: var(--background-color);
   top: 100px;
   margin-top: 30px;
-  position: relative;
-  margin-right: 28px;
+  margin-right: 20px;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 .nav-right .nav-right-container {
-  width: 100%;
+  width: calc(100% - 4px);
   height: auto;
   display: flex;
   flex-flow: column nowrap;
@@ -444,6 +459,13 @@ header .notification-profile .profile .dropdown .item .item-text {
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
 }
 
+.template-container {
+  position: relative;
+  width: calc(100% - 515px);
+  left: 270px;
+  padding: 20px;
+}
+
 .center-page {
   z-index: 3;
   width: 100vw;
@@ -459,8 +481,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   position: absolute;
   width: 100vw;
   height: 100vh;
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 .container {
@@ -503,9 +524,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   font-family: Varela-Round;
 }
 .container .login .input-fields .input:focus {
@@ -592,14 +611,6 @@ textarea.description {
   scrollbar-width: thin;
 }
 
-@font-face {
-  font-family: "Varela";
-  src: url(../font/VarelaRound-Regular.ttf);
-}
-* {
-  background-color: var(--background-color);
-}
-
 /* Mentions Légales */
 .container-mentions-row {
   width: 100%;
@@ -616,7 +627,7 @@ textarea.description {
   margin-top: 130px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: "Varela";
+  font-family: Varela-Round;
 }
 .container-mentions-row .container-mentions h2 {
   font-size: 50px;
@@ -634,7 +645,7 @@ textarea.description {
 
 /* Search */
 .container-search-row {
-  font-family: "Varela";
+  font-family: Varela-Round;
   width: 100%;
   height: 100%;
   display: flex;
@@ -649,7 +660,7 @@ textarea.description {
   margin-top: 130px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: "Varela";
+  font-family: Varela-Round;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -769,142 +780,125 @@ textarea.description {
 }
 
 /* ACCUEIL */
-.container-accueil-row {
-  font-family: "Varela";
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-}
-.container-accueil-row .container-accueil {
+.container-accueil {
   height: 100%;
   padding-top: 20px;
   margin-left: 5px;
-  width: 935px;
+  width: 100%;
   margin-top: 130px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: "Varela";
+  font-family: Varela-Round;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
 }
-.container-accueil-row .container-accueil .container-accueil-text {
+.container-accueil .container-accueil-text {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.container-accueil-row .container-accueil .container-accueil-text h3 {
+.container-accueil .container-accueil-text h3 {
   font-size: 30px;
 }
-.container-accueil-row .container-accueil .container-accueil-text p {
+.container-accueil .container-accueil-text p {
   margin-top: 25px;
   font-size: 14px;
   font-style: italic;
   font-weight: lighter;
 }
-.container-accueil-row .container-accueil .container-accueil-content {
+.container-accueil .container-accueil-content {
   height: 100%;
   margin-top: 50px;
   margin-left: 50px;
   margin-right: 50px;
-  padding-left: 50px;
   padding-top: 20px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: "Varela";
+  font-family: Varela-Round;
   display: flex;
   flex-direction: column;
   padding-bottom: 30px;
 }
-.container-accueil-row .container-accueil .container-accueil-content h4 {
+.container-accueil .container-accueil-content h4 {
+  margin-left: 20px;
   font-size: 20px;
   font-weight: normal;
   opacity: 0.8;
 }
-.container-accueil-row .container-accueil .container-accueil-content .container-hottopic {
+.container-accueil .container-accueil-content .container-hottopic {
   display: flex;
+  align-self: center;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
   height: 51px;
-  width: 750px;
-  border-radius: 5px;
+  width: calc(100% - 100px);
   margin-top: 20px;
   padding-left: 10px;
 }
-.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text {
+.container-accueil .container-accueil-content .container-hottopic .container-thread-text {
   display: flex;
   justify-content: space-between;
   padding-left: 20px;
   padding-right: 20px;
   width: 750px;
 }
-.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text h3 {
+.container-accueil .container-accueil-content .container-hottopic .container-thread-text h3 {
   font-size: 15px;
   font-weight: normal;
 }
-.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text h5 {
+.container-accueil .container-accueil-content .container-hottopic .container-thread-text h5 {
   font-size: 15px;
   font-weight: normal;
 }
-.container-accueil-row .container-accueil .container-accueil-content .container-hottopic .container-thread-text p {
+.container-accueil .container-accueil-content .container-hottopic .container-thread-text p {
   font-size: 15px;
 }
-.container-accueil-row .container-accueil .container-category {
+.container-accueil .container-category {
+  align-self: center;
+  width: calc(100% - 50px);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding-right: 50px;
   cursor: pointer;
 }
-.container-accueil-row .container-accueil .container-category .rectangle-category {
-  width: 120px;
-  height: 120px;
+.container-accueil .container-category .rectangle-category {
+  width: 100px;
+  height: 100px;
   margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-radius: 5px;
 }
-.container-accueil-row .container-accueil .container-category .rectangle-category h5 {
+.container-accueil .container-category .rectangle-category h5 {
   font-size: 15px;
   font-weight: normal;
   margin-top: 10px;
 }
-.container-accueil-row .container-accueil .container-favtag {
+.container-accueil .container-favtag {
+  align-self: center;
+  width: calc(100% - 50px);
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  padding-right: 50px;
+  justify-content: start;
+  gap: 10px;
   margin-top: 20px;
 }
-.container-accueil-row .container-accueil .container-favtag .favtag {
+.container-accueil .container-favtag .favtag {
   height: auto;
   display: flex;
   justify-content: center;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  border-right: 2px solid rgba(0, 0, 0, 0.1);
-  border-left: 2px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.2);
-  border-radius: 0 0 10px 10px;
-  margin-bottom: 20px;
   padding: 5px;
   transition: 0.3s;
 }
-.container-accueil-row .container-accueil .container-favtag .favtag h5 {
+.container-accueil .container-favtag .favtag h5 {
   font-size: 12px;
   font-weight: normal;
 }
-.container-accueil-row .container-accueil .container-favtag .favtag:hover {
+.container-accueil .container-favtag .favtag:hover {
   cursor: pointer;
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
 }
 
 /* LISTE DES THREADS */
 .container-liste-row {
-  font-family: "Varela";
+  font-family: Varela-Round;
   width: 100%;
   height: 100%;
   display: flex;
@@ -919,7 +913,7 @@ textarea.description {
   margin-top: 130px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: "Varela";
+  font-family: Varela-Round;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -1006,7 +1000,7 @@ textarea.description {
 
 /* THREAD */
 .container-inthread-row {
-  font-family: "Varela";
+  font-family: Varela-Round;
   width: 100%;
   height: 100%;
   display: flex;
@@ -1021,7 +1015,7 @@ textarea.description {
   margin-top: 130px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: "Varela";
+  font-family: Varela-Round;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -1177,294 +1171,260 @@ textarea.description {
 }
 
 /* Dashboard */
-.container-dashboard-row {
-  font-family: "Varela";
-  width: 100%;
+.container-dashboard {
   height: 100%;
-  display: flex;
-  flex-direction: row;
-}
-.container-dashboard-row .container-dashboard {
-  height: 100%;
-  padding-top: 30px;
   margin-left: 5px;
-  padding-left: 50px;
-  width: 935px;
+  width: 100%;
   margin-top: 130px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: "Varela";
+  font-family: Varela-Round;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
 }
-.container-dashboard-row .container-dashboard h4 {
+.container-dashboard .dashboard-title {
   font-size: 20px;
+  padding: 20px;
   font-weight: normal;
+  padding-bottom: 0px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest {
+.container-dashboard .container-profile-friendsrequest {
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-profile {
+.container-dashboard .container-profile-friendsrequest .container-profile {
   margin-top: 50px;
-  padding-left: 20px;
-  padding-top: 15px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  width: 320px;
-  height: 150px;
-  border-radius: 5px;
+  width: 300px;
+  height: auto;
+  padding: 15px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name {
+.container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name {
   display: flex;
   flex-direction: row;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name .pic {
+.container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name .pic {
   background-color: #000000;
   border-radius: 50%;
   width: 87px;
   height: 87px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name .pic .camera {
+.container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name .pic .camera {
   background: none;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name h4 {
+.container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name h4 {
   font-size: 22px;
-  margin-top: 10px;
-  margin-left: 10px;
+  margin-top: 20px;
   font-weight: normal;
+  margin-left: 15px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name h5 {
+.container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name h5 {
   margin-top: 3px;
-  margin-left: 13px;
+  margin-left: 15px;
   font-size: 12px;
   font-style: italic;
   opacity: 0.7;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .profil-post {
+.container-dashboard .container-profile-friendsrequest .profil-post {
   display: flex;
   flex-direction: row;
-  margin-top: 15px;
-  padding-right: 50px;
-  justify-content: space-between;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  justify-content: space-evenly;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest h4 {
+.container-dashboard .container-profile-friendsrequest h4 {
   font-size: 12px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest h5 {
+.container-dashboard .container-profile-friendsrequest h5 {
   margin-top: 5px;
   font-size: 10px;
   font-style: italic;
   font-weight: normal;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request {
+.container-dashboard .container-profile-friendsrequest .container-friends-request {
   display: flex;
   flex-direction: column;
   margin-left: 40px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  width: 427px;
-  height: 150px;
-  border-radius: 5px;
+  width: 400px;
+  height: auto;
   margin-top: 50px;
-  padding-left: 20px;
-  padding-top: 15px;
-  padding-bottom: 20px;
+  padding: 15px;
   margin-bottom: 5px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request h4 {
+.container-dashboard .container-profile-friendsrequest .container-friends-request h4 {
   font-size: 20px;
   font-weight: normal;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-row {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-row {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests {
   margin-right: 20px;
   margin-top: 20px;
   display: flex;
   flex-direction: row;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .pic-friends {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .pic-friends {
   background-color: #000000;
   border-radius: 50%;
   width: 40px;
   height: 40px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .container-colonne-amis {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .container-colonne-amis {
   display: flex;
   flex-direction: column;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .container-colonne-amis h5 {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .container-colonne-amis h5 {
   font-size: 12px;
   margin-left: 5px;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .accepte-refuse {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .accepte-refuse {
   display: flex;
   flex-direction: row;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .accepte-refuse img {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .accepte-refuse img {
   margin-left: 5px;
   opacity: 0.7;
 }
-.container-dashboard-row .container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .accepte-refuse img:hover {
+.container-dashboard .container-profile-friendsrequest .container-friends-request .container-requests .accepte-refuse img:hover {
   cursor: pointer;
   opacity: 1;
 }
-.container-dashboard-row .container-dashboard .container-row {
+.container-dashboard .container-row {
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
-.container-dashboard-row .container-dashboard .container-row .container-mythread {
+.container-dashboard .container-row .container-mythread {
   margin-bottom: 5px;
   margin-top: 40px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  width: 320px;
-  padding-left: 20px;
-  padding-top: 15px;
-  border-radius: 5px;
-  padding-bottom: 20px;
+  width: 300px;
+  padding: 15px;
   height: auto;
 }
-.container-dashboard-row .container-dashboard .container-row .container-mythread .mythread {
+.container-dashboard .container-row .container-mythread .mythread {
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
   height: 51px;
   width: 270px;
-  border-radius: 5px;
   margin-top: 20px;
   padding-left: 10px;
 }
-.container-dashboard-row .container-dashboard .container-row .container-mythread .mythread .text {
+.container-dashboard .container-row .container-mythread .mythread .text {
   display: flex;
   justify-content: space-between;
   padding-left: 20px;
   padding-right: 20px;
   width: 270px;
 }
-.container-dashboard-row .container-dashboard .container-row .container-mythread .mythread .text h3 {
+.container-dashboard .container-row .container-mythread .mythread .text h3 {
   font-size: 15px;
   font-weight: normal;
 }
-.container-dashboard-row .container-dashboard .container-row .friends-container {
-  border-radius: 5px;
+.container-dashboard .container-row .friends-container {
   display: flex;
   flex-direction: column;
-  padding-left: 20px;
-  padding-top: 15px;
-  padding-bottom: 20px;
+  padding: 15px;
   margin-left: 40px;
   margin-top: 40px;
-  width: 427px;
+  width: 400px;
   margin-bottom: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
 }
-.container-dashboard-row .container-dashboard .container-row .friends-container .friends {
+.container-dashboard .container-row .friends-container .friends {
   margin-top: 15px;
   display: flex;
   align-items: center;
   flex-direction: row;
 }
-.container-dashboard-row .container-dashboard .container-row .friends-container .friends .pic-friends {
+.container-dashboard .container-row .friends-container .friends .pic-friends {
   background-color: #000000;
   border-radius: 50%;
   width: 40px;
   height: 40px;
 }
-.container-dashboard-row .container-dashboard .container-row .friends-container .friends h5 {
+.container-dashboard .container-row .friends-container .friends h5 {
   margin-left: 10px;
   font-size: 15px;
   font-weight: normal;
 }
-.container-dashboard-row .container-dashboard .container-last-user {
+.container-dashboard .container-last-user {
   display: flex;
+  margin: 30px;
   flex-direction: column;
   align-items: center;
   padding-top: 15px;
   padding-bottom: 20px;
-  margin-top: 30px;
   width: 205px;
-  border-radius: 5px;
-  margin-right: 110px;
-  margin-top: 40px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
 }
-.container-dashboard-row .container-dashboard .container-last-user h4 {
+.container-dashboard .container-last-user h4 {
   font-size: 15px;
   font-weight: normal;
 }
-.container-dashboard-row .container-dashboard .container-last-user .last-user {
-  border-radius: 5px;
+.container-dashboard .container-last-user .last-user {
   width: 100px;
   height: 24px;
   opacity: 0.5;
   margin-top: 20px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  border-right: 2px solid rgba(0, 0, 0, 0.1);
-  border-left: 2px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.2);
   padding: 5px;
   cursor: pointer;
   text-align: center;
   display: flex;
   justify-content: center;
 }
-.container-dashboard-row .container-dashboard .container-last-user .last-user h5 {
+.container-dashboard .container-last-user .last-user h5 {
   font-size: 12px;
 }
-.container-dashboard-row .container-dashboard .container-last-user .last-user:hover {
-  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
-}
-.container-dashboard-row .container-dashboard .container-last-thread {
-  margin-top: 40px;
+.container-dashboard .container-last-thread {
+  align-self: center;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  width: 800px;
-  padding-left: 20px;
+  width: 825px;
   padding-top: 15px;
-  border-radius: 5px;
   padding-bottom: 20px;
   height: auto;
 }
-.container-dashboard-row .container-dashboard .container-last-thread .lastthread {
+.container-dashboard .container-last-thread h4 {
+  font-size: 15px;
+  font-weight: normal;
+  margin-left: 20px;
+}
+.container-dashboard .container-last-thread .lastthread {
+  align-self: center;
+  align-items: center;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
   height: 51px;
   width: 730px;
-  border-radius: 5px;
   margin-top: 20px;
   padding-left: 10px;
 }
-.container-dashboard-row .container-dashboard .container-last-thread .lastthread .text {
+.container-dashboard .container-last-thread .lastthread .text {
   display: flex;
   justify-content: space-between;
   padding-left: 20px;
   padding-right: 20px;
   width: 700px;
 }
-.container-dashboard-row .container-dashboard .container-last-thread .lastthread .text h3 {
+.container-dashboard .container-last-thread .lastthread .text h3 {
   font-size: 15px;
   font-weight: normal;
 }
-.container-dashboard-row .container-dashboard .container-last-thread .lastthread .text h5 {
+.container-dashboard .container-last-thread .lastthread .text h5 {
   font-size: 15px;
   font-weight: normal;
 }
-.container-dashboard-row .container-dashboard .container-last-thread .lastthread .text p {
+.container-dashboard .container-last-thread .lastthread .text p {
   font-size: 15px;
 }
 
 /* Error 404 */
 .container-error-row {
-  font-family: "Varela";
+  font-family: Varela-Round;
   width: 100%;
   height: 100%;
   display: flex;
@@ -1477,7 +1437,7 @@ textarea.description {
   padding-left: 50px;
   width: 935px;
   margin-top: 130px;
-  font-family: "Varela";
+  font-family: Varela-Round;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1490,4 +1450,6 @@ textarea.description {
 .container-error-row .container-error p {
   margin-top: 40px;
   font-size: 20px;
-}/*# sourceMappingURL=style.css.map */
+}
+
+/*# sourceMappingURL=style.css.map */

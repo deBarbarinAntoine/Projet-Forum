@@ -12,6 +12,15 @@
   background-color: var(--background-color);
 }
 
+.borders-hover {
+  transition: 0.3s;
+}
+
+.borders-hover:hover {
+  cursor: pointer;
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
+}
+
 @font-face {
   font-family: Varela-Round;
   src: url(../font/VarelaRound-Regular.ttf);
@@ -28,6 +37,7 @@ body {
 header {
   z-index: 3;
   position: fixed;
+  top: 0;
   width: 100%;
   height: 100px;
   display: flex;
@@ -144,6 +154,7 @@ header .notification-profile .profile .dropdown .item {
   padding-left: 10px;
   padding-bottom: 5px;
   padding-top: 5px;
+  transition: 0.3s;
 }
 header .notification-profile .profile .dropdown .item:hover {
   cursor: pointer;
@@ -157,27 +168,22 @@ header .notification-profile .profile .dropdown .item .item-text {
   font-family: Varela-Round;
 }
 
-.navs {
-  z-index: 3;
-  position: fixed;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-}
-
 .nav-left {
+  position: fixed;
+  left: 0;
   top: 100px;
+  bottom: 0;
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
   align-items: center;
   background-color: var(--background-color);
   width: 280px;
-  height: auto;
-  position: relative;
   gap: 20px;
   padding-top: 30px;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 .nav-left .profile {
   width: 80%;
@@ -302,12 +308,14 @@ header .notification-profile .profile .dropdown .item .item-text {
   opacity: 0.5;
   transition: 0.3s;
   transform: rotate(0deg);
+  background-color: transparent;
 }
 .nav-left .page-link .link .link-icon.rotated {
   transform: rotate(-90deg);
 }
 .nav-left .page-link .link .link-text {
   font-size: 16px;
+  background-color: transparent;
 }
 .nav-left .page-link .category-list {
   position: relative;
@@ -370,7 +378,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   gap: 12px;
   padding-left: 30px;
   font-family: Varela-Round;
-  transform: rotate(-90deg);
+  transition: 0.3s;
 }
 .nav-left .footer .footer-link .footer-icon {
   opacity: 0.5;
@@ -390,16 +398,19 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 
 .nav-right {
+  position: fixed;
+  right: 0;
+  bottom: 0;
   width: 200px;
-  height: auto;
   background-color: var(--background-color);
   top: 100px;
   margin-top: 30px;
-  position: relative;
-  margin-right: 28px;
+  margin-right: 20px;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 .nav-right .nav-right-container {
-  width: 100%;
+  width: calc(100% - 4px);
   height: auto;
   display: flex;
   flex-flow: column nowrap;
@@ -447,6 +458,13 @@ header .notification-profile .profile .dropdown .item .item-text {
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
 }
 
+.template-container {
+  position: relative;
+  width: calc(100% - 515px);
+  left: 270px;
+  padding: 20px;
+}
+
 .center-page {
   z-index: 3;
   width: 100vw;
@@ -462,8 +480,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   position: absolute;
   width: 100vw;
   height: 100vh;
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 .container {
@@ -506,9 +523,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   font-family: Varela-Round;
 }
 .container .login .input-fields .input:focus {
@@ -593,4 +608,6 @@ textarea.description {
   height: 200px !important;
   resize: none;
   scrollbar-width: thin;
-}/*# sourceMappingURL=base.css.map */
+}
+
+/*# sourceMappingURL=base.css.map */
