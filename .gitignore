@@ -19,3 +19,5 @@ backend/tls/*.pem
 # data files
 data/.envrc
 data/.env
+data/backend.env
+data/backend.envrc

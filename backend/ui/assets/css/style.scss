@@ -2,11 +2,6 @@
 
     /* Mentions Légales */
 
-.container-mentions-row{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
 
     .container-mentions {
         height: 100%;
@@ -33,16 +28,10 @@
             font-size: 30px;
         }
     }
-}
+
 
 /* Search */
 
-.container-search-row {
-    font-family: Varela-Round;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
     .container-search {
         height: 100%;
         padding-top: 20px;
@@ -82,7 +71,6 @@
             .search-thread {
                 display: flex;
                 align-items: center;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
                 height: 51px;
                 width: 820px;
                 border-radius: 5px;
@@ -170,12 +158,13 @@
             }
         }
     }
-}
+
 
 
 /* ACCUEIL */
 
 .container-accueil {
+
     height: 100%;
     padding-top: 20px;
     margin-left: 5px;
@@ -299,12 +288,7 @@
 
 /* LISTE DES THREADS */
 
-.container-liste-row {
-    font-family: Varela-Round;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
+
     .container-liste {
         height: 100%;
         padding-top: 30px;
@@ -337,6 +321,7 @@
                 padding-left: 5px;
                 font-size: 12px;
                 position: relative;
+                background-color: var(--background-color);
             }
             p {
                 margin-left: 20px;
@@ -372,7 +357,6 @@
             .container-thread {
                 display: flex;
                 align-items: center;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
                 height: 51px;
                 width: 750px;
                 border-radius: 5px;
@@ -399,18 +383,14 @@
             }
          }
     }
- }
+ 
 
 
  /* THREAD */
 
- .container-inthread-row {
-    font-family: Varela-Round;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
+
     .container-inthread {
+        background-color: var(--background-color);
         height: 100%;
         padding-top: 30px;
         margin-left: 5px;
@@ -442,6 +422,7 @@
                 padding-left: 5px;
                 font-size: 12px;
                 position: relative;
+                background-color: var(--background-color);
             }
             p {
                 margin-left: 20px;
@@ -532,6 +513,7 @@
                 border: none;
                 padding-left: 10px;
                 border-radius: 5px;
+                background-color: var(--background-color);
             }
             img {
                 position: absolute;
@@ -575,7 +557,7 @@
            }
         }
     }
- } 
+ 
 
 
  /* Dashboard */ 
