@@ -12,6 +12,15 @@
     background-color: var(--background-color);
 }
 
+.borders-hover {
+    transition: .3s;
+}
+
+.borders-hover:hover {
+    cursor: pointer;
+    box-shadow: 0px 4px 5px rgba($color: #000000, $alpha: 0.5);
+}
+
 
 @font-face {
     font-family: Varela-Round;
@@ -30,6 +39,7 @@ body {
 header {
     z-index: 3;
     position: fixed;
+    top: 0;
     width: 100%;
     height: 100px;
     display: flex;
@@ -156,6 +166,7 @@ header {
                     padding-left: 10px;
                     padding-bottom: 5px;
                     padding-top: 5px;
+                    transition: .3s;
 
                     &:hover {
                         cursor: pointer;
@@ -178,28 +189,22 @@ header {
     }
 }
 
-.navs {
-    z-index: 3;
-    position: fixed;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-}
-
-
 .nav-left {
+    position: fixed;
+    left: 0;
     top: 100px;
+    bottom: 0;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: center;
     background-color: var(--background-color);
     width: 280px;
-    height: auto;
-    position: relative;
     gap: 20px;
     padding-top: 30px;
     overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
 
     .profile {
         width: 80%;
@@ -339,6 +344,7 @@ header {
                 opacity: 0.5;
                 transition: .3s;
                 transform: rotate(0deg);
+                background-color: transparent;
 
                 &.rotated {
                     transform: rotate(-90deg);
@@ -347,6 +353,7 @@ header {
 
             .link-text {
                 font-size: 16px;
+                background-color: transparent;
             }
         }
 
@@ -419,7 +426,7 @@ header {
             gap: 12px;
             padding-left: 30px;
             font-family: Varela-Round;
-            transform: rotate(-90deg);
+            transition: .3s;
 
             .footer-icon {
                 opacity: 0.5;
@@ -445,16 +452,19 @@ header {
 }
 
 .nav-right {
+    position: fixed;
+    right: 0;
+    bottom: 0;
     width: 200px;
-    height: auto;
     background-color: var(--background-color);
     top: 100px;
     margin-top: 30px;
-    position: relative;
-    margin-right: 28px;
+    margin-right: 20px;
+    overflow-y: auto;
+    scrollbar-width: none;
 
     .nav-right-container {
-        width: 100%;
+        width: calc(100% - 4px);
         height: auto;
         display: flex;
         flex-flow: column nowrap;
@@ -506,6 +516,13 @@ header {
             }
         }
     }
+}
+
+.template-container {
+    position: relative;
+    width: calc(100% - 515px);
+    left: 270px;
+    padding: 20px;
 }
 
 

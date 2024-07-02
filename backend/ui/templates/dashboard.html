@@ -1,29 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Dashboard </title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<header>
-    <div class="logo-searchbar">
-        <img class="logo" src="../assets/img//logo/logo_transparent.png" alt="logo">
-        <form class="search">
-            <input class="searchbar" type="searchbar" placeholder="Search for a category, a thread ...">
-            <img class="search-icon" src="../assets/img/icons/search-icon.svg">
-        </form>
-    </div>
-    <div class="notification-profile">
-        <img class="notification-icon" src="../assets/img/icons/notification-icon.svg">
-        <div class="profile">
-            <div class="profile-picture"></div>
-            <img class="profile-icon" src="../assets/img/icons/down-arrow-icon.svg"></img>
-        </div>
-    </div>
-</header>
+
 <body>
-    <section class="container-dashboard-row">
+
+    <!-- COPY PASTE OF HEADER -->
+
+    <header>
+        <div class="logo-searchbar">
+            <img class="logo" src="../assets/img//logo/logo_transparent.png" alt="logo">
+            <form class="search">
+                <input class="searchbar" type="searchbar" placeholder="Search for a category, a thread ...">
+                <img class="search-icon" src="../assets/img/icons/search-icon.svg">
+            </form>
+        </div>
+        <div class="notification-profile">
+            <img class="notification-icon" src="../assets/img/icons/notification-icon.svg">
+            <div class="profile">
+                <div class="profile-picture"></div>
+                <div class="profile-icon-box">
+                    <img class="profile-icon" src="../assets/img/icons/down-arrow-icon.svg">
+                </div>
+                <div class="dropdown">
+                    <div class="item">
+                        <img class="item-icon" src="../assets/img/icons/dashboard-icon.svg">
+                        <p class="item-text"> Dashboard </p>
+                    </div>
+                    <div class="item">
+                        <img class="item-icon" src="../assets/img/icons/disconnect-icon.svg">
+                        <p class="item-text"> Disconnect </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <div class="nav-left">
         <div class="profile">
             <div class="personal-info">
@@ -31,25 +48,25 @@
                     <div class="activity"></div>
                 </div>
                 <div class="name-rank">
-                    <p> Poupi Poupo </p>
-                    <p> Administrator </p>
+                    <p> Poupi Poupo </p> <!--{{ Nom de l'user }}-->
+                    <p> Administrator </p> <!--{{ Role }}-->
                 </div>
             </div>
 
             <div class="stats">
                 <div class="member-since">
                     <p> Member since </p>
-                    <p> 01/01/0001 </p>
+                    <p> 11/09/2001 </p> <!--{{ Date d'inscription  }}-->
                 </div>
 
                 <div class="posts">
                     <p> Post(s) </p>
-                    <p> 100M </p>
+                    <p> 69 </p> <!--{{ Nombre de post }}-->
                 </div>
             </div>
         </div>
 
-        <div class="page-link">
+        <div class="page-link borders">
             <div class="link">
                 <img class="link-icon" src="../assets/img/icons/home-icon.svg">
                 <p class="link-text"> Home </p>
@@ -65,228 +82,270 @@
                 <p class="link-text"> Friends </p>
             </div>
 
-            <div class="link">
+            <div data-list="list-of-categories-1" class="link has-list">
                 <img class="link-icon" src="../assets/img/icons/categories-icon.svg">
-                <p class="link-text"> Categories </p>
-                <img class="link-icon" src="../assets/img/icons/down-arrow-icon.svg">    
+                <p class="link-text"> Categories </p> <!--{{ Toutes les catégories à mettre dans le header  }}-->
+                <img class="link-icon" src="../assets/img/icons/down-arrow-icon.svg">
             </div>
 
-            <div class="category-list">
+            <div id="list-of-categories-1" class="category-list">
 
                 <div class="category">
                     <img class="category-icon" src="../assets/img/icons/hardware-icon.svg">
-                    <p class="category-text"> Hardware </p>
+                    <p class="category-text"> Hardware </p> <!--{{ Category  }}-->
                 </div>
 
                 <div class="category">
                     <img class="category-icon" src="../assets/img/icons/languages-icon.svg">
-                    <p class="category-text"> Languages </p>
+                    <p class="category-text"> Languages </p> <!--{{ Category  }}-->
                 </div>
 
                 <div class="category">
                     <img class="category-icon" src="../assets/img/icons/tech-icon.svg">
-                    <p class="category-text"> Tech </p>
+                    <p class="category-text"> Tech </p> <!--{{ Category  }}-->
                 </div>
+                <!--{{ Fin des Categories  }}-->
             </div>
         </div>
 
-        <div class="footer">
-            <div class="legal-notice">
-                <img class="legal-notice-icon" src="../assets/img/icons/legal-notice-icon.svg">
-                <p class="legal-notice-text"> Legal Notice </p>
+        <div class="footer borders">
+            <div class="footer-link">
+                <img class="footer-icon" src="../assets/img/icons/legal-notice-icon.svg">
+                <p class="footer-text"> Legal Notice </p>
             </div>
 
-            <div class="privacy-policy">
-                <img class="privacy-policy-icon" src="../assets/img/icons/privacy-policy-icon.svg">
-                <p class="privacy-policy-text"> Privacy Policy </p>
+            <div class="footer-link">
+                <img class="footer-icon" src="../assets/img/icons/privacy-policy-icon.svg">
+                <p class="footer-text"> Privacy Policy </p>
             </div>
 
-            <div class="rules">
-                <img class="rules-icon" src="../assets/img/icons/rules-icon.svg">
-                <p class="rules-text"> Rules </p>
+            <div class="footer-link">
+                <img class="footer-icon" src="../assets/img/icons/rules-icon.svg">
+                <p class="footer-text"> Rules </p>
             </div>
 
-            <p> Threadive, inc © 2024 - All rights reserved </p>
+            <p class="rights"> Threadive, inc © 2024 - All rights reserved </p>
         </div>
     </div>
-    <div class="container-dashboard">
-        <h4> Dashboard </h4>
-        <div class="container-profile-friendsrequest">
-            <div class="container-profile">
-                <div class="profilte-picture-name">
-            <div class="pic"> <!--{{ Photo de profil de l'utilisateur }}-->
-                <img class="camera"src="../assets/img/icons/camera-icon.svg">
-            </div>
-            <div class="text-profile">
-            <h4> Bruno Saltor </h4>  <!--{{ Nom de l'utilisateur }}-->
-            <h5> Administrator</h5>  <!--{{ Role de l'utilisateur}}-->
-            </div>
-            </div>
-            <div class="profil-post">
-                <div class="container-colonne">
-                <h4> Member Since </h4>
-                <h5> 10/05/22 </h5>  <!--{{ Date d'inscription }}-->
+
+    <div class="nav-right">
+        <div class="nav-right-container borders">
+            <p class="nav-right-title"> Popular tags </p>
+            <div class="all-tags">
+                <div class="tag">
+                    <a class="tag-link"> apple </a>
                 </div>
-                <div class="container-colonne">
-                <h4> Post </h4>
-                <h5> 16 </h5>  <!--{{ Nombre de post }}-->
+                <div class="tag">
+                    <a class="tag-link"> json </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> javascript </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> android </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> cpu </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> arrays </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> mysql </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> regex </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> middleware </a>
+                </div>
+                <div class="tag">
+                    <a class="tag-link"> wamp </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COPY PASTE OF HEADER -->
+
+
+    <main class="template-container">
+        <div class="container-dashboard borders">
+            <h4 class="dashboard-title"> Dashboard </h4>
+            <div class="container-profile-friendsrequest">
+                <div class="container-profile borders">
+                    <div class="profilte-picture-name">
+                        <div class="pic">
+                            <img class="camera" src="../assets/img/icons/camera-icon.svg">
+                        </div>
+                        <div class="text-profile">
+                            <h4> Bruno Saltor </h4> <!--{{ Nom de l'utilisateur }}-->
+                            <h5> Administrator</h5> <!--{{ Role de l'utilisateur}}-->
+                        </div>
                     </div>
-                <div class="container-colonne">
-                <h4> Friends </h4>
-                <h5> 5 </h5>  <!--{{ Nom d'amis }}-->
+                    <div class="profil-post">
+                        <div class="container-colonne">
+                            <h4> Member Since </h4>
+                            <h5> 10/05/22 </h5> <!--{{ Date d'inscription }}-->
+                        </div>
+                        <div class="container-colonne">
+                            <h4> Post </h4>
+                            <h5> 16 </h5> <!--{{ Nombre de post }}-->
+                        </div>
+                        <div class="container-colonne">
+                            <h4> Friends </h4>
+                            <h5> 5 </h5> <!--{{ Nom d'amis }}-->
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="container-friends-request">
-            <h4> Friend Requests </h4>  
-             <!--{{ Toutes les demandes d'amis en attente }}-->
-            <div class="container-row">
+                <div class="container-friends-request borders">
+                    <h4> Friend Requests </h4>
+                    <!--{{ Toutes les demandes d'amis en attente }}-->
+                    <div class="container-row">
+                        <div class="container-requests">
+                            <div class="pic-friends"></div>
+                            <div class="container-colonne-amis">
+                                <h5> Jean-Mi</h5> <!--{{ Nom de l'utilisateur qui a envoyé la demande  }}-->
+                                <div class="accepte-refuse">
+                                    <img src="../assets/img/icons/check-icon.svg">
+                                    <img src="../assets/img/icons/close-icon.svg">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-requests">
+                            <div class="pic-friends"></div>
+                            <div class="container-colonne-amis">
+                                <h5> Jean-Mi</h5>
+                                <div class="accepte-refuse">
+                                    <img src="../assets/img/icons/check-icon.svg">
+                                    <img src="../assets/img/icons/close-icon.svg">
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="container-requests">
-                <div class="pic-friends"></div>
-                <div class="container-colonne-amis">
-              
-                <h5> Jean-Mi</h5>  <!--{{ Nom de l'utilisateur qui a envoyé la demande  }}-->
-                <div class="accepte-refuse">
-                <img src="../assets/img/icons/check-icon.svg">
-                <img src="../assets/img/icons/close-icon.svg">
-                </div>
-            </div>
-            </div>
+                        <div class="container-requests">
+                            <div class="pic-friends"></div>
+                            <div class="container-colonne-amis">
 
-            <div class="container-requests">
-                <div class="pic-friends"></div>
-                <div class="container-colonne-amis">
-              
-                <h5> Jean-Mi</h5>
-                <div class="accepte-refuse">
-                <img src="../assets/img/icons/check-icon.svg">
-                <img src="../assets/img/icons/close-icon.svg">
-                </div>
-            </div>
-            </div>
+                                <h5> Jean-Mi</h5>
+                                <div class="accepte-refuse">
+                                    <img src="../assets/img/icons/check-icon.svg">
+                                    <img src="../assets/img/icons/close-icon.svg">
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="container-requests">
-                <div class="pic-friends"></div>
-                <div class="container-colonne-amis">
-              
-                <h5> Jean-Mi</h5>
-                <div class="accepte-refuse">
-                <img src="../assets/img/icons/check-icon.svg">
-                <img src="../assets/img/icons/close-icon.svg">
-                </div>
-            </div>
-            </div>
+                        <div class="container-requests">
+                            <div class="pic-friends"></div>
+                            <div class="container-colonne-amis">
 
-            <div class="container-requests">
-                <div class="pic-friends"></div>
-                <div class="container-colonne-amis">
-              
-                <h5> Jean-Mi</h5>
-                <div class="accepte-refuse">
-                <img src="../assets/img/icons/check-icon.svg">
-                <img src="../assets/img/icons/close-icon.svg">
-                </div>
-            </div>  <!--{{ Fin demande d'amis }}-->
-            </div>
+                                <h5> Jean-Mi</h5>
+                                <div class="accepte-refuse">
+                                    <img src="../assets/img/icons/check-icon.svg">
+                                    <img src="../assets/img/icons/close-icon.svg">
+                                </div>
+                            </div> <!--{{ Fin demande d'amis }}-->
+                        </div>
 
-        </div>
-        </div>
-    </div>
-    <section class="container-row">
-    <div class="container-mythread"> 
-         <!--{{ Tous les threads de l'utilisateur }}-->
-        <h4> My Thread </h4>
-        <div class="mythread">
-            <img src="../assets/img/icons/greenfolder.svg">  <!--{{folder vert si ouvert, jaune si terminé et rouge si fermé }}-->
-            <div class="text">
-            <h3> Aide Golang ! </h3>  <!--{{ Titre du thread}}-->
-            </div>
-        </div>
-
-        <div class="mythread">
-            <img src="../assets/img/icons/greenfolder.svg">
-            <div class="text">
-            <h3> Aide Golang ! </h3>
-            </div>
-        </div>
-
-        <div class="mythread">
-            <img src="../assets/img/icons/greenfolder.svg">
-            <div class="text">
-            <h3> Aide Golang ! </h3>
-            </div>
-        </div>  <!--{{ Fin des threads de l'user }}-->
-        </div>
-        <div class="friends-container"> 
-             <!--{{ Tous les amis de l'utilisateur }}-->
-            <h4> Friends </h4>
-            <div class="friends">
-                <div class="pic-friends"></div>
-                <h5> Lucas </h5>  <!--{{ Nom de l'ami }}-->
-        </div>
-
-        <div class="friends">
-            <div class="pic-friends"></div>
-            <h5> Lucas test nom de famille bien longgg </h5>
-        </div>
-         <!--{{ Fin de la liste d'ami}}-->
-        </div>
-        </section>
-        <section class="container-row">
-             <!--{{ Tous les derniers utilisateurs inscrit }}-->
-            <div class="container-last-user">
-                <h4> Last User </h4>
-                <div class="last-user">
-                    <h5> Jean-Mi </h5>  <!--{{ nom de l'user inscrit }}-->
-                </div>
-
-                <div class="last-user">
-                    <h5> XLucasX </h5>
-                </div>
-
-                <div class="last-user">
-                    <h5> Alan  </h5>
+                    </div>
                 </div>
             </div>
-            <div class="container-last-user"> 
-                <!--{{ Toutes les dernières categories }}-->
-                <h4> Last Categories </h4>
-                <div class="last-user">
-                    <h5> Golang </h5>  <!--{{ Nom de la catégorie }}-->
-                </div>
-            </div>
-             <!--{{ Fin des catégories  }}-->
+            <section class="container-row">
+                <div class="container-mythread borders">
+                    <!--{{ Tous les threads de l'utilisateur }}-->
+                    <h4> My Thread </h4>
+                    <div class="mythread borders borders-hover">
+                        <img src="../assets/img/icons/greenfolder.svg">
+                        <!--{{folder vert si ouvert, jaune si terminé et rouge si fermé }}-->
+                        <div class="text">
+                            <h3> Aide Golang ! </h3> <!--{{ Titre du thread}}-->
+                        </div>
+                    </div>
 
-            <div class="container-last-user">
-                  <!--{{ Tous les derniers tags }}-->
-                <h4> Last Tags </h4>
-                <div class="last-user">
-                    <h5> Golang </h5>   <!--{{ Tags }}-->
+                    <div class="mythread borders borders-hover">
+                        <img src="../assets/img/icons/greenfolder.svg">
+                        <div class="text">
+                            <h3> Aide Golang ! </h3>
+                        </div>
+                    </div>
+
+                    <div class="mythread borders borders-hover">
+                        <img src="../assets/img/icons/greenfolder.svg">
+                        <div class="text">
+                            <h3> Aide Golang ! </h3>
+                        </div>
+                    </div> <!--{{ Fin des threads de l'user }}-->
                 </div>
-                <div class="last-user">
-                    <h5> Apple </h5>
+                <div class="friends-container borders">
+                    <!--{{ Tous les amis de l'utilisateur }}-->
+                    <h4> Friends </h4>
+                    <div class="friends">
+                        <div class="pic-friends"></div>
+                        <h5> Lucas </h5> <!--{{ Nom de l'ami }}-->
+                    </div>
+
+                    <div class="friends">
+                        <div class="pic-friends"></div>
+                        <h5> Lucas test nom de famille bien longgg </h5>
+                    </div>
+                    <!--{{ Fin de la liste d'ami}}-->
                 </div>
-                <div class="last-user">
-                    <h5> Linux </h5>
+            </section>
+            <section class="container-row">
+                <!--{{ Tous les derniers utilisateurs inscrit }}-->
+                <div class="container-last-user borders">
+                    <h4> Last User </h4>
+                    <div class="last-user borders borders-hover">
+                        <h5> Jean-Mi </h5> <!--{{ nom de l'user inscrit }}-->
+                    </div>
+
+                    <div class="last-user borders borders-hover">
+                        <h5> XLucasX </h5>
+                    </div>
+
+                    <div class="last-user borders borders-hover">
+                        <h5> Alan </h5>
+                    </div>
                 </div>
-                  <!--{{ Fin des derniers tags  }}-->
-            </div>
-        </section>
-        <div class="container-last-thread">
-              <!--{{ Tous les derniers threads créés }}-->
-            <h4> Last Threads </h4>
-                <div class="lastthread">
-                    <img src="../assets/img/icons/greenfolder.svg">  <!--{{folder vert si ouvert, jaune si terminé et rouge si fermé }}-->
+                <div class="container-last-user borders">
+                    <!--{{ Toutes les dernières categories }}-->
+                    <h4> Last Categories </h4>
+                    <div class="last-user borders borders-hover">
+                        <h5> Golang </h5> <!--{{ Nom de la catégorie }}-->
+                    </div>
+                </div>
+                <!--{{ Fin des catégories  }}-->
+
+                <div class="container-last-user borders">
+                    <!--{{ Tous les derniers tags }}-->
+                    <h4> Last Tags </h4>
+                    <div class="last-user borders borders-hover">
+                        <h5> Golang </h5> <!--{{ Tags }}-->
+                    </div>
+                    <div class="last-user borders borders-hover">
+                        <h5> Apple </h5>
+                    </div>
+                    <div class="last-user borders borders-hover">
+                        <h5> Linux </h5>
+                    </div>
+                    <!--{{ Fin des derniers tags  }}-->
+                </div>
+            </section>
+            <div class="container-last-thread borders">
+                <!--{{ Tous les derniers threads créés }}-->
+                <h4> Last Threads </h4>
+                <div class="lastthread borders borders-hover">
+                    <img src="../assets/img/icons/greenfolder.svg">
+                    <!--{{folder vert si ouvert, jaune si terminé et rouge si fermé }}-->
                     <div class="text">
-                    <h3> Aide Golang ! </h3>   <!--{{ Titre du thread }}-->
-                    <h5> Bruno Saltor </h5>   <!--{{ Auteur du thread }}-->
-                    <p> 09:27:56</p>      <!--{{ Date de création }}-->
+                        <h3> Aide Golang ! </h3> <!--{{ Titre du thread }}-->
+                        <h5> Bruno Saltor </h5> <!--{{ Auteur du thread }}-->
+                        <p> 09:27:56</p> <!--{{ Date de création }}-->
                     </div>
-                     <!--{{ Fin de tous les derniers threads créés }}-->
+                    <!--{{ Fin de tous les derniers threads créés }}-->
                 </div>
-        </div>
+            </div>
 
-    </div>
-</section>
+        </div>
+    </main>
 </body>
