@@ -481,7 +481,8 @@ header .notification-profile .profile .dropdown .item .item-text {
   position: absolute;
   width: 100vw;
   height: 100vh;
-  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
 }
 
 .container {
@@ -524,7 +525,9 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   font-family: Varela-Round;
 }
 .container .login .input-fields .input:focus {
@@ -1308,6 +1311,7 @@ textarea.description {
   height: auto;
 }
 .container-dashboard .container-row .container-mythread .mythread {
+  align-self: center;
   display: flex;
   align-items: center;
   height: 51px;
@@ -1423,33 +1427,20 @@ textarea.description {
 }
 
 /* Error 404 */
-.container-error-row {
-  font-family: Varela-Round;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-}
-.container-error-row .container-error {
-  height: 400px;
-  padding-top: 30px;
-  margin-left: 5px;
-  padding-left: 50px;
-  width: 935px;
-  margin-top: 130px;
+.container-error {
+  height: auto;
+  width: auto;
+  margin-top: 300px;
   font-family: Varela-Round;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding-bottom: 20px;
 }
-.container-error-row .container-error h4 {
+.container-error h4 {
   font-size: 80px;
 }
-.container-error-row .container-error p {
+.container-error p {
   margin-top: 40px;
   font-size: 20px;
-}
-
-/*# sourceMappingURL=style.css.map */
+}/*# sourceMappingURL=style.css.map */

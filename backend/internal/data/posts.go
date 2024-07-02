@@ -186,4 +186,80 @@ func (m *PostModel) GetByID(token string, id int, query url.Values, v *validator
 	return post, nil
 }
 
-// FIXME -> ADD FUNCTIONS TO REACT TO POSTS!!!
+func (m *PostModel) React(token, reaction string, id int, v *validator.Validator) error {
+
+	// creating the request body
+	body := envelope{
+		"reaction": reaction,
+	}
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/react", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodPost, endpoint, reqBody, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *PostModel) UpdateReaction(token, reaction string, id int, v *validator.Validator) error {
+
+	// creating the request body
+	body := envelope{
+		"reaction": reaction,
+	}
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/react", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodPatch, endpoint, reqBody, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *PostModel) DeleteReaction(token string, id int, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/react", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodPut, endpoint, nil, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -2,6 +2,9 @@
 ## explicit; go 1.20
 filippo.io/edwards25519
 filippo.io/edwards25519/field
+# github.com/alexedwards/flow v0.1.0
+## explicit; go 1.21
+github.com/alexedwards/flow
 # github.com/alexedwards/scs/mysqlstore v0.0.0-20240316134038-7e11d57e8885
 ## explicit; go 1.12
 github.com/alexedwards/scs/mysqlstore
@@ -15,12 +18,6 @@ github.com/go-playground/form/v4
 # github.com/go-sql-driver/mysql v1.8.1
 ## explicit; go 1.18
 github.com/go-sql-driver/mysql
-# github.com/joho/godotenv v1.5.1
-## explicit; go 1.12
-github.com/joho/godotenv
-# github.com/justinas/alice v1.2.0
-## explicit; go 1.12
-github.com/justinas/alice
 # github.com/justinas/nosurf v1.1.1
 ## explicit; go 1.12
 github.com/justinas/nosurf

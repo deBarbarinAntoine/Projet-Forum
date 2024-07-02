@@ -152,7 +152,7 @@ func (p *password) Matches(plainTextPassword string) (bool, error) {
 }
 
 func ValidateEmail(v *validator.Validator, email string) {
-	v.Check(email != "", "email", "must be provided")
+	v.StringCheck(email, 5, 150, true, "email")
 	v.Check(validator.Matches(email, validator.EmailRX), "email", "must be a valid email address")
 }
 
@@ -187,7 +187,10 @@ type UserModel struct {
 
 func (m UserModel) Insert(user *User) error {
 
-	args := []any{user.Name, user.Email, user.Password.hash, user.Status}
+	username := strings.ReplaceAll(strings.TrimSpace(user.Name), " ", "+")
+	avatarPath := fmt.Sprintf("https://ui-avatars.com/api/?name=%s&background=random&size=256&rounded=true", username)
+
+	args := []any{user.Name, user.Email, user.Password.hash, avatarPath, user.Status}
 
 	var role, roleValue string
 	if user.Role != "" {
@@ -197,8 +200,8 @@ func (m UserModel) Insert(user *User) error {
 	}
 
 	query := fmt.Sprintf(`
-		INSERT INTO users (Username, Email, Hashed_password, Status%s)
-		VALUES (?, ?, ?, ?%s);`, role, roleValue)
+		INSERT INTO users (Username, Email, Hashed_password, Avatar_path, Status%s)
+		VALUES (?, ?, ?, ?, ?%s);`, role, roleValue)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

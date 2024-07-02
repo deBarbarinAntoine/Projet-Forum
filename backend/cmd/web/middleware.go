@@ -1,11 +1,19 @@
 package main
 
 import (
+	"Projet-Forum/internal/data"
+	"Projet-Forum/internal/validator"
 	"context"
 	"fmt"
 	"github.com/justinas/nosurf"
 	"log/slog"
 	"net/http"
+	"time"
+)
+
+const (
+	userTokenSessionManager           = "user_token"
+	authenticatedUserIDSessionManager = "authenticated_user_id"
 )
 
 func commonHeaders(next http.Handler) http.Handler {
@@ -69,20 +77,60 @@ func noSurf(next http.Handler) http.Handler {
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+		// getting the userID from the session
+		id := app.sessionManager.GetInt(r.Context(), authenticatedUserIDSessionManager)
 
+		// if user not authenticated
 		if id == 0 {
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		exists, err := app.models.UserModel.Exists(id)
-		if err != nil {
-			app.serverError(w, r, err)
-			return
-		}
+		// getting the user tokens from the session
+		tokens, ok := app.sessionManager.Get(r.Context(), userTokenSessionManager).(*data.Tokens)
+		if ok {
 
-		if exists {
+			// checking the authentication imminent expiry
+			if time.Until(tokens.Authentication.Expiry) < 1*time.Hour {
+
+				// checking the refresh token validity
+				if time.Until(tokens.Refresh.Expiry) > 0 {
+
+					// request new tokens from API with refresh token
+					v := validator.New()
+					err := app.models.TokenModel.Refresh(tokens.Refresh.Token, tokens, v)
+					if err != nil {
+						app.serverError(w, r, err)
+						return
+					}
+
+					// if refresh token invalid -> logout
+					if !v.Valid() {
+						err = app.logout(r)
+						if err != nil {
+							app.serverError(w, r, err)
+							return
+						}
+						next.ServeHTTP(w, r)
+						return
+					}
+
+					// replacing the tokens in the user session
+					app.sessionManager.Put(r.Context(), userTokenSessionManager, tokens)
+				} else {
+
+					// if refresh token expired -> logout
+					err := app.logout(r)
+					if err != nil {
+						app.serverError(w, r, err)
+						return
+					}
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
+
+			// setting the user as authenticated in the context
 			ctx := context.WithValue(r.Context(), isAuthenticatedContextKey, true)
 			r = r.WithContext(ctx)
 		}

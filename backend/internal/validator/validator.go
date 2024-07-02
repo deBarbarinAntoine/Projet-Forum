@@ -1,10 +1,16 @@
 package validator
 
 import (
+	"fmt"
 	"regexp"
 	"slices"
 	"strings"
 	"unicode/utf8"
+)
+
+const (
+	MinPasswordLength = 8
+	MaxPasswordLength = 72
 )
 
 type Validator struct {
@@ -34,10 +40,44 @@ func (v *Validator) AddFieldError(key, message string) {
 	}
 }
 
-func (v *Validator) CheckField(ok bool, key, message string) {
+func (v *Validator) Check(ok bool, key, message string) {
 	if !ok {
 		v.AddFieldError(key, message)
 	}
+}
+
+func (v *Validator) ValidateEmail(email string) {
+	v.StringCheck(email, 5, 150, true, "email")
+	v.Check(Matches(email, EmailRX), "email", "must be a valid email address")
+}
+
+func (v *Validator) StringCheck(str string, min, max int, isMandatory bool, key string) {
+	if isMandatory {
+		v.Check(str != "", key, "must be provided")
+	}
+	v.Check(len(str) >= min, key, fmt.Sprintf("must be minimum %d bytes long", min))
+	v.Check(len(str) <= max, key, fmt.Sprintf("must not be more than %d bytes long", max))
+}
+
+func (v *Validator) ValidatePassword(password string) {
+	v.StringCheck(password, MinPasswordLength, MaxPasswordLength, true, "password")
+}
+
+func (v *Validator) ValidateRegisterPassword(password, confirmationPassword string) {
+	v.StringCheck(password, MinPasswordLength, MaxPasswordLength, true, "password")
+	v.Check(confirmationPassword != "", "confirmation_password", "must be provided")
+	v.Check(password == confirmationPassword, "confirmation_password", "must be the same")
+}
+
+func (v *Validator) ValidateNewPassword(newPassword, confirmationPassword string) {
+	v.StringCheck(newPassword, MinPasswordLength, MaxPasswordLength, true, "new_password")
+	v.Check(confirmationPassword != "", "confirmation_password", "must be provided")
+	v.Check(newPassword == confirmationPassword, "confirmation_password", "must be the same")
+}
+
+func (v *Validator) ValidateToken(token string) {
+	v.Check(token != "", "token", "must be provided")
+	v.Check(len(token) == 86, "token", "must be 86 bytes long")
 }
 
 func NotBlank(fieldName string) bool {

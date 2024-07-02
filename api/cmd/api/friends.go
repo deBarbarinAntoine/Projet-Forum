@@ -88,17 +88,30 @@ func (app *application) friendResponseHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	var status string
-
-	if r.URL.Query().Has("status") {
-		status = strings.TrimSpace(strings.ToLower(r.URL.Query().Get("status")))
-	} else {
-		status = data.FriendStatus.Accepted
+	var input struct {
+		Status string `json:"status"`
 	}
+
+	err = app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	v := validator.New()
+
+	v.StringCheck(input.Status, 2, 50, true, "status")
+
+	if !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	input.Status = strings.TrimSpace(strings.ToLower(input.Status))
 
 	user := app.contextGetUser(r)
 
-	switch status {
+	switch input.Status {
 	case data.FriendStatus.Rejected:
 		err = app.models.Users.RejectFriend(id, user)
 	case data.FriendStatus.Accepted:
@@ -118,7 +131,7 @@ func (app *application) friendResponseHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	response := envelope{
-		"message": fmt.Sprintf("%sed friend with id %d", status, id),
+		"message": fmt.Sprintf("%sed friend with id %d", input.Status, id),
 	}
 
 	err = app.writeJSON(w, http.StatusOK, response, nil)

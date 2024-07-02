@@ -25,20 +25,39 @@ type application struct {
 }
 
 type templateData struct {
-	CurrentYear     int
-	Message         string
-	Form            any
-	Flash           string
-	IsAuthenticated bool
-	CSRFToken       string
-	User            data.User
-	CategoryList    []data.Category
-	ThreadList      []data.Thread
-	PostList        []data.Post
-	TagList         []data.Tag
-	Category        data.Category
-	Thread          data.Thread
-	Tag             data.Tag
+	CurrentYear       int
+	Message           string
+	Form              any
+	Flash             string
+	IsAuthenticated   bool
+	CSRFToken         string
+	ActivationToken   string
+	ResetToken        string
+	FieldErrors       map[string]string
+	NonFieldErrors    []string
+	User              *data.User
+	CategoriesNavLeft []*data.Category
+	PopularTags       []*data.Tag
+	PopularThreads    []*data.Thread
+	CategoryList      struct {
+		Metadata data.Metadata
+		List     []*data.Category
+	}
+	ThreadList struct {
+		Metadata data.Metadata
+		List     []*data.Thread
+	}
+	PostList struct {
+		Metadata data.Metadata
+		List     []*data.Post
+	}
+	TagList struct {
+		Metadata data.Metadata
+		List     []*data.Tag
+	}
+	Category *data.Category
+	Thread   *data.Thread
+	Tag      *data.Tag
 }
 
 type userLoginForm struct {
@@ -48,8 +67,26 @@ type userLoginForm struct {
 }
 
 type userRegisterForm struct {
+	Username            string `form:"username"`
 	Email               string `form:"email"`
 	Password            string `form:"password"`
+	ConfirmPassword     string `form:"confirm_password"`
+	validator.Validator `form:"-"`
+}
+
+type userConfirmForm struct {
+	Token               string `form:"token"`
+	validator.Validator `form:"-"`
+}
+
+type forgotPasswordForm struct {
+	Email               string `form:"email"`
+	validator.Validator `form:"-"`
+}
+
+type resetPasswordForm struct {
+	Token               string `form:"token"`
+	NewPassword         string `form:"new_password"`
 	ConfirmPassword     string `form:"confirm_password"`
 	validator.Validator `form:"-"`
 }
@@ -57,7 +94,7 @@ type userRegisterForm struct {
 type categoryForm struct {
 	Name                string `form:"name"`
 	Author              string `form:"author"`
-	ParentCategory      string `form:"parent_category"`
+	ParentCategory      *int   `form:"parent_category,omitempty"`
 	validator.Validator `form:"-"`
 }
 
@@ -74,7 +111,7 @@ type postForm struct {
 	Content             string `form:"content"`
 	Author              string `form:"author"`
 	ThreadId            int    `form:"thread_id"`
-	ParentPostId        int    `form:"parent_post_id"`
+	ParentPostId        *int   `form:"parent_post_id,omitempty"`
 	validator.Validator `form:"-"`
 }
 

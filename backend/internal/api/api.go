@@ -16,7 +16,6 @@ import (
 )
 
 const (
-	userTokenSessionKey = "user_token"
 	StatusFailedRequest = 0
 )
 

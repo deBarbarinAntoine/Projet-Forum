@@ -191,4 +191,146 @@ func (m *UserModel) GetByID(token string, id string, query url.Values, v *valida
 	return user, nil
 }
 
-// FIXME -> ADD FRIENDS RELATED FUNCTIONS & ACTIVATION/FORGOT-PASSWORD HANDLERS
+func (m *UserModel) Activate(activationToken string, v *validator.Validator) error {
+
+	// creating the request body
+	body := envelope{
+		"token": activationToken,
+	}
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/activated", m.endpoint)
+
+	// making the request
+	res, status, err := m.api().Request("", http.MethodPut, endpoint, reqBody, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *UserModel) ForgotPassword(email string, v *validator.Validator) error {
+
+	// creating the request body
+	body := envelope{
+		"email": email,
+	}
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/forgot-password", m.endpoint)
+
+	// making the request
+	res, status, err := m.api().Request("", http.MethodPost, endpoint, reqBody, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *UserModel) ResetPassword(body map[string]string, v *validator.Validator) error {
+
+	// formatting the body to JSON
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/password", m.endpoint)
+
+	// making the request
+	res, status, err := m.api().Request("", http.MethodPut, endpoint, reqBody, true)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *UserModel) FriendRequest(token string, id int, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/friend", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodPost, endpoint, nil, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *UserModel) FriendResponse(token string, id int, body []byte, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/friend", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodPut, endpoint, body, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *UserModel) FriendDelete(token string, id int, v *validator.Validator) error {
+
+	// building the endpoint's specific URL
+	endpoint := fmt.Sprintf("%s/%d/friend", m.endpoint, id)
+
+	// making the request
+	res, status, err := m.api().Request(token, http.MethodDelete, endpoint, nil, false)
+	if err != nil {
+		return err
+	}
+
+	// checking for errors
+	err = api.GetErr(status, res, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

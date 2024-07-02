@@ -480,7 +480,8 @@ header .notification-profile .profile .dropdown .item .item-text {
   position: absolute;
   width: 100vw;
   height: 100vh;
-  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
 }
 
 .container {
@@ -523,7 +524,9 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   font-family: Varela-Round;
 }
 .container .login .input-fields .input:focus {
@@ -608,6 +611,4 @@ textarea.description {
   height: 200px !important;
   resize: none;
   scrollbar-width: thin;
-}
-
-/*# sourceMappingURL=base.css.map */
+}/*# sourceMappingURL=base.css.map */
