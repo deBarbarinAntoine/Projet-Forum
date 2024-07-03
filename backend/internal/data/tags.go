@@ -58,19 +58,13 @@ func (m *TagModel) Create(token string, tag *Tag, v *validator.Validator) error 
 	return nil
 }
 
-func (m *TagModel) Update(token string, id int, body envelope, v *validator.Validator) (*Tag, error) {
-
-	// converting the body in JSON format
-	reqBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
+func (m *TagModel) Update(token string, id int, body []byte, v *validator.Validator) (*Tag, error) {
 
 	// building the endpoint's specific URL
 	endpoint := fmt.Sprintf("%s/%d", m.endpoint, id)
 
 	// making the request
-	res, status, err := m.api().Request(token, http.MethodPut, endpoint, reqBody, false)
+	res, status, err := m.api().Request(token, http.MethodPut, endpoint, body, false)
 	if err != nil {
 		return nil, err
 	}

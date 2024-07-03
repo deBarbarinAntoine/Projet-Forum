@@ -125,7 +125,7 @@ func (m *ThreadModel) Delete(token string, id int, v *validator.Validator) error
 func (m *ThreadModel) Get(token string, query url.Values, v *validator.Validator) ([]*Thread, Metadata, error) {
 
 	// making the request
-	res, status, err := m.api().Get(token, m.endpoint, query)
+	res, status, err := m.api().Get(token, m.endpoint, query) // FIXME -> handle Threads by status!
 	if err != nil {
 		return nil, Metadata{}, err
 	}

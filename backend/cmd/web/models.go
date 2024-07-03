@@ -105,31 +105,29 @@ type resetPasswordForm struct {
 }
 
 type categoryForm struct {
-	Name                string `form:"name"`
-	Author              string `form:"author"`
-	ParentCategory      *int   `form:"parent_category,omitempty"`
+	Name                *string `form:"name,omitempty"`
+	ParentCategoryID    *int    `form:"parent_category_id,omitempty"`
 	validator.Validator `form:"-"`
 }
 
 type threadForm struct {
-	Title               string `form:"title"`
-	Description         string `form:"description"`
-	IsPublic            bool   `form:"is_public"`
-	Author              string `form:"author"`
-	Category            string `form:"category"`
+	Title               *string `form:"title,omitempty"`
+	Description         *string `form:"description,omitempty"`
+	IsPublic            *bool   `form:"is_public,omitempty"`
+	CategoryID          *int    `form:"category_id,omitempty"`
 	validator.Validator `form:"-"`
 }
 
 type postForm struct {
-	Content             string `form:"content"`
-	Author              string `form:"author"`
-	ThreadId            int    `form:"thread_id"`
-	ParentPostId        *int   `form:"parent_post_id,omitempty"`
+	Content             *string `form:"content,omitempty"`
+	ThreadID            *int    `form:"thread_id,omitempty"`
+	ParentPostID        *int    `form:"parent_post_id,omitempty"`
 	validator.Validator `form:"-"`
 }
 
 type tagForm struct {
-	Name                string `form:"name"`
-	Author              string `form:"author"`
+	Name                *string `form:"name,omitempty"`
+	AddThreads          []int   `form:"add_threads,omitempty"`
+	RemoveThreads       []int   `form:"remove_threads,omitempty"`
 	validator.Validator `form:"-"`
 }

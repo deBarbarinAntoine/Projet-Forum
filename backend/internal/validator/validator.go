@@ -54,6 +54,10 @@ func (v *Validator) ValidateDate(date, fieldName string) {
 	}
 }
 
+func (v *Validator) CheckID(id int, fieldName string) {
+	v.Check(id > 0, fieldName, "ID must be greater than 0")
+}
+
 func (v *Validator) ValidateEmail(email string) {
 	v.StringCheck(email, 5, 150, true, "email")
 	v.Check(Matches(email, EmailRX), "email", "must be a valid email address")
@@ -106,4 +110,14 @@ func Matches(value string, rx *regexp.Regexp) bool {
 
 func PermittedValue[T comparable](value T, permittedValues ...T) bool {
 	return slices.Contains(permittedValues, value)
+}
+
+func Unique[T comparable](values []T) bool {
+	uniqueValues := make(map[T]bool)
+
+	for _, value := range values {
+		uniqueValues[value] = true
+	}
+
+	return len(values) == len(uniqueValues)
 }

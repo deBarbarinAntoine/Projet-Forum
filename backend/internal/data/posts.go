@@ -155,13 +155,13 @@ func (m *PostModel) Get(token string, query url.Values, v *validator.Validator) 
 	return posts, metadata, nil
 }
 
-func (m *PostModel) GetByID(token string, id int, query url.Values, v *validator.Validator) (*Post, error) {
+func (m *PostModel) GetByID(token string, id int, v *validator.Validator) (*Post, error) {
 
 	// building the endpoint's specific URL
 	endpoint := fmt.Sprintf("%s/%d", m.endpoint, id)
 
 	// making the request
-	res, status, err := m.api().Get(token, endpoint, query)
+	res, status, err := m.api().Get(token, endpoint, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -85,6 +85,14 @@ func (app *application) getToken(r *http.Request) string {
 	return tokens.Authentication.Token
 }
 
+func (app *application) getUserID(r *http.Request) int {
+	id, ok := app.sessionManager.Get(r.Context(), authenticatedUserIDSessionManager).(int)
+	if !ok {
+		return 0
+	}
+	return id
+}
+
 func newUserRegisterForm() *userRegisterForm {
 	return &userRegisterForm{
 		Validator: *validator.New(),

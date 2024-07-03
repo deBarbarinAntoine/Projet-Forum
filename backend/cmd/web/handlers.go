@@ -3,9 +3,12 @@ package main
 import (
 	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/validator"
+	"encoding/json"
 	"fmt"
 	"github.com/alexedwards/flow"
 	"net/http"
+	"net/url"
+	"time"
 )
 
 /* #############################################################################
@@ -318,7 +321,7 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 	// checking the data from the user
 	form.ValidateToken(form.Token)
 
-	// looking for errors from the API
+	// return to confirm page if there is an error
 	if !form.Valid() {
 
 		// retrieving basic template data
@@ -382,7 +385,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	form.Check(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
 	form.ValidatePassword(form.Password)
 
-	// looking for errors from the API
+	// return to login page if there is an error
 	if !form.Valid() {
 
 		// retrieving basic template data
@@ -468,7 +471,7 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 	// checking the data from the user
 	form.ValidateEmail(form.Email)
 
-	// looking for errors from the API
+	// return to forgot-password page if there is an error
 	if !form.Valid() {
 
 		// retrieving basic template data
@@ -542,7 +545,7 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 	form.ValidateNewPassword(form.NewPassword, form.ConfirmPassword)
 	form.ValidateToken(form.Token)
 
-	// looking for errors from the API
+	// return to reset-password page if there is an error
 	if !form.Valid() {
 
 		// retrieving basic template data
@@ -635,27 +638,49 @@ func (app *application) updateUserPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// creating the User struct to insert the new data into it
+	user := &data.User{}
+
 	// checking the data from the user
+	var isEmpty = true
 	if form.Username != nil {
+		isEmpty = false
 		form.StringCheck(*form.Username, 2, 70, false, "username")
+		user.Name = *form.Username
 	}
 	if form.Password != nil || form.NewPassword != nil || form.ConfirmationPassword != nil {
+		isEmpty = false
 		form.ValidateNewPassword(*form.NewPassword, *form.ConfirmationPassword)
+		user.Password = *form.NewPassword
 	}
 	if form.Email != nil {
+		isEmpty = false
 		form.ValidateEmail(*form.Email)
+		user.Email = *form.Email
 	}
 	if form.Bio != nil {
+		isEmpty = false
 		form.StringCheck(*form.Bio, 2, 255, false, "bio")
+		user.Bio = *form.Bio
 	}
 	if form.Birth != nil {
+		isEmpty = false
 		form.ValidateDate(*form.Birth, "birth")
+		birthDate, err := time.Parse("2006-01-02", *form.Birth)
+		if nil == err {
+			user.BirthDate = birthDate
+		}
 	}
 	if form.Signature != nil {
+		isEmpty = false
 		form.StringCheck(*form.Signature, 1, 255, false, "signature")
+		user.Signature = *form.Signature
+	}
+	if isEmpty {
+		form.AddNonFieldError("at least one field is required")
 	}
 
-	// looking for errors from the API
+	// return to update-user page if there is an error
 	if !form.Valid() {
 
 		// retrieving basic template data
@@ -669,16 +694,9 @@ func (app *application) updateUserPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// building the API request body
-	body := map[string]string{
-		"token":            form.Token,
-		"new_password":     form.NewPassword,
-		"confirm_password": form.ConfirmPassword,
-	}
-
 	// API request to send a reset password token
 	v := validator.New()
-	err = app.models.UserModel.ResetPassword(body, v)
+	err = app.models.UserModel.Update(app.getToken(r), *form.Password, user, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -707,14 +725,13 @@ func (app *application) createCategory(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newCategoryForm()
-
 	// render the template
 	app.render(w, r, http.StatusOK, "category-create.tmpl", data)
 }
 
 func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Request) {
 
+	// retrieving the form data
 	form := newCategoryForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
@@ -722,8 +739,19 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// TODO check form values
+	// checking the data from the user
+	if form.ParentCategoryID == nil {
+		form.AddFieldError("parent_category_id", "must be provided")
+	} else {
+		form.CheckID(*form.ParentCategoryID, "parent_category_id")
+	}
+	if form.Name == nil {
+		form.AddFieldError("name", "must be provided")
+	} else {
+		form.StringCheck(*form.Name, 2, 70, true, "name")
+	}
 
+	// return to category-create page if there is an error
 	if !form.Valid() {
 		data := app.newTemplateData(r, false)
 		data.Form = form
@@ -733,12 +761,36 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// TODO create category
-	id := app.models.CategoryModel.Create(form.Name, form.Author, form.ParentCategory)
+	// creating the new category
+	category := &data.Category{}
+	category.Name = *form.Name
+	category.Author.ID = app.getUserID(r)
+	category.ParentCategory.ID = *form.ParentCategoryID
 
-	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Category %s created successfully!", form.Name))
+	// API request to create a category
+	v := validator.New()
+	err = app.models.CategoryModel.Create(app.getToken(r), category, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 
-	http.Redirect(w, r, fmt.Sprintf("/category/%d", id), http.StatusSeeOther)
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// retrieving basic template data
+		data := app.newTemplateData(r, false)
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "category-create.tmpl", data)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Category %s created successfully!", *form.Name))
+	http.Redirect(w, r, fmt.Sprintf("/category/%d", category.ID), http.StatusSeeOther)
 }
 
 func (app *application) createThread(w http.ResponseWriter, r *http.Request) {
@@ -746,14 +798,13 @@ func (app *application) createThread(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newThreadForm()
-
 	// render the template
 	app.render(w, r, http.StatusOK, "thread-create.tmpl", data)
 }
 
 func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request) {
 
+	// retrieving the form data
 	form := newThreadForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
@@ -761,23 +812,71 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// TODO check form values
+	// creating the new thread
+	thread := &data.Thread{}
 
+	// checking the data from the user
+	if form.Title == nil {
+		form.AddFieldError("title", "must be provided")
+	} else {
+		form.StringCheck(*form.Title, 2, 125, true, "title")
+		thread.Title = *form.Title
+	}
+	if form.Description == nil {
+		form.AddFieldError("description", "must be provided")
+	} else {
+		form.StringCheck(*form.Description, 1, 1_020, true, "name")
+		thread.Description = *form.Description
+	}
+	if form.IsPublic == nil {
+		thread.IsPublic = true
+	} else {
+		thread.IsPublic = *form.IsPublic
+	}
+	if form.CategoryID == nil {
+		form.AddFieldError("category_id", "must be provided")
+	} else {
+		form.CheckID(*form.CategoryID, "category_id")
+		thread.Category.ID = *form.CategoryID
+	}
+
+	// return to thread-create page if there is an error
 	if !form.Valid() {
 		data := app.newTemplateData(r, false)
 		data.Form = form
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
 
 		// render the template
 		app.render(w, r, http.StatusUnprocessableEntity, "thread-create.tmpl", data)
 		return
 	}
 
-	// TODO create thread
-	id := app.models.ThreadModel.Create(form.Title, form.Description, form.IsPublic, form.Author, form.Category)
+	// API request to create a category
+	v := validator.New()
+	err = app.models.ThreadModel.Create(app.getToken(r), thread, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 
-	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Thread %s created successfully!", form.Title))
+	// looking for errors from the API
+	if !v.Valid() {
 
-	http.Redirect(w, r, fmt.Sprintf("/thread/%d", id), http.StatusSeeOther)
+		// retrieving basic template data
+		data := app.newTemplateData(r, false)
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "thread-create.tmpl", data)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Thread created successfully!")
+	http.Redirect(w, r, fmt.Sprintf("/thread/%d", thread.ID), http.StatusSeeOther)
 }
 
 func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
@@ -785,14 +884,13 @@ func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newPostForm()
-
 	// render the template
 	app.render(w, r, http.StatusOK, "post-create.tmpl", data)
 }
 
 func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 
+	// retrieving the form data
 	form := newPostForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
@@ -800,21 +898,66 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO check form values
+	// creating the new thread
+	post := &data.Post{}
 
+	// checking the data from the user
+	if form.Content == nil {
+		form.AddFieldError("content", "must be provided")
+	} else {
+		form.StringCheck(*form.Content, 2, 1_020, true, "content")
+		post.Content = *form.Content
+	}
+	if form.ThreadID == nil {
+		form.AddFieldError("thread_id", "must be provided")
+	} else {
+		form.CheckID(*form.ThreadID, "thread_id")
+		post.Thread.ID = *form.ThreadID
+	}
+	if form.ParentPostID == nil {
+		form.AddFieldError("parent_post_id", "must be provided")
+	} else {
+		form.CheckID(*form.ParentPostID, "parent_post_id")
+		post.IDParentPost = *form.ParentPostID
+	}
+
+	// return to post-create page if there is an error
 	if !form.Valid() {
 		data := app.newTemplateData(r, false)
 		data.Form = form
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
 
 		// render the template
 		app.render(w, r, http.StatusUnprocessableEntity, "post-create.tmpl", data)
 		return
 	}
 
-	// TODO create post
-	id := app.models.PostModel.Create(form.Content, form.Author, form.ThreadId, form.ParentPostId)
+	// API request to create a category
+	v := validator.New()
+	err = app.models.PostModel.Create(app.getToken(r), post, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 
-	http.Redirect(w, r, fmt.Sprintf("/thread/%d", id), http.StatusSeeOther)
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// retrieving basic template data
+		data := app.newTemplateData(r, false)
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "post-create.tmpl", data)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Post created successfully!")
+	http.Redirect(w, r, fmt.Sprintf("/thread/%d", post.Thread.ID), http.StatusSeeOther)
 }
 
 func (app *application) createTag(w http.ResponseWriter, r *http.Request) {
@@ -822,14 +965,13 @@ func (app *application) createTag(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newTagForm()
-
 	// render the template
 	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
 }
 
 func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 
+	// retrieving the form data
 	form := newTagForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
@@ -837,23 +979,54 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO check form values
+	// creating the new thread
+	tag := &data.Tag{}
 
+	// checking the data from the user
+	if form.Name == nil {
+		form.AddFieldError("name", "must be provided")
+	} else {
+		form.StringCheck(*form.Name, 2, 70, true, "name")
+		tag.Name = *form.Name
+	}
+
+	// return to tag-create page if there is an error
 	if !form.Valid() {
 		data := app.newTemplateData(r, false)
 		data.Form = form
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
 
 		// render the template
 		app.render(w, r, http.StatusUnprocessableEntity, "tag-create.tmpl", data)
 		return
 	}
 
-	// TODO create tag
-	id := app.models.TagModel.Create(form.Name, form.Author)
+	// API request to create a category
+	v := validator.New()
+	err = app.models.TagModel.Create(app.getToken(r), tag, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 
-	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Tag %s created successfully!", form.Name))
+	// looking for errors from the API
+	if !v.Valid() {
 
-	http.Redirect(w, r, fmt.Sprintf("/tag/%d", id), http.StatusSeeOther)
+		// retrieving basic template data
+		data := app.newTemplateData(r, false)
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Tag %s created successfully!", tag.Name))
+	http.Redirect(w, r, fmt.Sprintf("/tag/%d", tag.ID), http.StatusSeeOther)
 }
 
 func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
@@ -861,10 +1034,26 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newTagForm()
+	// retrieving the post id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// retrieving the post from the API
+	v := validator.New()
+	post, err := app.models.PostModel.GetByID(app.getToken(r), id, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// inserting the post values in the TemplateData's Form
+	data.Form = post
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "post-update.tmpl", data)
 }
 
 func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
@@ -872,10 +1061,29 @@ func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newTagForm()
+	// retrieving the tag id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// retrieving the tag from the API
+	v := validator.New()
+	query := url.Values{
+		"includes[]": {"threads"},
+	}
+	tag, err := app.models.TagModel.GetByID(app.getToken(r), id, query, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// inserting the tag values in the TemplateData's Form
+	data.Form = tag
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "tag-update.tmpl", data)
 }
 
 func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
@@ -883,10 +1091,26 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newTagForm()
+	// retrieving the category id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// retrieving the category from the API
+	v := validator.New()
+	category, err := app.models.CategoryModel.GetByID(app.getToken(r), id, nil, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// inserting the category values in the TemplateData's Form
+	data.Form = category
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "category-update.tmpl", data)
 }
 
 func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
@@ -894,10 +1118,26 @@ func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	data := app.newTemplateData(r, false)
 
-	data.Form = newTagForm()
+	// retrieving the thread id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// retrieving the thread from the API
+	v := validator.New()
+	thread, err := app.models.ThreadModel.GetByID(app.getToken(r), id, nil, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// inserting the thread values in the TemplateData's Form
+	data.Form = thread
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "thread-update.tmpl", data)
 }
 
 func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request) {
@@ -935,11 +1175,74 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 
-	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	// retrieving the form data
+	form := newTagForm()
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
-	data.Form = newTagForm()
+	// checking the data from the user
+	if form.Name != nil {
+		form.StringCheck(*form.Name, 2, 70, false, "name")
+	}
+	if form.AddThreads != nil {
+		form.Check(validator.Unique(form.AddThreads), "threads_ids", "must be unique")
+	}
+	if form.AddThreads != nil {
+		form.Check(validator.Unique(form.AddThreads), "threads_ids", "must be unique")
+	}
 
-	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	// return to tag-create page if there is an error
+	if !form.Valid() {
+		data := app.newTemplateData(r, false)
+		data.Form = form
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusUnprocessableEntity, "tag-create.tmpl", data)
+		return
+	}
+
+	// creating the API request body
+	body, err := json.Marshal(form)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// retrieving the thread id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// API request to create a category
+	v := validator.New()
+	tag, err := app.models.TagModel.Update(app.getToken(r), id, body, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// retrieving basic template data
+		data := app.newTemplateData(r, false)
+
+		data.NonFieldErrors = form.NonFieldErrors
+		data.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Tag %s updated successfully!", tag.Name))
+	http.Redirect(w, r, fmt.Sprintf("/tag/%d", tag.ID), http.StatusSeeOther)
 }
