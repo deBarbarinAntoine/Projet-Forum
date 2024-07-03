@@ -12,9 +12,12 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"log/slog"
 	"net/http"
 	"os"
+	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -22,7 +25,7 @@ func main() {
 	var cfg config
 
 	flag.BoolVar(&cfg.isHTTPS, "https", false, "use https")
-	flag.IntVar(&cfg.port, "port", 4000, "HTTP service address")
+	flag.Int64Var(&cfg.port, "port", 4000, "HTTP service address")
 	flag.StringVar(&cfg.apiURL, "api-url", "http://localhost:3000", "API URL")
 
 	pemFilePath := flag.String("pem", "./pem/public.pem", "PEM file path")
@@ -36,9 +39,20 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
+	// check if the program is run by Windows OS, to fetch the necessary variables
+	if runtime.GOOS == "windows" {
+
+		// fetch environment variable from .env file
+		err := cfg.loadEnv()
+		if err != nil {
+			logger.Error(err.Error())
+			os.Exit(1)
+		}
+	}
+
 	addr := fmt.Sprintf(":%d", cfg.port)
 
-	if secret == nil || *secret == "" {
+	if secret == nil || *secret == "" || len(*secret) != 86 {
 		logger.Error("secret is required")
 		os.Exit(1)
 	}
@@ -56,6 +70,12 @@ func main() {
 		}
 		if clientToken == nil {
 			logger.Error("impossible to get client token")
+			os.Exit(1)
+		}
+	} else {
+		pemKey, err = getPEM(*pemFilePath)
+		if err != nil {
+			logger.Error(err.Error())
 			os.Exit(1)
 		}
 	}
@@ -143,6 +163,40 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
+func (cfg *config) loadEnv() error {
+
+	err := godotenv.Load()
+	if err != nil {
+		return err
+	}
+
+	cfg.port, err = strconv.ParseInt(os.Getenv("PORT"), 10, 64)
+	if err != nil {
+		return err
+	}
+	cfg.dsn = os.Getenv("DB_DSN")
+	cfg.secret = os.Getenv("API_HOST_SECRET")
+	cfg.clientToken = os.Getenv("API_CLIENT_TOKEN")
+	cfg.pemPath = os.Getenv("PEM_PATH")
+
+	if len(cfg.clientToken) != 86 {
+		cfg.clientToken = ""
+	}
+
+	return nil
+}
+
+func getPEM(pemFilePath string) ([]byte, error) {
+
+	// retrieving the PEM private key from pemFilePath
+	pem, err := os.ReadFile(pemFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	return pem, nil
+}
+
 func getClientCredentials(urlAPI, secret, pemFilePath string) (*string, []byte, error) {
 
 	// creating connection to API
@@ -158,6 +212,9 @@ func getClientCredentials(urlAPI, secret, pemFilePath string) (*string, []byte, 
 	clientToken, err := apiClient.GetClient(credentials, v)
 	if err != nil {
 		return nil, nil, err
+	}
+	if !v.Valid() {
+		return nil, nil, fmt.Errorf("errors occurred when registering the client to the API")
 	}
 
 	// fetching PEM public key

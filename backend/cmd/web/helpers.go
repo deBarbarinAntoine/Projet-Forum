@@ -153,7 +153,7 @@ func newTagForm() *tagForm {
 	}
 }
 
-func (app *application) newTemplateData(r *http.Request, allUser bool) templateData {
+func (app *application) newTemplateData(r *http.Request, allUser bool, overlay string) templateData {
 
 	// checking is the user is authenticated
 	isAuthenticated := app.isAuthenticated(r)
@@ -178,21 +178,14 @@ func (app *application) newTemplateData(r *http.Request, allUser bool) templateD
 	if err != nil {
 		app.logger.Error(err.Error())
 	}
-	// DEBUG
-	fmt.Printf("categories: %+v\n", categories)
 	tags, threads, err := app.models.TagModel.GetPopular(token, v)
 	if err != nil {
 		app.logger.Error(err.Error())
 	}
-	// DEBUG
-	fmt.Print("tags: ")
-	for _, tag := range tags {
-		fmt.Printf("%+v\n", *tag)
-	}
-	fmt.Printf("threads: %+v\n", threads)
 
 	// returning the templateData with all information
 	return templateData{
+		Overlay:           overlay,
 		CurrentYear:       time.Now().Year(),
 		Flash:             app.sessionManager.PopString(r.Context(), "flash"),
 		IsAuthenticated:   isAuthenticated,

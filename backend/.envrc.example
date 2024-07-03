@@ -1,7 +1,8 @@
-export DB_HOST=localhost
-export DB_PORT=:3306
-export DB_USER=user_name
-export DB_PASSWORD=user_password
-export DB_DATABASE=database_name
-export DB_NETWORK=tcp
-export PORT=:8080
+# constant variables
+export PORT=4000
+export DB_DSN="user:password@/database-name?parseTime=true"
+export API_HOST_SECRET="api-host-secret"
+
+# temporary variables
+export API_CLIENT_TOKEN="api-client-token"
+export PEM_PATH="./pem/public.pem"

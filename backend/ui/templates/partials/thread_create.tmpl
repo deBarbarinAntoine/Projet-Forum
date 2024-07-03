@@ -1,9 +1,11 @@
+{{define "thread-create"}}
 <div class="blur-underlay"></div>
 
 <div class="center-page">
     <div class="container borders">
         <form class="login">
             <p class="login-title bottom-outset"> Create Thread </p>
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 
             <div class="input-fields">
                 <label for="title"></label>
@@ -18,3 +20,4 @@
     
     </div>
 </div>
+{{end}}

@@ -10,9 +10,13 @@ import (
 )
 
 type config struct {
-	isHTTPS bool
-	apiURL  string
-	port    int
+	isHTTPS     bool
+	apiURL      string
+	port        int64
+	dsn         string
+	secret      string
+	clientToken string
+	pemPath     string
 }
 
 type application struct {
@@ -24,7 +28,24 @@ type application struct {
 	config         *config
 }
 
+type overlayEnum struct {
+	Default        string
+	Login          string
+	Register       string
+	ForgotPassword string
+	ResetPassword  string
+}
+
+var Overlay = overlayEnum{
+	Default:        "default",
+	Login:          "login",
+	Register:       "register",
+	ForgotPassword: "forgot-password",
+	ResetPassword:  "reset-password",
+}
+
 type templateData struct {
+	Overlay           string
 	CurrentYear       int
 	Message           string
 	Form              any

@@ -18,7 +18,7 @@ import (
 func (app *application) notFound(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "error.tmpl", tmplData)
@@ -27,7 +27,7 @@ func (app *application) notFound(w http.ResponseWriter, r *http.Request) {
 func (app *application) index(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, true)
+	tmplData := app.newTemplateData(r, true, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
@@ -36,16 +36,16 @@ func (app *application) index(w http.ResponseWriter, r *http.Request) {
 func (app *application) about(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "about.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "policies.tmpl", tmplData)
 }
 
 func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// fetching the category id in the path
 	id, err := getPathID(r)
@@ -75,7 +75,7 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// fetching the thread id in the path
 	id, err := getPathID(r)
@@ -105,7 +105,7 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// fetching the tag id in the path
 	id, err := getPathID(r)
@@ -135,7 +135,7 @@ func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 func (app *application) TagsGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// fetching the tags
 	v := validator.New()
@@ -159,7 +159,7 @@ func (app *application) TagsGet(w http.ResponseWriter, r *http.Request) {
 func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// fetching the categories
 	v := validator.New()
@@ -183,7 +183,7 @@ func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 func (app *application) search(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// fetching the categories
 	v := validator.New()
@@ -225,10 +225,10 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 func (app *application) register(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Register)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "register.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 }
 
 func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
@@ -237,9 +237,13 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	form := newUserRegisterForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
+		app.logger.Error(err.Error())
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("form: %+v", form))
 
 	// checking the data from the user
 	form.StringCheck(form.Username, 2, 70, true, "username")
@@ -250,11 +254,11 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Register)
 		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "register.tmpl", tmplData)
+		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", tmplData)
 		return
 	}
 
@@ -275,7 +279,7 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Register)
 
 		tmplData.Form = form
 
@@ -283,7 +287,7 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 		tmplData.NonFieldErrors = v.NonFieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "register.tmpl", tmplData)
+		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", tmplData)
 		return
 	}
 
@@ -295,7 +299,7 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) confirm(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// retrieving the activation token from the URL
 	tmplData.ActivationToken = flow.Param(r.Context(), "token")
@@ -325,7 +329,7 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.FieldErrors = form.FieldErrors
 		tmplData.ActivationToken = form.Token
@@ -347,7 +351,7 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.FieldErrors = form.FieldErrors
 		tmplData.ActivationToken = form.Token
@@ -364,10 +368,10 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Login)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "login.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 }
 
 func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
@@ -389,12 +393,12 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Login)
 
 		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", tmplData)
+		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", tmplData)
 		return
 	}
 
@@ -416,7 +420,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Login)
 
 		tmplData.FieldErrors = form.FieldErrors
 
@@ -424,7 +428,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", tmplData)
+		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", tmplData)
 		return
 	}
 
@@ -452,10 +456,10 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) forgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.ForgotPassword)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "forgot-password.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 }
 
 func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Request) {
@@ -475,7 +479,7 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 	if !form.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.ForgotPassword)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -483,7 +487,7 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusOK, "forgot-password.tmpl", tmplData)
+		app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 		return
 	}
 
@@ -499,7 +503,7 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.ForgotPassword)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -507,7 +511,7 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusOK, "forgot-password.tmpl", tmplData)
+		app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 		return
 	}
 
@@ -518,7 +522,7 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.ResetPassword)
 
 	// retrieving the reset token from the URL
 	tmplData.ResetToken = flow.Param(r.Context(), "token")
@@ -528,7 +532,7 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "reset-password.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 }
 
 func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request) {
@@ -549,13 +553,13 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 	if !form.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.ResetPassword)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "reset-password.tmpl", tmplData)
+		app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 		return
 	}
 
@@ -578,13 +582,13 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.ResetPassword)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "reset-password.tmpl", tmplData)
+		app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 		return
 	}
 
@@ -599,7 +603,7 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, true)
+	tmplData := app.newTemplateData(r, true, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "dashboard.tmpl", tmplData)
@@ -622,7 +626,7 @@ func (app *application) logoutPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "user-update.tmpl", tmplData)
@@ -684,7 +688,7 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -706,7 +710,7 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -723,7 +727,7 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 func (app *application) createCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "category-create.tmpl", tmplData)
@@ -753,7 +757,7 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 
 	// return to category-create page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		// render the template
@@ -779,7 +783,7 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -796,7 +800,7 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 func (app *application) createThread(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "thread-create.tmpl", tmplData)
@@ -842,7 +846,7 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 
 	// return to thread-create page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
@@ -865,7 +869,7 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -882,7 +886,7 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "post-create.tmpl", tmplData)
@@ -923,7 +927,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 
 	// return to post-create page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
@@ -946,7 +950,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -963,7 +967,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) createTag(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "tag-create.tmpl", tmplData)
@@ -992,7 +996,7 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 
 	// return to tag-create page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
@@ -1015,7 +1019,7 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -1032,7 +1036,7 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// retrieving the post id from the path
 	id, err := getPathID(r)
@@ -1059,7 +1063,7 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// retrieving the tag id from the path
 	id, err := getPathID(r)
@@ -1089,7 +1093,7 @@ func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// retrieving the category id from the path
 	id, err := getPathID(r)
@@ -1116,7 +1120,7 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 	// retrieving the thread id from the path
 	id, err := getPathID(r)
@@ -1171,7 +1175,7 @@ func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request
 
 	// return to category-update page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
@@ -1201,7 +1205,7 @@ func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -1247,7 +1251,7 @@ func (app *application) updateThreadPut(w http.ResponseWriter, r *http.Request) 
 
 	// return to thread-update page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
@@ -1277,7 +1281,7 @@ func (app *application) updateThreadPut(w http.ResponseWriter, r *http.Request) 
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -1316,7 +1320,7 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 
 	// return to post-update page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
@@ -1346,7 +1350,7 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
@@ -1383,7 +1387,7 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 
 	// return to tag-update page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
@@ -1420,7 +1424,7 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false, Overlay.Default)
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors

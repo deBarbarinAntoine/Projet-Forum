@@ -191,7 +191,7 @@ func (m *CategoryModel) GetByID(token string, id int, query url.Values, v *valid
 		if err != nil {
 			return nil, err
 		}
-		err = api.Unmarshall(response["category"], category)
+		err = api.Unmarshall(response["category"], &category)
 		if err != nil {
 			return nil, err
 		}

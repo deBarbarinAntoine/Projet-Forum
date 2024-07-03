@@ -11,7 +11,7 @@
     <title> Threadive </title>
 
     <link rel="icon" type="image/png" href="/static/img/logo/logo_icon.png">
-    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
@@ -182,8 +182,15 @@
     <!--########## OVERLAY CONTENT ##########-->
     <!--#####################################-->
 
-    {{/* Template */}}
-
+    {{if eq .Overlay "login"}}
+        {{block "login" .}}{{end}}
+    {{else if eq .Overlay "register"}}
+        {{block "register" .}}{{end}}
+    {{else if eq .Overlay "forgot-password"}}
+        {{block "forgot-password" .}}{{end}}
+    {{else if eq .Overlay "reset-password"}}
+        {{block "reset-password" .}}{{end}}
+    {{end}}
 
 
     <script src="/static/js/script.js"></script>

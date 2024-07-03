@@ -1,20 +1,22 @@
+{{define "login"}}
 <div class="blur-underlay"></div>
 
     <div class="center-page">
         <div class="container borders">
-            <form class="login">
+            <form method="post" action="/login" class="login">
                 <p class="login-title bottom-outset"> Login </p>
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
     
                 <div class="input-fields">
-                    <label for="mail"> Username </label>
-                    <input class="input borders" type="text" placeholder="Mail Address" id="mail">
+                    <label for="mail"> Email </label>
+                    <input class="input borders" type="text" name="email" placeholder="Mail Address" id="mail" autofocus required>
         
                     <label for="password"> Password </label>
-                    <input class="input borders" type="password" placeholder="Password" id="password">
+                    <input class="input borders" type="password" name="password" placeholder="Password" id="password" required>
                 </div>
     
                 <div class="submit">
-                    <a class="classic-link"> Forgot password ? </a>
+                    <a href="/forgot-password" class="classic-link"> Forgot password ? </a>
                     <button class="button borders" type="submit"> Submit </button>
                 </div>
             </form>
@@ -25,6 +27,7 @@
                 <div class="line"></div>
             </div>
     
-            <a class="switch borders"> Register </a>
+            <a href="/register" class="switch borders"> Register </a>
         </div>
     </div>
+{{end}}

@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 )
 
 func (api *API) encryptPEM(data []byte) ([]byte, error) {
@@ -13,6 +14,8 @@ func (api *API) encryptPEM(data []byte) ([]byte, error) {
 
 	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBlock.Bytes)
 	if err != nil {
+		// DEBUG
+		fmt.Printf("error: %s\n", err.Error())
 		return nil, err
 	}
 
