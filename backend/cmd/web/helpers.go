@@ -174,8 +174,22 @@ func (app *application) newTemplateData(r *http.Request, allUser bool) templateD
 		}
 		user, _ = app.models.UserModel.GetByID(token, "me", query, v)
 	}
-	categories, metadata, _ := app.models.CategoryModel.Get(token, nil, v)
-	tags, threads, _ := app.models.TagModel.GetPopular(token, v)
+	categories, metadata, err := app.models.CategoryModel.Get(token, nil, v)
+	if err != nil {
+		app.logger.Error(err.Error())
+	}
+	// DEBUG
+	fmt.Printf("categories: %+v\n", categories)
+	tags, threads, err := app.models.TagModel.GetPopular(token, v)
+	if err != nil {
+		app.logger.Error(err.Error())
+	}
+	// DEBUG
+	fmt.Print("tags: ")
+	for _, tag := range tags {
+		fmt.Printf("%+v\n", *tag)
+	}
+	fmt.Printf("threads: %+v\n", threads)
 
 	// returning the templateData with all information
 	return templateData{

@@ -52,7 +52,10 @@ func (m *CategoryModel) Create(token string, category *Category, v *validator.Va
 		if err != nil {
 			return err
 		}
-		category = response["category"]
+		err = api.Unmarshall(response["category"], category)
+		if err != nil {
+			return err
+		}
 		if category.ID < 1 {
 			return errors.New("invalid category id")
 		}
@@ -95,7 +98,10 @@ func (m *CategoryModel) Update(token string, category *Category, v *validator.Va
 		if err != nil {
 			return err
 		}
-		category = response["category"]
+		err = api.Unmarshall(response["category"], category)
+		if err != nil {
+			return err
+		}
 		if category.ID < 1 {
 			return errors.New("invalid category id")
 		}
@@ -147,12 +153,13 @@ func (m *CategoryModel) Get(token string, query url.Values, v *validator.Validat
 		if err != nil {
 			return nil, Metadata{}, err
 		}
-		var ok bool
-		if categories, ok = response["categories"].([]*Category); !ok {
-			return nil, Metadata{}, errors.New("invalid response from Categories")
+		err = api.UnmarshallSlice(response["categories"], &categories)
+		if err != nil {
+			return nil, Metadata{}, err
 		}
-		if metadata, ok = response["_metadata"].(Metadata); !ok {
-			return nil, Metadata{}, errors.New("invalid response from Metadata")
+		err = api.Unmarshall(response["_metadata"], &metadata)
+		if err != nil {
+			return nil, Metadata{}, err
 		}
 	}
 
@@ -184,7 +191,10 @@ func (m *CategoryModel) GetByID(token string, id int, query url.Values, v *valid
 		if err != nil {
 			return nil, err
 		}
-		category = response["category"]
+		err = api.Unmarshall(response["category"], category)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return category, nil

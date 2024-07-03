@@ -64,40 +64,60 @@ func (api *API) GetClient(credentials map[string]string, v *validator.Validator)
 		return nil, err
 	}
 
-	// making the request
-	res, status, err := api.Request("", http.MethodPost, "tokens/client", reqBody, false)
+	// building the request's URL
+	urlRequest := fmt.Sprintf("%s/v1/tokens/client", api.url)
+
+	// creating the request
+	req, err := http.NewRequest(http.MethodPost, urlRequest, bytes.NewReader(reqBody))
+	if err != nil {
+		return nil, err
+	}
+
+	// setting the headers
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.clientToken))
+	req.Header.Set("Accept", "application/json")
+
+	// sending the request
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	// reading the body of the response
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	// checking for errors
-	err = GetErr(status, res, v)
+	err = GetErr(res.StatusCode, body, v)
 	if err != nil {
 		return nil, err
 	}
-	var token *string
+	var token string
 	if v.Valid() {
 
 		// retrieving the tokens
-		response := make(map[string]map[string]*string)
-		err = json.Unmarshal(res, &response)
+		response := make(map[string]map[string]any)
+		err = json.Unmarshal(body, &response)
 		if err != nil {
 			return nil, err
 		}
-		token = response["client_token"]["token"]
-		log.Printf("client_token: %s", *token)
+		token = response["client_token"]["token"].(string)
+		log.Printf("client_token: %s", token)
 	} else {
 		log.Printf("generic errors: %+v", v.NonFieldErrors)
 		log.Printf("errors: %+v", v.FieldErrors)
 	}
 
-	return token, nil
+	return &token, nil
 }
 
 func (api *API) GetPEM(pemFilePath string, v *validator.Validator) ([]byte, error) {
 
 	// making the request
-	res, status, err := api.Get("", "tokens/public-key", nil)
+	res, status, err := api.Get("", "/tokens/public-key", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +177,9 @@ func (api *API) Get(userToken, endpoint string, query url.Values) ([]byte, int, 
 	if err != nil {
 		return nil, StatusFailedRequest, err
 	}
+
+	// DEBUG -> REMOVE WHEN SENDING TO PRODUCTION
+	//fmt.Printf("body %s\n", string(body)) // FIXME
 
 	return body, res.StatusCode, nil
 }
@@ -247,4 +270,22 @@ func GetErr(statusCode int, body []byte, v *validator.Validator) error {
 	}
 	v.AddNonFieldError(apiErr["error"])
 	return nil
+}
+
+func Unmarshall[T any](data any, result *T) error {
+	byteSlice, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(byteSlice, result)
+	return err
+}
+
+func UnmarshallSlice[T any](data any, result *[]T) error {
+	byteSlice, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(byteSlice, &result)
+	return err
 }

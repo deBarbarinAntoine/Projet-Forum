@@ -17,6 +17,8 @@ func (app *application) routes() http.Handler {
 
 	router := flow.New()
 
+	router.Handle("/static/...", http.StripPrefix("/static/", http.FileServerFS(staticFs)), http.MethodGet) // static files
+
 	router.Use(app.recoverPanic, app.logRequest, commonHeaders, app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
 	/* #############################################################################
@@ -24,8 +26,6 @@ func (app *application) routes() http.Handler {
 	/* #############################################################################*/
 
 	router.NotFound = http.HandlerFunc(app.notFound) // error 404 page
-
-	router.Handle("/static/...", http.StripPrefix("/static/", http.FileServerFS(staticFs)), http.MethodGet) // static files
 
 	router.HandleFunc("/", app.index, http.MethodGet)      // landing page
 	router.HandleFunc("/about", app.about, http.MethodGet) // about page
