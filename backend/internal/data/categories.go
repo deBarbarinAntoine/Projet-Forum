@@ -53,6 +53,9 @@ func (m *CategoryModel) Create(token string, category *Category, v *validator.Va
 			return err
 		}
 		category = response["category"]
+		if category.ID < 1 {
+			return errors.New("invalid category id")
+		}
 	}
 
 	return nil
@@ -93,6 +96,9 @@ func (m *CategoryModel) Update(token string, category *Category, v *validator.Va
 			return err
 		}
 		category = response["category"]
+		if category.ID < 1 {
+			return errors.New("invalid category id")
+		}
 	}
 
 	return nil

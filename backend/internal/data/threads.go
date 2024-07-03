@@ -55,6 +55,9 @@ func (m *ThreadModel) Create(token string, thread *Thread, v *validator.Validato
 			return err
 		}
 		thread = response["thread"]
+		if thread.ID < 1 {
+			return errors.New("invalid thread id")
+		}
 	}
 
 	return nil
@@ -97,6 +100,9 @@ func (m *ThreadModel) Update(token string, thread *Thread, v *validator.Validato
 			return err
 		}
 		thread = response["thread"]
+		if thread.ID < 1 {
+			return errors.New("invalid thread id")
+		}
 	}
 
 	return nil

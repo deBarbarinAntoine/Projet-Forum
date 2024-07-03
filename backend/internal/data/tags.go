@@ -53,6 +53,9 @@ func (m *TagModel) Create(token string, tag *Tag, v *validator.Validator) error 
 			return err
 		}
 		tag = response["tag"]
+		if tag.ID < 1 {
+			return errors.New("invalid tag id")
+		}
 	}
 
 	return nil
@@ -84,6 +87,9 @@ func (m *TagModel) Update(token string, id int, body []byte, v *validator.Valida
 			return nil, err
 		}
 		tag = response["tag"]
+		if tag.ID < 1 {
+			return nil, errors.New("invalid tag id")
+		}
 	}
 
 	return tag, nil

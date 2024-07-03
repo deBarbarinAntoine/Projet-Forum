@@ -18,34 +18,34 @@ import (
 func (app *application) notFound(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "error.tmpl", data)
+	app.render(w, r, http.StatusOK, "error.tmpl", tmplData)
 }
 
 func (app *application) index(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, true)
+	tmplData := app.newTemplateData(r, true)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "index.tmpl", data)
+	app.render(w, r, http.StatusOK, "index.tmpl", tmplData)
 }
 
 func (app *application) about(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "about.tmpl", data)
+	app.render(w, r, http.StatusOK, "about.tmpl", tmplData)
 }
 
 func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// fetching the category id in the path
 	id, err := getPathID(r)
@@ -56,7 +56,7 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 
 	// fetching the category
 	v := validator.New()
-	data.Category, err = app.models.CategoryModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
+	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -69,13 +69,13 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "category.tmpl", data)
+	app.render(w, r, http.StatusOK, "category.tmpl", tmplData)
 }
 
 func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// fetching the thread id in the path
 	id, err := getPathID(r)
@@ -86,7 +86,7 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 
 	// fetching the thread
 	v := validator.New()
-	data.Thread, err = app.models.ThreadModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
+	tmplData.Thread, err = app.models.ThreadModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -99,13 +99,13 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "thread.tmpl", data)
+	app.render(w, r, http.StatusOK, "thread.tmpl", tmplData)
 }
 
 func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// fetching the tag id in the path
 	id, err := getPathID(r)
@@ -116,7 +116,7 @@ func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 
 	// fetching the tag
 	v := validator.New()
-	data.Tag, err = app.models.TagModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
+	tmplData.Tag, err = app.models.TagModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -129,18 +129,18 @@ func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag.tmpl", data)
+	app.render(w, r, http.StatusOK, "tag.tmpl", tmplData)
 }
 
 func (app *application) TagsGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// fetching the tags
 	v := validator.New()
 	var err error
-	data.TagList.List, data.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -153,18 +153,18 @@ func (app *application) TagsGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tags.tmpl", data)
+	app.render(w, r, http.StatusOK, "tags.tmpl", tmplData)
 }
 
 func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// fetching the categories
 	v := validator.New()
 	var err error
-	data.CategoryList.List, data.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -177,32 +177,32 @@ func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag.tmpl", data)
+	app.render(w, r, http.StatusOK, "tag.tmpl", tmplData)
 }
 
 func (app *application) search(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// fetching the categories
 	v := validator.New()
 	var err error
-	data.CategoryList.List, data.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// fetching the threads
-	data.ThreadList.List, data.ThreadList.Metadata, err = app.models.ThreadModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.ThreadList.List, tmplData.ThreadList.Metadata, err = app.models.ThreadModel.Get(app.getToken(r), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// fetching the tags
-	data.TagList.List, data.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -215,7 +215,7 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "search.tmpl", data)
+	app.render(w, r, http.StatusOK, "search.tmpl", tmplData)
 }
 
 /* #############################################################################
@@ -225,10 +225,10 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 func (app *application) register(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "register.tmpl", data)
+	app.render(w, r, http.StatusOK, "register.tmpl", tmplData)
 }
 
 func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
@@ -250,11 +250,11 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
-		data.Form = form
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "register.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "register.tmpl", tmplData)
 		return
 	}
 
@@ -275,15 +275,15 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.Form = form
+		tmplData.Form = form
 
-		data.FieldErrors = v.FieldErrors
-		data.NonFieldErrors = v.NonFieldErrors
+		tmplData.FieldErrors = v.FieldErrors
+		tmplData.NonFieldErrors = v.NonFieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "register.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "register.tmpl", tmplData)
 		return
 	}
 
@@ -295,17 +295,17 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) confirm(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// retrieving the activation token from the URL
-	data.ActivationToken = flow.Param(r.Context(), "token")
-	if data.ActivationToken == "" {
+	tmplData.ActivationToken = flow.Param(r.Context(), "token")
+	if tmplData.ActivationToken == "" {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "confirm.tmpl", data)
+	app.render(w, r, http.StatusOK, "confirm.tmpl", tmplData)
 }
 
 func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
@@ -325,13 +325,13 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.FieldErrors = form.FieldErrors
-		data.ActivationToken = form.Token
+		tmplData.FieldErrors = form.FieldErrors
+		tmplData.ActivationToken = form.Token
 
 		// render the template
-		app.render(w, r, http.StatusOK, "confirm.tmpl", data)
+		app.render(w, r, http.StatusOK, "confirm.tmpl", tmplData)
 		return
 	}
 
@@ -347,13 +347,13 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.FieldErrors = form.FieldErrors
-		data.ActivationToken = form.Token
+		tmplData.FieldErrors = form.FieldErrors
+		tmplData.ActivationToken = form.Token
 
 		// render the template
-		app.render(w, r, http.StatusOK, "confirm.tmpl", data)
+		app.render(w, r, http.StatusOK, "confirm.tmpl", tmplData)
 		return
 	}
 
@@ -364,10 +364,10 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "login.tmpl", data)
+	app.render(w, r, http.StatusOK, "login.tmpl", tmplData)
 }
 
 func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
@@ -389,12 +389,12 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.Form = form
+		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", tmplData)
 		return
 	}
 
@@ -416,15 +416,15 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.FieldErrors = form.FieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		form.Password = ""
-		data.Form = form
+		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", tmplData)
 		return
 	}
 
@@ -452,10 +452,10 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) forgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "forgot-password.tmpl", data)
+	app.render(w, r, http.StatusOK, "forgot-password.tmpl", tmplData)
 }
 
 func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Request) {
@@ -475,15 +475,15 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 	if !form.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
-		data.Form = form
+		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusOK, "forgot-password.tmpl", data)
+		app.render(w, r, http.StatusOK, "forgot-password.tmpl", tmplData)
 		return
 	}
 
@@ -499,15 +499,15 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
-		data.Form = form
+		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusOK, "forgot-password.tmpl", data)
+		app.render(w, r, http.StatusOK, "forgot-password.tmpl", tmplData)
 		return
 	}
 
@@ -518,17 +518,17 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// retrieving the reset token from the URL
-	data.ResetToken = flow.Param(r.Context(), "token")
-	if data.ResetToken == "" {
+	tmplData.ResetToken = flow.Param(r.Context(), "token")
+	if tmplData.ResetToken == "" {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "reset-password.tmpl", data)
+	app.render(w, r, http.StatusOK, "reset-password.tmpl", tmplData)
 }
 
 func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request) {
@@ -549,13 +549,13 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 	if !form.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "reset-password.tmpl", data)
+		app.render(w, r, http.StatusOK, "reset-password.tmpl", tmplData)
 		return
 	}
 
@@ -578,13 +578,13 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "reset-password.tmpl", data)
+		app.render(w, r, http.StatusOK, "reset-password.tmpl", tmplData)
 		return
 	}
 
@@ -599,10 +599,10 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, true)
+	tmplData := app.newTemplateData(r, true)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "dashboard.tmpl", data)
+	app.render(w, r, http.StatusOK, "dashboard.tmpl", tmplData)
 }
 
 func (app *application) logoutPost(w http.ResponseWriter, r *http.Request) {
@@ -622,13 +622,13 @@ func (app *application) logoutPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "user.tmpl", data)
+	app.render(w, r, http.StatusOK, "user.tmpl", tmplData)
 }
 
-func (app *application) updateUserPost(w http.ResponseWriter, r *http.Request) {
+func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving the form data
 	form := newUserUpdateForm()
@@ -684,13 +684,13 @@ func (app *application) updateUserPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "update-user.tmpl", data)
+		app.render(w, r, http.StatusOK, "update-user.tmpl", tmplData)
 		return
 	}
 
@@ -706,13 +706,13 @@ func (app *application) updateUserPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "update-user.tmpl", data)
+		app.render(w, r, http.StatusOK, "update-user.tmpl", tmplData)
 		return
 	}
 
@@ -723,10 +723,10 @@ func (app *application) updateUserPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) createCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "category-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "category-create.tmpl", tmplData)
 }
 
 func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Request) {
@@ -753,11 +753,11 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 
 	// return to category-create page if there is an error
 	if !form.Valid() {
-		data := app.newTemplateData(r, false)
-		data.Form = form
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "category-create.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "category-create.tmpl", tmplData)
 		return
 	}
 
@@ -779,13 +779,13 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "category-create.tmpl", data)
+		app.render(w, r, http.StatusOK, "category-create.tmpl", tmplData)
 		return
 	}
 
@@ -796,10 +796,10 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 func (app *application) createThread(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "thread-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "thread-create.tmpl", tmplData)
 }
 
 func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request) {
@@ -842,14 +842,14 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 
 	// return to thread-create page if there is an error
 	if !form.Valid() {
-		data := app.newTemplateData(r, false)
-		data.Form = form
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "thread-create.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "thread-create.tmpl", tmplData)
 		return
 	}
 
@@ -865,13 +865,13 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "thread-create.tmpl", data)
+		app.render(w, r, http.StatusOK, "thread-create.tmpl", tmplData)
 		return
 	}
 
@@ -882,10 +882,10 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "post-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "post-create.tmpl", tmplData)
 }
 
 func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
@@ -923,14 +923,14 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 
 	// return to post-create page if there is an error
 	if !form.Valid() {
-		data := app.newTemplateData(r, false)
-		data.Form = form
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "post-create.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "post-create.tmpl", tmplData)
 		return
 	}
 
@@ -946,13 +946,13 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "post-create.tmpl", data)
+		app.render(w, r, http.StatusOK, "post-create.tmpl", tmplData)
 		return
 	}
 
@@ -963,10 +963,10 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) createTag(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	app.render(w, r, http.StatusOK, "tag-create.tmpl", tmplData)
 }
 
 func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
@@ -992,14 +992,14 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 
 	// return to tag-create page if there is an error
 	if !form.Valid() {
-		data := app.newTemplateData(r, false)
-		data.Form = form
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "tag-create.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "tag-create.tmpl", tmplData)
 		return
 	}
 
@@ -1015,13 +1015,13 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+		app.render(w, r, http.StatusOK, "tag-create.tmpl", tmplData)
 		return
 	}
 
@@ -1032,7 +1032,7 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// retrieving the post id from the path
 	id, err := getPathID(r)
@@ -1050,16 +1050,16 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// inserting the post values in the TemplateData's Form
-	data.Form = post
+	tmplData.Form = post
 
 	// render the template
-	app.render(w, r, http.StatusOK, "post-update.tmpl", data)
+	app.render(w, r, http.StatusOK, "post-update.tmpl", tmplData)
 }
 
 func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// retrieving the tag id from the path
 	id, err := getPathID(r)
@@ -1080,16 +1080,16 @@ func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// inserting the tag values in the TemplateData's Form
-	data.Form = tag
+	tmplData.Form = tag
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag-update.tmpl", data)
+	app.render(w, r, http.StatusOK, "tag-update.tmpl", tmplData)
 }
 
 func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// retrieving the category id from the path
 	id, err := getPathID(r)
@@ -1107,16 +1107,16 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// inserting the category values in the TemplateData's Form
-	data.Form = category
+	tmplData.Form = category
 
 	// render the template
-	app.render(w, r, http.StatusOK, "category-update.tmpl", data)
+	app.render(w, r, http.StatusOK, "category-update.tmpl", tmplData)
 }
 
 func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	tmplData := app.newTemplateData(r, false)
 
 	// retrieving the thread id from the path
 	id, err := getPathID(r)
@@ -1134,43 +1134,230 @@ func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// inserting the thread values in the TemplateData's Form
-	data.Form = thread
+	tmplData.Form = thread
 
 	// render the template
-	app.render(w, r, http.StatusOK, "thread-update.tmpl", data)
+	app.render(w, r, http.StatusOK, "thread-update.tmpl", tmplData)
 }
 
 func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request) {
 
-	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	// retrieving the form data
+	form := newCategoryForm()
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
-	data.Form = newTagForm()
+	// creating the updated category
+	category := &data.Category{}
 
-	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	// checking the data from the user
+	var isEmpty = true
+	if form.Name != nil {
+		isEmpty = false
+		form.StringCheck(*form.Name, 2, 70, false, "name")
+		category.Name = *form.Name
+	}
+	if form.ParentCategoryID != nil {
+		isEmpty = false
+		form.CheckID(*form.ParentCategoryID, "parent_category_id")
+		category.ParentCategory.ID = *form.ParentCategoryID
+	}
+	if isEmpty {
+		form.AddNonFieldError("empty values")
+	}
+
+	// return to category-update page if there is an error
+	if !form.Valid() {
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
+
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusUnprocessableEntity, "category-update.tmpl", tmplData)
+		return
+	}
+
+	// retrieving the category id from the path
+	category.ID, err = getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// API request to update a category
+	v := validator.New()
+	err = app.models.CategoryModel.Update(app.getToken(r), category, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// retrieving basic template data
+		tmplData := app.newTemplateData(r, false)
+
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "category-update.tmpl", tmplData)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Category %s updated successfully!", category.Name))
+	http.Redirect(w, r, fmt.Sprintf("/category/%d", category.ID), http.StatusSeeOther)
 }
 
 func (app *application) updateThreadPut(w http.ResponseWriter, r *http.Request) {
 
-	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	// retrieving the form data
+	form := newThreadForm()
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
-	data.Form = newTagForm()
+	// creating the updated thread
+	thread := &data.Thread{}
 
-	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	// checking the data from the user
+	if form.Title != nil {
+		form.StringCheck(*form.Title, 2, 70, false, "title")
+		thread.Title = *form.Title
+	}
+	if form.Description != nil {
+		form.StringCheck(*form.Description, 2, 1_020, false, "description")
+		thread.Description = *form.Description
+	}
+	if form.IsPublic != nil {
+		thread.IsPublic = *form.IsPublic
+	}
+	if form.CategoryID != nil {
+		form.CheckID(*form.CategoryID, "category_id")
+		thread.Category.ID = *form.CategoryID
+	}
+
+	// return to thread-update page if there is an error
+	if !form.Valid() {
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
+
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusUnprocessableEntity, "thread-update.tmpl", tmplData)
+		return
+	}
+
+	// retrieving the thread id from the path
+	thread.ID, err = getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// API request to update a thread
+	v := validator.New()
+	err = app.models.ThreadModel.Update(app.getToken(r), thread, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// retrieving basic template data
+		tmplData := app.newTemplateData(r, false)
+
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "thread-update.tmpl", tmplData)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Thread %s updated successfully!", thread.Title))
+	http.Redirect(w, r, fmt.Sprintf("/thread/%d", thread.ID), http.StatusSeeOther)
 }
 
 func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 
-	// retrieving basic template data
-	data := app.newTemplateData(r, false)
+	// retrieving the form data
+	form := newPostForm()
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
-	data.Form = newTagForm()
+	// creating the updated post
+	post := &data.Post{}
 
-	// render the template
-	app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+	// checking the data from the user
+	if form.Content != nil {
+		form.StringCheck(*form.Content, 1, 1_020, false, "content")
+		post.Content = *form.Content
+	}
+	if form.ParentPostID != nil {
+		form.CheckID(*form.ParentPostID, "parent_post_id")
+		post.IDParentPost = *form.ParentPostID
+	}
+
+	// return to post-update page if there is an error
+	if !form.Valid() {
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
+
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusUnprocessableEntity, "post-update.tmpl", tmplData)
+		return
+	}
+
+	// retrieving the post id from the path
+	post.ID, err = getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// API request to update a post
+	v := validator.New()
+	err = app.models.PostModel.Update(app.getToken(r), post, v)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// retrieving basic template data
+		tmplData := app.newTemplateData(r, false)
+
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
+
+		// render the template
+		app.render(w, r, http.StatusOK, "post-update.tmpl", tmplData)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Post updated successfully!")
+	http.Redirect(w, r, fmt.Sprintf("/thread/%d", post.Thread.ID), http.StatusSeeOther)
 }
 
 func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
@@ -1194,16 +1381,16 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 		form.Check(validator.Unique(form.AddThreads), "threads_ids", "must be unique")
 	}
 
-	// return to tag-create page if there is an error
+	// return to tag-update page if there is an error
 	if !form.Valid() {
-		data := app.newTemplateData(r, false)
-		data.Form = form
+		tmplData := app.newTemplateData(r, false)
+		tmplData.Form = form
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "tag-create.tmpl", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "tag-update.tmpl", tmplData)
 		return
 	}
 
@@ -1214,14 +1401,14 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// retrieving the thread id from the path
+	// retrieving the tag id from the path
 	id, err := getPathID(r)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	// API request to create a category
+	// API request to update a tag
 	v := validator.New()
 	tag, err := app.models.TagModel.Update(app.getToken(r), id, body, v)
 	if err != nil {
@@ -1233,13 +1420,13 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		data := app.newTemplateData(r, false)
+		tmplData := app.newTemplateData(r, false)
 
-		data.NonFieldErrors = form.NonFieldErrors
-		data.FieldErrors = form.FieldErrors
+		tmplData.NonFieldErrors = form.NonFieldErrors
+		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "tag-create.tmpl", data)
+		app.render(w, r, http.StatusOK, "tag-update.tmpl", tmplData)
 		return
 	}
 

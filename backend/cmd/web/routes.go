@@ -57,10 +57,10 @@ func (app *application) routes() http.Handler {
 
 	router.Use(app.requireAuthentication)
 
-	router.HandleFunc("/dashboard", app.dashboard, http.MethodGet)  // dashboard page
-	router.HandleFunc("/logout", app.logoutPost, http.MethodPost)   // logout route
-	router.HandleFunc("/user", app.updateUser, http.MethodGet)      // update user page
-	router.HandleFunc("/user", app.updateUserPost, http.MethodPost) // update user treatment route
+	router.HandleFunc("/dashboard", app.dashboard, http.MethodGet) // dashboard page
+	router.HandleFunc("/logout", app.logoutPost, http.MethodPost)  // logout route
+	router.HandleFunc("/user", app.updateUser, http.MethodGet)     // update user page
+	router.HandleFunc("/user", app.updateUserPut, http.MethodPut)  // update user treatment route
 
 	router.HandleFunc("/post/:id/create", app.createPost, http.MethodGet)         // post creation page
 	router.HandleFunc("/tag/:id/create", app.createTag, http.MethodGet)           // tag creation page

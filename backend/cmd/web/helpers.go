@@ -218,13 +218,6 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 	buf.WriteTo(w)
 }
 
-func getId(queryValues url.Values) (int, error) {
-	if queryValues.Has("id") {
-		return strconv.Atoi(queryValues.Get("id"))
-	}
-	return -1, fmt.Errorf("id not found")
-}
-
 func getPathID(r *http.Request) (int, error) {
 
 	// fetching the id param from the URL

@@ -54,6 +54,9 @@ func (m *PostModel) Create(token string, post *Post, v *validator.Validator) err
 			return err
 		}
 		post = response["post"]
+		if post.ID < 1 {
+			return errors.New("invalid post id")
+		}
 	}
 
 	return nil
@@ -95,6 +98,9 @@ func (m *PostModel) Update(token string, post *Post, v *validator.Validator) err
 			return err
 		}
 		post = response["post"]
+		if post.ID < 1 {
+			return errors.New("invalid post id")
+		}
 	}
 
 	return nil

@@ -54,6 +54,9 @@ func (m *UserModel) Create(token string, user *User, v *validator.Validator) err
 			return err
 		}
 		user = response["user"]
+		if user.ID < 1 {
+			return errors.New("invalid user id")
+		}
 	}
 
 	return nil
@@ -100,6 +103,9 @@ func (m *UserModel) Update(token, previousPassword string, user *User, v *valida
 			return err
 		}
 		user = response["user"]
+		if user.ID < 1 {
+			return errors.New("invalid user id")
+		}
 	}
 
 	return nil
