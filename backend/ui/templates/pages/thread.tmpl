@@ -8,7 +8,7 @@
     {{range .Thread.Posts}}
         <div class="container-post">
             <div class="first-line">
-                <img src="/static/img/icons/circle-icon.svg">
+                <img src="{{.Author.Avatar}}" class="author-avatar">
                 <h3> {{.Author.Name}} </h3>
                 <p> {{humanDate .CreatedAt}} </p>
                 <img class="img-inthread" src="/static/img/icons/fav-icon.svg">

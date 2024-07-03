@@ -450,13 +450,19 @@
                 display: flex;
                 flex-direction: row;
                 align-items: center;
+                padding: 0 12px;
+                .author-avatar {
+                    width: 54px;
+                    aspect-ratio: 1;
+                }
                 h3 {
+                    flex: 1;
                     font-size: 20px;
                     margin-left: 10px;
                 }
                 p {
                     font-size: 14px;
-                    margin-left: 24vw;
+                    width: max-content;
                     font-style: italic;
                     margin-right: 1.5vw;
                 }

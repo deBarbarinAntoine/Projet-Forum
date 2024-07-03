@@ -114,10 +114,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 
 	post := &data.Post{
 		Content: *input.Content,
-		Author: struct {
-			ID   int    `json:"id"`
-			Name string `json:"name"`
-		}{
+		Author: data.User{
 			ID:   user.ID,
 			Name: user.Name,
 		},

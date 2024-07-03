@@ -165,15 +165,12 @@ type Thread struct {
 }
 
 type Post struct {
-	ID        int       `json:"id"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Author    struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"author"`
-	IDParentPost int `json:"id_parent_post,omitempty"`
+	ID           int       `json:"id"`
+	Content      string    `json:"content"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Author       User      `json:"author"`
+	IDParentPost int       `json:"id_parent_post,omitempty"`
 	Thread       struct {
 		ID    int    `json:"id"`
 		Title string `json:"title"`

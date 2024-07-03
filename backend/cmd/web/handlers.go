@@ -84,9 +84,14 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// setting the query according to the required data
+	query := url.Values{
+		"includes[]": {"posts", "tags", "popularity"},
+	}
+
 	// fetching the thread
 	v := validator.New()
-	tmplData.Thread, err = app.models.ThreadModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
+	tmplData.Thread, err = app.models.ThreadModel.GetByID(app.getToken(r), id, query, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return

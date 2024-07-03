@@ -1051,14 +1051,20 @@ textarea.description {
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding: 0 12px;
+}
+.container-inthread .container-post .first-line .author-avatar {
+  width: 54px;
+  aspect-ratio: 1;
 }
 .container-inthread .container-post .first-line h3 {
+  flex: 1;
   font-size: 20px;
   margin-left: 10px;
 }
 .container-inthread .container-post .first-line p {
   font-size: 14px;
-  margin-left: 24vw;
+  width: max-content;
   font-style: italic;
   margin-right: 1.5vw;
 }

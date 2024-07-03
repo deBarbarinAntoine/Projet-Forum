@@ -12,15 +12,12 @@ import (
 )
 
 type Post struct {
-	ID        int       `json:"id"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Author    struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"author"`
-	IDParentPost int `json:"id_parent_post,omitempty"`
+	ID           int       `json:"id"`
+	Content      string    `json:"content"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Author       User      `json:"author"`
+	IDParentPost int       `json:"id_parent_post,omitempty"`
 	Thread       struct {
 		ID    int    `json:"id"`
 		Title string `json:"title"`
@@ -120,7 +117,7 @@ func (m PostModel) Get(search string, filters Filters) ([]*Post, Metadata, error
 	}
 
 	query := fmt.Sprintf(`
-		SELECT count(*) OVER(), p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, p.Id_threads, t.Title
+		SELECT count(*) OVER(), p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, u.Avatar_path, p.Id_threads, t.Title
 		FROM posts p
 		INNER JOIN users u ON p.Id_author = u.Id_users
 		INNER JOIN threads t ON p.Id_threads = t.Id_threads
@@ -158,6 +155,7 @@ func (m PostModel) Get(search string, filters Filters) ([]*Post, Metadata, error
 			&post.UpdatedAt,
 			&post.Author.ID,
 			&post.Author.Name,
+			&post.Author.Avatar,
 			&post.Thread.ID,
 			&post.Thread.Title,
 		)
@@ -180,7 +178,7 @@ func (m PostModel) Get(search string, filters Filters) ([]*Post, Metadata, error
 func (m PostModel) GetByID(id int) (*Post, error) {
 
 	query := `
-		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, p.Id_parent_posts, p.Id_threads, t.Title, p.Version
+		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, u.Avatar_path, p.Id_parent_posts, p.Id_threads, t.Title, p.Version
 		FROM posts p
 		INNER JOIN users u ON p.Id_author = u.Id_users
 		INNER JOIN threads t ON p.Id_threads = t.Id_threads
@@ -199,6 +197,7 @@ func (m PostModel) GetByID(id int) (*Post, error) {
 		&post.UpdatedAt,
 		&post.Author.ID,
 		&post.Author.Name,
+		&post.Author.Avatar,
 		&parentPost,
 		&post.Thread.ID,
 		&post.Thread.Title,
@@ -274,7 +273,7 @@ func (m PostModel) GetByAuthorID(id int) ([]Post, error) {
 func (m PostModel) GetByThread(id int) ([]Post, error) {
 
 	query := `
-		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, p.Version
+		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, u.Avatar_path, p.Version
 		FROM posts p
 		INNER JOIN users u on p.Id_author = u.Id_users
 		WHERE p.Id_threads = ?;`
@@ -305,6 +304,7 @@ func (m PostModel) GetByThread(id int) ([]Post, error) {
 			&post.UpdatedAt,
 			&post.Author.ID,
 			&post.Author.Name,
+			&post.Author.Avatar,
 			&post.Version); err != nil {
 			log.Fatal(err)
 		}
