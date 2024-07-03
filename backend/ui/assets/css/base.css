@@ -2,6 +2,20 @@
   --background-color: #F1F6F9;
 }
 
+@font-face {
+  font-family: Varela-Round;
+  src: url(../font/VarelaRound-Regular.ttf);
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+* a {
+  text-decoration: none;
+  color: #000000;
+  cursor: pointer;
+}
+
 .borders {
   border-bottom: 2px solid rgba(0, 0, 0, 0.2);
   border-right: 2px solid rgba(0, 0, 0, 0.2);
@@ -19,15 +33,6 @@
 .borders-hover:hover {
   cursor: pointer;
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
-}
-
-@font-face {
-  font-family: Varela-Round;
-  src: url(../font/VarelaRound-Regular.ttf);
-}
-* {
-  margin: 0;
-  padding: 0;
 }
 
 body {
@@ -467,8 +472,10 @@ header .notification-profile .profile .dropdown .item .item-text {
 
 .center-page {
   z-index: 3;
-  width: 100vw;
-  height: 100vh;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -478,10 +485,11 @@ header .notification-profile .profile .dropdown .item .item-text {
 .blur-underlay {
   z-index: 2;
   position: absolute;
-  width: 100vw;
-  height: 100vh;
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(2px);
 }
 
 .container {
@@ -524,9 +532,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   font-family: Varela-Round;
 }
 .container .login .input-fields .input:focus {
@@ -611,4 +617,6 @@ textarea.description {
   height: 200px !important;
   resize: none;
   scrollbar-width: thin;
-}/*# sourceMappingURL=base.css.map */
+}
+
+/*# sourceMappingURL=base.css.map */
