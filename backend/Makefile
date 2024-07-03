@@ -22,7 +22,7 @@ confirm:
 ## run/backend: run the cmd/backend application
 .PHONY: run/backend
 run/backend:
-	@go run ./cmd/web -port=${PORT} -dsn=${DB_DSN} -client_token=${API_CLIENT_TOKEN} -pem=${PEM_PATH}
+	@go run ./cmd/web -port=${PORT} -dsn=${DB_DSN} -client-token=${API_CLIENT_TOKEN} -pem=${PEM_PATH} -secret=${API_HOST_SECRET}
 
 ## db/mysql: connect to the database using mysql
 .PHONY: db/mysql

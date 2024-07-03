@@ -153,7 +153,7 @@ func (app *application) authenticateAPISecret(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := app.models.Users.GetForToken(data.TokenScope.HostSecret, token)
+		_, err := app.models.Users.GetForToken(data.TokenScope.HostSecret, token)
 		if err != nil {
 			switch {
 			case errors.Is(err, data.ErrRecordNotFound):
@@ -161,10 +161,6 @@ func (app *application) authenticateAPISecret(next http.Handler) http.Handler {
 			default:
 				app.serverErrorResponse(w, r, err)
 			}
-			return
-		}
-		if user.ID != app.config.apiUserID {
-			app.invalidAuthenticationTokenResponse(w, r)
 			return
 		}
 

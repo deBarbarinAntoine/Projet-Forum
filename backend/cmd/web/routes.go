@@ -3,10 +3,17 @@ package main
 import (
 	"Projet-Forum/ui"
 	"github.com/alexedwards/flow"
+	"io/fs"
 	"net/http"
 )
 
 func (app *application) routes() http.Handler {
+
+	// setting the files to put in the static handler
+	staticFs, err := fs.Sub(ui.StaticFiles, "assets")
+	if err != nil {
+		panic(err)
+	}
 
 	router := flow.New()
 
@@ -18,7 +25,7 @@ func (app *application) routes() http.Handler {
 
 	router.NotFound = http.HandlerFunc(app.notFound) // error 404 page
 
-	router.Handle("/static/...", http.StripPrefix("/static/", http.FileServerFS(ui.Files)), http.MethodGet) // static files
+	router.Handle("/static/...", http.StripPrefix("/static/", http.FileServerFS(staticFs)), http.MethodGet) // static files
 
 	router.HandleFunc("/", app.index, http.MethodGet)      // landing page
 	router.HandleFunc("/about", app.about, http.MethodGet) // about page

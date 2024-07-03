@@ -54,6 +54,10 @@ func main() {
 			logger.Error(err.Error())
 			os.Exit(1)
 		}
+		if clientToken == nil {
+			logger.Error("impossible to get client token")
+			os.Exit(1)
+		}
 	}
 
 	db, err := openDB(*dsn)
@@ -151,7 +155,7 @@ func getClientCredentials(urlAPI, secret, pemFilePath string) (*string, []byte, 
 	v := validator.New()
 
 	// getting client token
-	clientToken, err := apiClient.GetClient(secret, credentials, v)
+	clientToken, err := apiClient.GetClient(credentials, v)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -159,7 +163,7 @@ func getClientCredentials(urlAPI, secret, pemFilePath string) (*string, []byte, 
 	// fetching PEM public key
 	var pem []byte
 	if !fileExists(pemFilePath) {
-		pem, err = apiClient.GetPEM(secret, pemFilePath, v)
+		pem, err = apiClient.GetPEM(pemFilePath, v)
 		if err != nil {
 			return nil, nil, err
 		}

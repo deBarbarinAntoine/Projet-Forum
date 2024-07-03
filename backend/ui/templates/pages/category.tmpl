@@ -1,0 +1,22 @@
+{{define "page"}}
+<div class="container-liste">
+        <h4> {{.Category.Name}} </h4>
+    <div class="container-search-filter">
+        <input class="search-liste" placeholder="Search in the category"> <img class="search-icon" src="/static/img/icons/search-icon.svg">
+        <p> Filter </p>
+    </div>
+    <img class="newfolder" src="/static/img/icons/newfolder-icon.svg">
+    <div class="container-liste-thread">
+         {{range .Category.Threads}}
+        <div class="container-thread borders borders-hover"> 
+            <img src="/static/img/icons/greenfolder.svg"> <!-- folder vert si ouvert, jaune si terminé et rouge si fermé -->
+            <div class="container-thread-text-liste">
+            <h3> {{.Title}} </h3>
+            <h5> {{.Author.Name}} </h5>
+            <p> {{humanDate .CreatedAt}} </p>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

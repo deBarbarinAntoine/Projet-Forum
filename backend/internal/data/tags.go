@@ -204,8 +204,15 @@ func (m *TagModel) GetPopular(token string, v *validator.Validator) ([]*Tag, []*
 		if err != nil {
 			return nil, nil, err
 		}
-		tags = response["popular"]["tags"].([]*Tag)
-		threads = response["popular"]["threads"].([]*Thread)
+		var ok bool
+		tags, ok = response["popular"]["tags"].([]*Tag)
+		if !ok {
+			return nil, nil, errors.New("invalid response from Tags")
+		}
+		threads, ok = response["popular"]["threads"].([]*Thread)
+		if !ok {
+			return nil, nil, errors.New("invalid response from Tags")
+		}
 	}
 
 	return tags, threads, nil

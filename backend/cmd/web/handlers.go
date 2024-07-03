@@ -30,7 +30,7 @@ func (app *application) index(w http.ResponseWriter, r *http.Request) {
 	tmplData := app.newTemplateData(r, true)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "index.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 }
 
 func (app *application) about(w http.ResponseWriter, r *http.Request) {
@@ -625,7 +625,7 @@ func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 	tmplData := app.newTemplateData(r, false)
 
 	// render the template
-	app.render(w, r, http.StatusOK, "user.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "user-update.tmpl", tmplData)
 }
 
 func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
@@ -690,7 +690,7 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "update-user.tmpl", tmplData)
+		app.render(w, r, http.StatusOK, "user-update.tmpl", tmplData)
 		return
 	}
 
@@ -712,7 +712,7 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "update-user.tmpl", tmplData)
+		app.render(w, r, http.StatusOK, "user-update.tmpl", tmplData)
 		return
 	}
 

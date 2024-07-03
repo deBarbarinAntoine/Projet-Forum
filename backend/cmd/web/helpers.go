@@ -172,11 +172,9 @@ func (app *application) newTemplateData(r *http.Request, allUser bool) templateD
 				"includes[]": {"following_tags", "favorite_threads", "categories_owned", "tags_owned", "threads_owned", "friends", "posts"},
 			}
 		}
-		if token != "" {
-			user, _ = app.models.UserModel.GetByID(token, "me", query, v)
-		}
+		user, _ = app.models.UserModel.GetByID(token, "me", query, v)
 	}
-	categories, _, _ := app.models.CategoryModel.Get(token, nil, v)
+	categories, metadata, _ := app.models.CategoryModel.Get(token, nil, v)
 	tags, threads, _ := app.models.TagModel.GetPopular(token, v)
 
 	// returning the templateData with all information
@@ -189,6 +187,10 @@ func (app *application) newTemplateData(r *http.Request, allUser bool) templateD
 		PopularTags:       tags,
 		PopularThreads:    threads,
 		CategoriesNavLeft: categories,
+		CategoryList: struct {
+			Metadata data.Metadata
+			List     []*data.Category
+		}{Metadata: metadata, List: categories},
 	}
 }
 

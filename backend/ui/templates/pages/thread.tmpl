@@ -1,0 +1,44 @@
+{{define "page"}}
+<div class="container-inthread">
+    <h4> {{.Thread.Title}} </h4>
+    <div class="container-search-filter">
+        <input class="search-liste" placeholder="Search in the category"> <img class="search-icon" src="/static/img/icons/search-icon.svg">
+        <p> Filter </p>
+    </div>
+    {{range .Thread.Posts}}
+        <div class="container-post">
+            <div class="first-line">
+                <img src="/static/img/icons/circle-icon.svg">
+                <h3> {{.Author.Name}} </h3>
+                <p> {{humanDate .CreatedAt}} </p>
+                <img class="img-inthread" src="/static/img/icons/fav-icon.svg">
+                <img class="img-inthread"src="/static/img/icons/réponse-icon.svg">
+            </div>
+            <div class="second-line">
+                <p>  {{.Content}} </p>
+            </div>
+            <div class="third-line">
+                <!-- Emojis possibilité d'en choisir 1  -->
+                <img  class="emoji" src="/static/img/icons/emoji-neutral-icon.svg">
+                <img  class="emoji" src="/static/img/icons/emoji-rigole2-icon.svg">
+                <img  class="emoji" src="/static/img/icons/emoji-applause-icon.svg">
+                <img class="emoji" src="/static/img/icons/emoji-coeur-icon.svg">
+                <!-- Fin des emojis -->
+            </div>
+        </div>
+    {{end}}
+    <div class="container-response"> 
+         <!-- Répondre à la suite -->
+       <input placeholder="Type your response here ...">
+       <img src="/static/img/icons/response-icon.svg">
+    </div>
+    <div class="pagination-container">
+        <div class="pagination">
+             <!-- Pagination -->
+            <img src="/static/img/icons/arrow-left-icon.svg">
+            <p> 1 2 3 4 5 </p>
+            <img src="/static/img/icons/arrow-right-icon.svg">
+        </div>
+    </div>
+    </div>
+{{end}}

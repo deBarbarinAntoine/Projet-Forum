@@ -1,29 +1,30 @@
+{{define "page"}}
 <div class="container-dashboard">
     <h4 class="dashboard-title"> Dashboard </h4>
     <div class="container-profile-friendsrequest">
         <div class="container-profile borders">
             <div class="profilte-picture-name">
                 <div class="pic">  
-                 <img src="https://ui-avatars.com/api/?name=Thorgan&background=random&size=87&rounded=true"> <!--{{ Username de l'user à la place de Thorgan }}-->
-                 <img class="camera" src="../assets/img/icons/camera-icon.svg">
+                 <img src="{{.User.Avatar}}">
+                 <img class="camera" src="/static/img/icons/camera-icon.svg">
                 </div>
                 <div class="text-profile">
-                    <h4> Bruno Saltor </h4> <!--{{ Nom de l'utilisateur }}-->
-                    <h5> Administrator</h5> <!--{{ Role de l'utilisateur}}-->
+                    <h4> {{.User.Name}} </h4>
+                    <h5> {{.User.Role}} </h5>
                 </div>
             </div>
             <div class="profil-post">
                 <div class="container-colonne">
                     <h4> Member Since </h4>
-                    <h5> 10/05/22 </h5> <!--{{ Date d'inscription }}-->
+                    <h5> {{humanDate .User.CreatedAt}} </h5>
                 </div>
                 <div class="container-colonne">
                     <h4> Post </h4>
-                    <h5> 16 </h5> <!--{{ Nombre de post }}-->
+                    <h5> {{len .User.Posts}} </h5>
                 </div>
                 <div class="container-colonne">
                     <h4> Friends </h4>
-                    <h5> 5 </h5> <!--{{ Nom d'amis }}-->
+                    <h5> {{len .User.Friends}} </h5>
                 </div>
             </div>
         </div>
@@ -31,18 +32,18 @@
             <h4> Friend Requests </h4>
             <div class="container-row">
 
-                <!--{{ Range friend requests }}-->
+                {{range .User.Invitations.Received}}
                 <div class="container-requests">
-                    <div class="pic-friends"></div> <!--{{ Image de l'utilisateur qui a envoyé la demande }}-->
+                    <div class="pic-friends"></div> <!-- Image de l'utilisateur qui a envoyé la demande -->
                     <div class="container-colonne-amis">
-                        <h5> Jean-Mi</h5> <!--{{ Nom de l'utilisateur qui a envoyé la demande  }}-->
+                        <h5> {{.Name}} </h5>
                         <div class="accepte-refuse">
-                            <img src="../assets/img/icons/check-icon.svg">
-                            <img src="../assets/img/icons/close-icon.svg">
+                            <img src="/static/img/icons/check-icon.svg" alt="friend reject icon">
+                            <img src="/static/img/icons/close-icon.svg" alt="friend accept icon">
                         </div>
                     </div>
                 </div>
-                <!--{{ end range }}-->
+                {{end}}
 
             </div>
         </div>
@@ -51,77 +52,79 @@
         <div class="container-mythread borders">
             <h4> My Thread </h4>
 
-            <!--{{ range my threads }}-->
+            {{range .User.ThreadsOwned}}
             <div class="mythread borders borders-hover">
-                <img src="../assets/img/icons/greenfolder.svg">
-                <!--{{folder vert si ouvert, jaune si terminé et rouge si fermé }}-->
+                <img src="/static/img/icons/greenfolder.svg">
+                <!-- folder vert si ouvert, jaune si terminé et rouge si fermé -->
                 <div class="text">
-                    <h3> Aide Golang ! </h3> <!--{{ Titre du thread}}-->
+                    <h3> {{.Title}} </h3>
                 </div>
             </div>
-            <!--{{ end range }}-->
+            {{end}}
 
         </div>
         <div class="friends-container borders">
             <h4> Friends </h4>
             
-            <!--{{ range friends }}-->
+            {{range .User.Friends}}
             <div class="friends">
-                <div class="pic-friends"></div> <!--{{ Image de l'ami }}-->
-                <h5> Lucas </h5> <!--{{ Nom de l'ami }}-->
+                <div class="pic-friends"></div> <!-- Image de l'ami -->
+                <h5> {{.Name}} </h5>
             </div>
-            <!--{{ end range }}-->
+            {{end}}
 
         </div>
     </section>
+    {{if eq .User.Role "admin"}}
     <section class="container-row">
         <div class="container-last-user borders">
             <h4> Last User </h4>
 
-            <!--{{ range derniers utilisateurs (?) }}-->
+            <!--{{/* range derniers utilisateurs (?) */}}-->
             <div class="last-user borders borders-hover">
-                <h5> Jean-Mi </h5> <!--{{ nom de l'user inscrit }}-->
+                <h5> Jean-Mi </h5> <!--{{/* nom de l'user inscrit */}}-->
             </div>
-            <!--{{ end range }}-->
+            <!--{{/* end range */}}-->
 
         </div>
         <div class="container-last-user borders">
             <h4> Last Categories </h4>
 
-            <!--{{ range dernieres categories }}-->
+            <!--{{/* range dernieres categories */}}-->
             <div class="last-user borders borders-hover">
-                <h5> Golang </h5> <!--{{ Nom de la catégorie }}-->
+                <h5> Golang </h5> <!--{{/* Nom de la catégorie */}}-->
             </div>
-            <!--{{ end range }}-->
+            <!--{{/* end range */}}-->
             
         </div>
 
         <div class="container-last-user borders">
             <h4> Last Tags </h4>
             
-            <!--{{ range derniers tags }}-->
+            <!--{{/* range derniers tags */}}-->
             <div class="last-user borders borders-hover">
-                <h5> Golang </h5> <!--{{ Tags }}-->
+                <h5> Golang </h5> <!--{{/* Tags */}}-->
             </div>
-            <!--{{ end range }}-->
+            <!--{{/* end range */}}-->
 
         </div>
     </section>
     <div class="container-last-thread borders">
         <h4> Last Threads </h4>
         
-        <!--{{ range last threads }}-->
+        <!--{{/* range last threads */}}-->
         <div class="lastthread borders borders-hover">
-            <img src="../assets/img/icons/greenfolder.svg">
-            <!--{{folder vert si ouvert, jaune si terminé et rouge si fermé }}-->
+            <img src="/static/img/icons/greenfolder.svg">
+            <!-- folder vert si ouvert, jaune si terminé et rouge si fermé -->
             <div class="text">
-                <h3> Aide Golang ! </h3> <!--{{ Titre du thread }}-->
-                <h5> Bruno Saltor </h5> <!--{{ Auteur du thread }}-->
-                <p> 09:27:56</p> <!--{{ Date de création }}-->
+                <h3> Aide Golang ! </h3> <!--{{/* Titre du thread */}}-->
+                <h5> Bruno Saltor </h5> <!--{{/* Auteur du thread */}}-->
+                <p> 09:27:56</p> <!--{{/* Date de création */}}-->
             </div>
         </div>
-        <!--{{ end range }}-->
+        <!--{{/* end range */}}-->
 
     </div>
-
+    {{end}}
 </div>
+{{end}}

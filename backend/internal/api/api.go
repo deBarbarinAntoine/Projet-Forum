@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -55,7 +56,7 @@ func GetForClient(url, secret string) *API {
 	}
 }
 
-func (api *API) GetClient(secret string, credentials map[string]string, v *validator.Validator) (*string, error) {
+func (api *API) GetClient(credentials map[string]string, v *validator.Validator) (*string, error) {
 
 	// converting the body to JSON format
 	reqBody, err := json.Marshal(credentials)
@@ -64,7 +65,7 @@ func (api *API) GetClient(secret string, credentials map[string]string, v *valid
 	}
 
 	// making the request
-	res, status, err := api.Request(secret, http.MethodPost, "tokens/client", reqBody, false)
+	res, status, err := api.Request("", http.MethodPost, "tokens/client", reqBody, false)
 	if err != nil {
 		return nil, err
 	}
@@ -84,15 +85,19 @@ func (api *API) GetClient(secret string, credentials map[string]string, v *valid
 			return nil, err
 		}
 		token = response["client_token"]["token"]
+		log.Printf("client_token: %s", *token)
+	} else {
+		log.Printf("generic errors: %+v", v.NonFieldErrors)
+		log.Printf("errors: %+v", v.FieldErrors)
 	}
 
 	return token, nil
 }
 
-func (api *API) GetPEM(secret, pemFilePath string, v *validator.Validator) ([]byte, error) {
+func (api *API) GetPEM(pemFilePath string, v *validator.Validator) ([]byte, error) {
 
 	// making the request
-	res, status, err := api.Get(secret, "tokens/public-key", nil)
+	res, status, err := api.Get("", "tokens/public-key", nil)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,68 @@
+{{define "page"}}
+<div class="container-accueil">
+    <div class="container-accueil-text">
+        <h3> Bienvenue sur Threadive</h3>
+        <p> Retrouvez notre communauté de passionés et venez échanger avec elle ! </p>
+    </div>
+
+    <div class="container-accueil-content borders">
+        <h4> Hot topics </h4> 
+
+        {{ range .PopularThreads }}
+        <div class="container-hottopic borders borders-hover">
+            {{/* folder vert si ouvert, jaune si terminé et rouge si fermé */}}
+            <img src="/static/img/icons/greenfolder.svg">
+            <div class="container-thread-text">
+                <h3> {{.Title}} </h3>
+                <h5> {{.Author.Name}} </h5>
+                <p> {{humanDate .CreatedAt}} </p>
+            </div>
+        </div>
+        {{ end }}
+
+    </div>
+    <div class="container-accueil-content borders">
+        <h4> Category </h4>
+        <div class="container-category">
+            {{/* Categories qui vont être affichés sur l'accueil du site */}}
+            {{range .CategoryList.List}}
+            <div class="rectangle-category borders borders-hover">
+                <img src="/static/img/icons/tech-icon.svg">
+                <h5> {{.Name}} </h5>
+            </div>
+            {{end}}
+            {{/* fin des categories */}}
+
+        </div>
+    </div>
+    {{if .IsAuthenticated}}
+        <div class="container-accueil-content borders">
+            <h4> Followed Thread </h4>
+
+            {{range .User.FavoriteThreads}}
+            <div class="container-hottopic borders borders-hover">
+                <img src="/static/img/icons/greenfolder.svg">
+                <div class="container-thread-text">
+                    <h3> {{.Title}} </h3>
+                    <h5> Bruno Saltor </h5> {{/* auteur */}}
+                    <p> 09:27:56</p> {{/* date de création */}}
+                </div>
+            </div>
+            {{end}}
+
+        </div>
+        <div class="container-accueil-content borders">
+            <h4> Fav Tag </h4>
+            <div class="container-favtag">
+
+                {{range .User.FollowingTags}}
+                <div class="favtag borders borders-hover">
+                    <h5> {{.Name}} </h5>
+                </div>
+                {{end}}
+
+            </div>
+        </div>
+    {{end}}
+</div>
+{{end}}
