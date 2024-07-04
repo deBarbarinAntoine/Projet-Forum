@@ -1051,7 +1051,7 @@ textarea.description {
 /* THREAD */
 .container-inthread {
   background-color: var(--background-color);
-  height: 100%;
+  height: fit-content;
   padding-top: 30px;
   margin-left: 5px;
   padding-left: 50px;
@@ -1068,15 +1068,17 @@ textarea.description {
   font-weight: normal;
 }
 .container-inthread .container-search-filter {
+  position: relative;
   margin-top: 30px;
-  width: 600px;
+  width: 35%;
+  min-width: 350px;
   display: flex;
   align-items: center;
   flex-direction: row;
 }
 .container-inthread .container-search-filter input {
+  flex: 1;
   height: 40px;
-  width: 263px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
   border: none;
@@ -1091,7 +1093,7 @@ textarea.description {
 }
 .container-inthread .container-search-filter .search-icon {
   position: absolute;
-  transform: translateX(950%);
+  right: 7ch;
   opacity: 0.5;
 }
 .container-inthread .container-post {
@@ -1104,7 +1106,7 @@ textarea.description {
   padding-bottom: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
   height: 100%;
-  width: 780px;
+  width: calc(100% - 35px);
 }
 .container-inthread .container-post .first-line {
   display: flex;
@@ -1167,7 +1169,7 @@ textarea.description {
   flex-direction: column;
   margin-top: 20px;
   height: 100%;
-  width: 795px;
+  width: calc(100% - 20px);
   border-radius: 5px;
   position: relative;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
