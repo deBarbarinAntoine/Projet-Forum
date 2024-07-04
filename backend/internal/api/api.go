@@ -105,11 +105,18 @@ func (api *API) GetClient(credentials map[string]string, v *validator.Validator)
 		if err != nil {
 			return nil, err
 		}
-		token = response["client_token"]["token"].(string)
+		tokenInfo := response["client_token"]["token"]
+		err = Unmarshall(tokenInfo, &token)
+		if err != nil {
+			return nil, err
+		}
 		log.Printf("client_token: %s", token)
+		fmt.Println()
 	} else {
 		log.Printf("generic errors: %+v", v.NonFieldErrors)
+		fmt.Println()
 		log.Printf("errors: %+v", v.FieldErrors)
+		fmt.Println()
 	}
 
 	return &token, nil
@@ -200,6 +207,9 @@ func (api *API) Request(userToken, method, endpoint string, body []byte, isEncry
 		var err error
 		body, err = api.encryptPEM(body)
 		if err != nil {
+
+			// DEBUG
+			fmt.Printf("error encrypting body: %v", err)
 			return nil, StatusFailedRequest, err
 		}
 	}
@@ -207,6 +217,9 @@ func (api *API) Request(userToken, method, endpoint string, body []byte, isEncry
 	// creating the request
 	req, err := http.NewRequest(method, urlRequest, bytes.NewBuffer(body))
 	if err != nil {
+
+		// DEBUG
+		fmt.Printf("error creating request: %v", err)
 		return nil, StatusFailedRequest, err
 	}
 

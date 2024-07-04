@@ -61,6 +61,7 @@
             <div class="profile">
                 <div class="personal-info">
                     <div class="profile-picture">
+                        <img class="avatar" src="{{.User.Avatar}}" alt="avatar image">
                         <div class="activity"></div>
                     </div>
                     <div class="name-rank">
@@ -72,7 +73,7 @@
                 <div class="stats">
                     <div class="member-since">
                         <p> Member since </p>
-                        <p> {{.User.CreatedAt}} </p>
+                        <p> {{humanDate .User.CreatedAt}} </p>
                     </div>
 
                     <div class="posts">

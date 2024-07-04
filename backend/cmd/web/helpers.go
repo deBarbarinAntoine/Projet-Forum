@@ -77,12 +77,46 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 	return isAuthenticated
 }
 
-func (app *application) getToken(r *http.Request) string {
-	tokens, ok := app.sessionManager.Get(r.Context(), userTokenSessionManager).(*data.Tokens)
+func (app *application) putToken(r *http.Request, tokens data.Tokens) {
+	app.sessionManager.Put(r.Context(), authTokenSessionManager, tokens.Authentication.Token)
+	app.sessionManager.Put(r.Context(), authExpirySessionManager, tokens.Authentication.Expiry.String())
+	app.sessionManager.Put(r.Context(), refreshTokenSessionManager, tokens.Refresh.Token)
+	app.sessionManager.Put(r.Context(), refreshExpirySessionManager, tokens.Refresh.Expiry.String())
+}
+
+func (app *application) getTokens(r *http.Request) (*data.Tokens, error) {
+	var tokens data.Tokens
+	authToken := app.getToken(r, authTokenSessionManager)
+	refreshToken := app.getToken(r, refreshTokenSessionManager)
+	authExpiry, ok := app.sessionManager.Get(r.Context(), authExpirySessionManager).(string)
 	if !ok {
+		return nil, fmt.Errorf("couldn't retreive authentication token's expiry from session manager")
+	}
+	refreshExpiry, ok := app.sessionManager.Get(r.Context(), refreshExpirySessionManager).(string)
+	if !ok {
+		return nil, fmt.Errorf("couldn't retreive refresh token's expiry from session manager")
+	}
+	var err error
+	tokens.Authentication.Token = authToken
+	tokens.Authentication.Expiry, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", authExpiry)
+	if err != nil {
+		return nil, err
+	}
+	tokens.Refresh.Token = refreshToken
+	tokens.Refresh.Expiry, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", refreshExpiry)
+	if err != nil {
+		return nil, err
+	}
+	return &tokens, nil
+}
+
+func (app *application) getToken(r *http.Request, key string) string {
+	token, ok := app.sessionManager.Get(r.Context(), key).(string)
+	if !ok {
+		fmt.Println("could not get token from session manager")
 		return ""
 	}
-	return tokens.Authentication.Token
+	return token
 }
 
 func (app *application) getUserID(r *http.Request) int {
@@ -157,7 +191,7 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 
 	// checking is the user is authenticated
 	isAuthenticated := app.isAuthenticated(r)
-	token := app.getToken(r)
+	token := app.getToken(r, authTokenSessionManager)
 	// retrieving the user data
 	var user *data.User
 	v := validator.New()

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/validator"
 	"context"
 	"fmt"
@@ -12,7 +11,10 @@ import (
 )
 
 const (
-	userTokenSessionManager           = "user_token"
+	authTokenSessionManager           = "auth_token"
+	authExpirySessionManager          = "auth_expiry"
+	refreshTokenSessionManager        = "refresh_token"
+	refreshExpirySessionManager       = "refresh_expiry"
 	authenticatedUserIDSessionManager = "authenticated_user_id"
 )
 
@@ -87,8 +89,8 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 		}
 
 		// getting the user tokens from the session
-		tokens, ok := app.sessionManager.Get(r.Context(), userTokenSessionManager).(*data.Tokens)
-		if ok {
+		tokens, err := app.getTokens(r)
+		if nil == err {
 
 			// checking the authentication imminent expiry
 			if time.Until(tokens.Authentication.Expiry) < 1*time.Hour {
@@ -116,7 +118,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 					}
 
 					// replacing the tokens in the user session
-					app.sessionManager.Put(r.Context(), userTokenSessionManager, tokens)
+					app.putToken(r, *tokens)
 				} else {
 
 					// if refresh token expired -> logout
@@ -133,6 +135,8 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 			// setting the user as authenticated in the context
 			ctx := context.WithValue(r.Context(), isAuthenticatedContextKey, true)
 			r = r.WithContext(ctx)
+		} else {
+			app.logger.Error(err.Error())
 		}
 
 		next.ServeHTTP(w, r)

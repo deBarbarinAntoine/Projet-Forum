@@ -56,7 +56,7 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 
 	// fetching the category
 	v := validator.New()
-	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r), id, v)
+	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -91,7 +91,7 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 
 	// fetching the thread
 	v := validator.New()
-	tmplData.Thread, err = app.models.ThreadModel.GetByID(app.getToken(r), id, query, v)
+	tmplData.Thread, err = app.models.ThreadModel.GetByID(app.getToken(r, authTokenSessionManager), id, query, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -121,7 +121,7 @@ func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 
 	// fetching the tag
 	v := validator.New()
-	tmplData.Tag, err = app.models.TagModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
+	tmplData.Tag, err = app.models.TagModel.GetByID(app.getToken(r, authTokenSessionManager), id, r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -145,7 +145,7 @@ func (app *application) TagsGet(w http.ResponseWriter, r *http.Request) {
 	// fetching the tags
 	v := validator.New()
 	var err error
-	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -169,7 +169,7 @@ func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 	// fetching the categories
 	v := validator.New()
 	var err error
-	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -193,21 +193,21 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 	// fetching the categories
 	v := validator.New()
 	var err error
-	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// fetching the threads
-	tmplData.ThreadList.List, tmplData.ThreadList.Metadata, err = app.models.ThreadModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.ThreadList.List, tmplData.ThreadList.Metadata, err = app.models.ThreadModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// fetching the tags
-	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r), r.URL.Query(), v)
+	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -258,6 +258,9 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	// return to register page if there is an error
 	if !form.Valid() {
 
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("errors: %+v", form.FieldErrors))
+
 		// retrieving basic template data
 		tmplData := app.newTemplateData(r, false, Overlay.Register)
 		tmplData.Form = form
@@ -274,7 +277,7 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 		Email:    form.Email,
 		Password: form.Password,
 	}
-	err = app.models.UserModel.Create(app.getToken(r), user, v)
+	err = app.models.UserModel.Create(app.getToken(r, authTokenSessionManager), user, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -282,6 +285,9 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 
 	// looking for errors from the API
 	if !v.Valid() {
+
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("errors: %+v", v.NonFieldErrors))
 
 		// retrieving basic template data
 		tmplData := app.newTemplateData(r, false, Overlay.Register)
@@ -453,7 +459,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 
 	// storing the user id and tokens in the user session
 	app.sessionManager.Put(r.Context(), authenticatedUserIDSessionManager, user.ID)
-	app.sessionManager.Put(r.Context(), userTokenSessionManager, tokens)
+	app.putToken(r, *tokens)
 
 	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
@@ -705,7 +711,7 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 
 	// API request to send a reset password token
 	v := validator.New()
-	err = app.models.UserModel.Update(app.getToken(r), *form.Password, user, v)
+	err = app.models.UserModel.Update(app.getToken(r, authTokenSessionManager), *form.Password, user, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -778,7 +784,7 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 
 	// API request to create a category
 	v := validator.New()
-	err = app.models.CategoryModel.Create(app.getToken(r), category, v)
+	err = app.models.CategoryModel.Create(app.getToken(r, authTokenSessionManager), category, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -864,7 +870,7 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 
 	// API request to create a category
 	v := validator.New()
-	err = app.models.ThreadModel.Create(app.getToken(r), thread, v)
+	err = app.models.ThreadModel.Create(app.getToken(r, authTokenSessionManager), thread, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -945,7 +951,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 
 	// API request to create a category
 	v := validator.New()
-	err = app.models.PostModel.Create(app.getToken(r), post, v)
+	err = app.models.PostModel.Create(app.getToken(r, authTokenSessionManager), post, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1014,7 +1020,7 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 
 	// API request to create a category
 	v := validator.New()
-	err = app.models.TagModel.Create(app.getToken(r), tag, v)
+	err = app.models.TagModel.Create(app.getToken(r, authTokenSessionManager), tag, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1052,7 +1058,7 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving the post from the API
 	v := validator.New()
-	post, err := app.models.PostModel.GetByID(app.getToken(r), id, v)
+	post, err := app.models.PostModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1082,7 +1088,7 @@ func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 	query := url.Values{
 		"includes[]": {"threads"},
 	}
-	tag, err := app.models.TagModel.GetByID(app.getToken(r), id, query, v)
+	tag, err := app.models.TagModel.GetByID(app.getToken(r, authTokenSessionManager), id, query, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1109,7 +1115,7 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving the category from the API
 	v := validator.New()
-	category, err := app.models.CategoryModel.GetByID(app.getToken(r), id, v)
+	category, err := app.models.CategoryModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1136,7 +1142,7 @@ func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving the thread from the API
 	v := validator.New()
-	thread, err := app.models.ThreadModel.GetByID(app.getToken(r), id, nil, v)
+	thread, err := app.models.ThreadModel.GetByID(app.getToken(r, authTokenSessionManager), id, nil, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1200,7 +1206,7 @@ func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request
 
 	// API request to update a category
 	v := validator.New()
-	err = app.models.CategoryModel.Update(app.getToken(r), category, v)
+	err = app.models.CategoryModel.Update(app.getToken(r, authTokenSessionManager), category, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1276,7 +1282,7 @@ func (app *application) updateThreadPut(w http.ResponseWriter, r *http.Request) 
 
 	// API request to update a thread
 	v := validator.New()
-	err = app.models.ThreadModel.Update(app.getToken(r), thread, v)
+	err = app.models.ThreadModel.Update(app.getToken(r, authTokenSessionManager), thread, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1345,7 +1351,7 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 
 	// API request to update a post
 	v := validator.New()
-	err = app.models.PostModel.Update(app.getToken(r), post, v)
+	err = app.models.PostModel.Update(app.getToken(r, authTokenSessionManager), post, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1419,7 +1425,7 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 
 	// API request to update a tag
 	v := validator.New()
-	tag, err := app.models.TagModel.Update(app.getToken(r), id, body, v)
+	tag, err := app.models.TagModel.Update(app.getToken(r, authTokenSessionManager), id, body, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return

@@ -5,8 +5,8 @@
         <div class="container-profile borders">
             <div class="profilte-picture-name">
                 <div class="pic">  
-                 <img src="{{.User.Avatar}}">
-                 <img class="camera" src="/static/img/icons/camera-icon.svg">
+                 <img class="avatar" src="{{.User.Avatar}}" alt="avatar image">
+                 <img class="camera" src="/static/img/icons/camera-icon.svg" alt="camera icon">
                 </div>
                 <div class="text-profile">
                     <h4> {{.User.Name}} </h4>
@@ -50,7 +50,7 @@
     </div>
     <section class="container-row">
         <div class="container-mythread borders">
-            <h4> My Thread </h4>
+            <h4> My Threads </h4>
 
             {{range .User.ThreadsOwned}}
             <div class="mythread borders borders-hover">

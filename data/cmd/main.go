@@ -222,12 +222,14 @@ func main() {
 	app.mysql.backend.password = base62.StdEncoding.Encode(randomPassword)
 	fmt.Println()
 
+	// FIXME -> create backend user!!!
+
 	fmt.Println("Writing configurations to environment file...")
 
 	var env strings.Builder
 	port := fmt.Sprintf("PORT=%s\n", app.backend.port)
 	apiURL := fmt.Sprintf("API_URL=\"http://localhost:%s\"\n", app.port)
-	secretToken := fmt.Sprintf("API_SECRET=\"%s\"\n", app.secretAPI)
+	secretToken := fmt.Sprintf("API_HOST_SECRET=\"%s\"\n", app.secretAPI)
 	dbDSN := fmt.Sprintf("DB_DSN=\"%s:%s@/%s?parseTime=true\"", app.mysql.backend.username, string(app.mysql.backend.password), app.mysql.name)
 
 	switch app.os {

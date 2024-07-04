@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 )
@@ -24,5 +25,7 @@ func (api *API) encryptPEM(data []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	return ciphertext, nil
+	hexEncrypted := hex.EncodeToString(ciphertext)
+
+	return []byte(hexEncrypted), nil
 }

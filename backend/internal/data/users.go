@@ -25,7 +25,7 @@ func (m *UserModel) Create(token string, user *User, v *validator.Validator) err
 
 	// creating the request body
 	body := envelope{
-		"name":     user.Name,
+		"username": user.Name,
 		"email":    user.Email,
 		"password": user.Password,
 	}

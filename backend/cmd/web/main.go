@@ -39,6 +39,8 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
+	addr := fmt.Sprintf(":%d", cfg.port)
+
 	// check if the program is run by Windows OS, to fetch the necessary variables
 	if runtime.GOOS == "windows" {
 
@@ -50,18 +52,27 @@ func main() {
 		}
 	}
 
-	addr := fmt.Sprintf(":%d", cfg.port)
-
 	if secret == nil || *secret == "" || len(*secret) != 86 {
-		logger.Error("secret is required")
-		os.Exit(1)
+		if cfg.secret != "" {
+			*secret = cfg.secret
+		} else {
+			logger.Error("secret is required")
+			os.Exit(1)
+		}
 	}
 	if pemFilePath == nil || *pemFilePath == "" {
-		logger.Error("pem file path is required")
-		os.Exit(1)
+		if cfg.pemPath != "" {
+			*pemFilePath = cfg.pemPath
+		} else {
+			logger.Error("pem file path is required")
+			os.Exit(1)
+		}
 	}
 	var pemKey []byte
 	var err error
+	if cfg.clientToken != "" {
+		*clientToken = cfg.clientToken
+	}
 	if clientToken == nil || *clientToken == "" {
 		clientToken, pemKey, err = getClientCredentials(cfg.apiURL, *secret, *pemFilePath)
 		if err != nil {
@@ -76,6 +87,15 @@ func main() {
 		pemKey, err = getPEM(*pemFilePath)
 		if err != nil {
 			logger.Error(err.Error())
+			os.Exit(1)
+		}
+	}
+
+	if dsn == nil || *dsn == "" {
+		if cfg.dsn != "" {
+			*dsn = cfg.dsn
+		} else {
+			logger.Error("dsn is required")
 			os.Exit(1)
 		}
 	}
