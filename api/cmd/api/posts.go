@@ -75,7 +75,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 
 	var input struct {
 		Content      *string `json:"content"`
-		Thread       *int    `json:"thread"`
+		ThreadID     *int    `json:"thread_id"`
 		ParentPostID *int    `json:"parent_post_id"`
 	}
 
@@ -94,12 +94,12 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 	v.StringCheck(*input.Content, 2, 125, true, "title")
 
-	if input.Thread == nil {
+	if input.ThreadID == nil {
 		v.AddError("thread", "must be provided")
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
-	v.Check(*input.Thread > 0, "thread", "must be greater than zero")
+	v.Check(*input.ThreadID > 0, "thread", "must be greater than zero")
 
 	if input.ParentPostID != nil {
 		v.Check(*input.ParentPostID > 0, "parent_post_id", "must be greater than zero")
@@ -121,7 +121,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		Thread: struct {
 			ID    int    `json:"id"`
 			Title string `json:"title"`
-		}{ID: *input.Thread},
+		}{ID: *input.ThreadID},
 	}
 
 	if input.ParentPostID != nil {

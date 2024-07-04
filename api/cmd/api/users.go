@@ -47,9 +47,6 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// DEBUG
-	app.logger.Debug(fmt.Sprintf("input: %+v", input))
-
 	user := &data.User{
 		Name:   input.Name,
 		Email:  input.Email,

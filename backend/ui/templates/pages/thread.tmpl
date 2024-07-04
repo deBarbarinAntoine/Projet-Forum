@@ -27,11 +27,14 @@
             </div>
         </div>
     {{end}}
-    <div class="container-response"> 
+    <form method="post" action="/post" class="container-response">
          <!-- Répondre à la suite -->
-       <input placeholder="Type your response here ...">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <input type="hidden" name="thread_id" value="{{.Thread.ID}}">
+        <label for="content"></label>
+       <input name="content" id="content" placeholder="Type your response here ...">
        <img src="/static/img/icons/response-icon.svg">
-    </div>
+    </form>
     <div class="pagination-container">
         <div class="pagination">
              <!-- Pagination -->

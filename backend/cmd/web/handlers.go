@@ -913,6 +913,10 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("content: %+v", *form.Content))
+	app.logger.Debug(fmt.Sprintf("thread_id: %+v", *form.ThreadID))
+
 	// creating the new thread
 	post := &data.Post{}
 
@@ -929,9 +933,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 		form.CheckID(*form.ThreadID, "thread_id")
 		post.Thread.ID = *form.ThreadID
 	}
-	if form.ParentPostID == nil {
-		form.AddFieldError("parent_post_id", "must be provided")
-	} else {
+	if form.ParentPostID != nil {
 		form.CheckID(*form.ParentPostID, "parent_post_id")
 		post.IDParentPost = *form.ParentPostID
 	}
@@ -945,7 +947,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "post-create.tmpl", tmplData)
+		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", tmplData) // FIXME
 		return
 	}
 
@@ -967,7 +969,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "post-create.tmpl", tmplData)
+		app.render(w, r, http.StatusOK, "home.tmpl", tmplData) // FIXME
 		return
 	}
 

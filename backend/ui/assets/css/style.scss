@@ -1,5 +1,19 @@
 @import 'base';
 
+    /*   Flash Message   */
+
+    .flash {
+        display: flex;
+        justify-content: center;
+        width: calc(100% - 24px);
+        padding: 12px;
+        border: 3px solid #864879;
+        border-radius: 8px;
+        color: #1F1D36;
+        font-size: 18px;
+        font-family: Varela-Round, sans-serif;
+    }
+
     /* Mentions Légales */
 
 
@@ -8,8 +22,7 @@
         padding-top: 20px;
         padding-left: 50px;
         margin-left: 5px;
-        width: 60%;
-        margin-top: 130px;
+        width: 100%;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
         font-family: Varela-Round;
@@ -37,8 +50,7 @@
         padding-top: 20px;
         padding-left: 50px;
         margin-left: 5px;
-        width: 935px;
-        margin-top: 130px;
+        width: 100%;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
         font-family: Varela-Round;
@@ -169,7 +181,6 @@
     padding-top: 20px;
     margin-left: 5px;
     width: 100%;
-    margin-top: 130px;
     font-family: Varela-Round;
     display: flex;
     flex-direction: column;
@@ -213,11 +224,21 @@
             margin-top: 20px;
             padding-left: 10px;
             .container-thread-text {
+                position: relative;
+                overflow: hidden;
                 display: flex;
                 justify-content: space-between;
                 padding-left: 20px;
                 padding-right: 20px;
                 width: 750px;
+                .thread-link {
+                    z-index: 5;
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+                }
                 h3 {
                     font-size: 15px;
                     font-weight: normal;
@@ -294,8 +315,7 @@
         padding-top: 30px;
         margin-left: 5px;
         padding-left: 50px;
-        width: 935px;
-        margin-top: 130px;
+        width: 100%;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
         font-family: Varela-Round;
@@ -395,8 +415,7 @@
         padding-top: 30px;
         margin-left: 5px;
         padding-left: 50px;
-        width: 935px;
-        margin-top: 130px;
+        width: 100%;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
         font-family: Varela-Round;
@@ -503,7 +522,7 @@
                 }
             }
         } 
-        .container-response {
+        form.container-response {
             display: flex;
             flex-direction: column;
             margin-top: 20px;
@@ -571,7 +590,6 @@
     height: 100%;
     margin-left: 5px;
     width: 100%;
-    margin-top: 130px;
     font-family: Varela-Round;
     display: flex;
     flex-direction: column;
@@ -832,7 +850,7 @@
 .container-error {
     height: auto;
     width: auto;
-    margin-top: 300px;
+    margin-top: 150px;
     font-family: Varela-Round;
     display: flex;
     align-items: center;

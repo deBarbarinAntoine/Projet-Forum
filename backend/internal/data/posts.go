@@ -25,9 +25,11 @@ func (m *PostModel) Create(token string, post *Post, v *validator.Validator) err
 
 	// creating the request body
 	body := envelope{
-		"content":        post.Content,
-		"thread":         post.Thread,
-		"parent_post_id": post.IDParentPost,
+		"content":   post.Content,
+		"thread_id": post.Thread.ID,
+	}
+	if post.IDParentPost > 0 {
+		body["parent_post_id"] = post.IDParentPost
 	}
 	reqBody, err := json.Marshal(body)
 	if err != nil {
@@ -48,12 +50,12 @@ func (m *PostModel) Create(token string, post *Post, v *validator.Validator) err
 	if v.Valid() {
 
 		// retrieving the post
-		var response = make(map[string]*Post)
+		var response = make(map[string]Post)
 		err = json.Unmarshal(res, &response)
 		if err != nil {
 			return err
 		}
-		post = response["post"]
+		*post = response["post"]
 		if post.ID < 1 {
 			return errors.New("invalid post id")
 		}

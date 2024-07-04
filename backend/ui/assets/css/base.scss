@@ -63,9 +63,17 @@ header {
         justify-content: space-between;
         align-items: center;
 
-        .logo {
+        a {
             width: 250px;
-            height: auto;
+            aspect-ratio: 5/1;
+            cursor: pointer;
+
+            .logo {
+                object-fit: contain;
+                object-position: center;
+                height: 100%;
+                width: 100%;
+            }
         }
 
         .search {
@@ -162,6 +170,8 @@ header {
                 border-radius: 0 0 5px 5px;
 
                 .item {
+                    position: relative;
+                    overflow: hidden;
                     width: calc(100% - 10px);
                     height: 30px;
                     display: flex;
@@ -173,6 +183,32 @@ header {
                     padding-bottom: 5px;
                     padding-top: 5px;
                     transition: .3s;
+
+                    .item-link {
+                        z-index: 4;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                    }
+                    button.logout-link {
+                        z-index: 4;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        appearance: none;
+                        border: none;
+                        background-color: transparent;
+
+                        &:hover {
+                            appearance: none;
+                            border: none;
+                            background-color: transparent;
+                        }
+                    }
 
                     &:hover {
                         cursor: pointer;
@@ -532,8 +568,11 @@ header {
 .template-container {
     position: relative;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
     width: calc(100% - 515px);
+    margin-top: 120px;
     left: 270px;
     padding: 20px;
 }

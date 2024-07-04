@@ -69,15 +69,15 @@ func (app *application) routes() http.Handler {
 	router.HandleFunc("/user", app.updateUser, http.MethodGet)     // update user page
 	router.HandleFunc("/user", app.updateUserPut, http.MethodPut)  // update user treatment route
 
-	router.HandleFunc("/post/:id/create", app.createPost, http.MethodGet)         // post creation page
-	router.HandleFunc("/tag/:id/create", app.createTag, http.MethodGet)           // tag creation page
-	router.HandleFunc("/category/:id/create", app.createCategory, http.MethodGet) // category creation page
-	router.HandleFunc("/thread/:id/create", app.createThread, http.MethodGet)     // thread creation page
+	router.HandleFunc("/post/create", app.createPost, http.MethodGet)         // post creation page
+	router.HandleFunc("/tag/create", app.createTag, http.MethodGet)           // tag creation page
+	router.HandleFunc("/category/create", app.createCategory, http.MethodGet) // category creation page
+	router.HandleFunc("/thread/create", app.createThread, http.MethodGet)     // thread creation page
 
-	router.HandleFunc("/category/:id/create", app.createCategoryPost, http.MethodPost) // post creation treatment route
-	router.HandleFunc("/thread/:id/create", app.createThreadPost, http.MethodPost)     // tag creation treatment route
-	router.HandleFunc("/post/:id/create", app.createPostPost, http.MethodPost)         // category creation treatment route
-	router.HandleFunc("/tag/:id/create", app.createTagPost, http.MethodPost)           // thread creation treatment route
+	router.HandleFunc("/category", app.createCategoryPost, http.MethodPost) // post creation treatment route
+	router.HandleFunc("/thread", app.createThreadPost, http.MethodPost)     // tag creation treatment route
+	router.HandleFunc("/post", app.createPostPost, http.MethodPost)         // category creation treatment route
+	router.HandleFunc("/tag", app.createTagPost, http.MethodPost)           // thread creation treatment route
 
 	router.HandleFunc("/post/:id/update", app.updatePost, http.MethodGet)         // post update page
 	router.HandleFunc("/tag/:id/update", app.updateTag, http.MethodGet)           // tag update page
