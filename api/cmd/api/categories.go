@@ -156,6 +156,10 @@ func (app *application) getSingleCategoryHandler(w http.ResponseWriter, r *http.
 	category, err := app.models.Categories.GetByID(form.ID)
 	if err != nil {
 		if errors.Is(err, data.ErrRecordNotFound) {
+
+			// DEBUG
+			app.logger.Debug(fmt.Sprintf("error: %s", err.Error()))
+
 			app.notFoundResponse(w, r)
 			return
 		}
@@ -187,6 +191,9 @@ func (app *application) getSingleCategoryHandler(w http.ResponseWriter, r *http.
 			}
 		}
 	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("category: %+v", category))
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"category": category}, nil)
 	if err != nil {

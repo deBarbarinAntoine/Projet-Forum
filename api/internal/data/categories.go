@@ -203,7 +203,7 @@ func (m CategoryModel) GetByID(id int) (Category, error) {
 		SELECT c.Id_categories, c.Name, c.Id_author, u.Username, c.Id_parent_categories, pc.Name, c.Created_at, c.Updated_at, c.Version
 		FROM categories c
 		INNER JOIN users u ON u.Id_users = c.Id_author
-		INNER JOIN categories pc ON pc.Id_categories = c.Id_parent_categories
+		INNER JOIN categories pc ON (c.Id_parent_categories IS NOT NULL AND pc.Id_categories = c.Id_parent_categories)
 		WHERE c.Id_categories = ?;`
 
 	var category Category

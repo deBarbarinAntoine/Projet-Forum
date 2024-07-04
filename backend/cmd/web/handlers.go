@@ -56,7 +56,7 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 
 	// fetching the category
 	v := validator.New()
-	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r), id, r.URL.Query(), v)
+	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1109,7 +1109,7 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving the category from the API
 	v := validator.New()
-	category, err := app.models.CategoryModel.GetByID(app.getToken(r), id, nil, v)
+	category, err := app.models.CategoryModel.GetByID(app.getToken(r), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return

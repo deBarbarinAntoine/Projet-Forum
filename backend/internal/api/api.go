@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 )
@@ -142,7 +143,7 @@ func (api *API) GetPEM(pemFilePath string, v *validator.Validator) ([]byte, erro
 func (api *API) Get(userToken, endpoint string, query url.Values) ([]byte, int, error) {
 
 	// building the url request
-	urlRequest := fmt.Sprintf("%s/v1%s", api.url, endpoint)
+	urlRequest := strings.TrimSpace(fmt.Sprintf("%s/v1%s", api.url, endpoint))
 
 	// creating the request
 	req, err := http.NewRequest(http.MethodGet, urlRequest, nil)
@@ -192,7 +193,7 @@ func (api *API) Request(userToken, method, endpoint string, body []byte, isEncry
 	}
 
 	// building the url request
-	urlRequest := fmt.Sprintf("%s/v1%s", api.url, endpoint)
+	urlRequest := strings.TrimSpace(fmt.Sprintf("%s/v1%s", api.url, endpoint))
 
 	// encrypting the body if necessary
 	if isEncrypted {
