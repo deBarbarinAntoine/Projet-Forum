@@ -240,7 +240,7 @@ func (m ThreadModel) GetByCategory(id int) ([]Thread, error) {
 	query := `
 		SELECT t.Id_threads, t.Title, t.Description, t.Is_public, t.Created_at, t.Updated_at, t.Id_author, u.Username, t.Status
 		FROM threads t
-		INNER JOIN forum.users u on t.Id_author = u.Id_users
+		INNER JOIN users u on t.Id_author = u.Id_users
 		WHERE t.Id_categories = ?;`
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

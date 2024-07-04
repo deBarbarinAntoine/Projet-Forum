@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type CategoryModel struct {
@@ -212,5 +213,5 @@ func (m *CategoryModel) GetByID(token string, id int, v *validator.Validator) (*
 		}
 	}
 
-	return category, fmt.Errorf(v.NonFieldErrors[0])
+	return category, fmt.Errorf(strings.Join(v.NonFieldErrors, ", "))
 }

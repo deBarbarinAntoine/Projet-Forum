@@ -140,6 +140,10 @@ func (app *application) getSingleCategoryHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("get category %d", form.ID))
+	app.logger.Debug(fmt.Sprintf("includes %+v", form.Includes))
+
 	form.Check(validator.Unique(form.Includes), "includes[]", "duplicate values")
 	for _, field := range form.Includes {
 		form.Check(validator.PermittedValue(field, form.PermittedFields...), "includes[]", fmt.Sprintf("incorrect value %s", field))
@@ -260,7 +264,7 @@ func (app *application) updateCategoryHandler(w http.ResponseWriter, r *http.Req
 		category.ParentCategory.ID = *input.ParentCategoryID
 	}
 
-	err = app.models.Categories.Update(&category)
+	err = app.models.Categories.Update(category)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrEditConflict):

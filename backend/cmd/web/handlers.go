@@ -57,7 +57,7 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 	// fetching the category
 	v := validator.New()
 	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
-	if err != nil {
+	if err != nil && err.Error() != "" { // FIXME!!!
 		app.serverError(w, r, err)
 		return
 	}
