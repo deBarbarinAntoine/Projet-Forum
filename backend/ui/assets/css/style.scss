@@ -315,7 +315,7 @@
         padding-top: 30px;
         margin-left: 5px;
         padding-left: 50px;
-        width: 100%;
+        width: calc(100% - 55px);
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
         font-family: Varela-Round;
@@ -378,25 +378,30 @@
                 display: flex;
                 align-items: center;
                 height: 51px;
-                width: 750px;
+                width: calc(100% - 65px);
                 border-radius: 5px;
                 margin-top: 20px;
                 padding-left: 10px;
                 .container-thread-text-liste {
                     display: flex;
                     justify-content: space-between;
-                    padding-left: 20px;
-                    padding-right: 20px;
-                    width: 750px;
+                    padding: 0 20px;
+                    width: calc(100% - 40px);
+                    gap: 20px;
                     h3 {
+                        flex: 0.7;
                         font-size: 15px;
                         font-weight: normal;
                     }
                     h5 {
+                        flex: 0.3;
                         font-size: 15px;
                         font-weight: normal;
                     }
                     p {
+                        width: 20%;
+                        text-align: right;
+                        min-width: max-content;
                         font-size: 15px;
                     }
                 }

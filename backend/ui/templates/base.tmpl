@@ -123,9 +123,10 @@
 
             <div id="list-of-categories-1" class="category-list">
                 {{range .CategoriesNavLeft}}
-                <div class="category">
+                <div class="category relative">
                     <img class="category-icon" src="/static/img/icons/tech-icon.svg">
                     <p class="category-text"> {{.Name}} </p>
+                    <a href="/category/{{.ID}}" class="category-link abs full on-top"></a>
                 </div>
                 {{end}}
             </div>
@@ -163,7 +164,7 @@
             <div class="all-tags">
                 {{range .PopularTags}}
                 <div class="tag">
-                    <a href="/tags/{{.ID}}" class="tag-link"> {{.Name}} </a>
+                    <a href="/tag/{{.ID}}" class="tag-link"> {{.Name}} </a>
                 </div>
                 {{end}}
             </div>

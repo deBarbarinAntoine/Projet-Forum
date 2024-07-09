@@ -8,12 +8,17 @@
     <img class="newfolder" src="/static/img/icons/newfolder-icon.svg">
     <div class="container-liste-thread">
          {{range .Category.Threads}}
-        <div class="container-thread borders borders-hover"> 
-            <img src="/static/img/icons/greenfolder.svg"> <!-- folder vert si ouvert, jaune si terminé et rouge si fermé -->
-            <div class="container-thread-text-liste">
-            <h3> {{.Title}} </h3>
-            <h5> {{.Author.Name}} </h5>
-            <p> {{humanDate .CreatedAt}} </p>
+        <div class="container-thread borders borders-hover">
+            {{if eq .Status "active"}} {{/* folder vert si ouvert, jaune si terminé et rouge si fermé -> green if active and red if archived (hidden doesn't appear normally...) */}}
+                <img src="/static/img/icons/greenfolder.svg">
+            {{else if eq .Status "archived"}}
+                <img src="/static/img/icons/redfolder-icon.svg">
+            {{end}}
+            <div class="container-thread-text-liste relative">
+                <h3> {{.Title}} </h3>
+                <h5> {{.Author.Name}} </h5>
+                <p> {{humanDate .CreatedAt}} </p>
+                <a href="/thread/{{.ID}}" class="thread-link abs full on-top"></a>
             </div>
         </div>
         {{end}}
