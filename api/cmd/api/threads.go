@@ -180,6 +180,14 @@ func (app *application) getSingleThreadHandler(w http.ResponseWriter, r *http.Re
 				return
 			}
 		}
+		err = app.models.Posts.GetReactions(thread.Posts)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("Posts: %+v", thread.Posts))
 	}
 	if slices.Contains(form.Includes, "tags") {
 		thread.Tags, err = app.models.Tags.GetByThread(thread.ID)

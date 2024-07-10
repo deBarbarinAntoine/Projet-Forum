@@ -28,10 +28,10 @@ type Thread struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
 	} `json:"category"`
-	Version    int    `json:"version,omitempty"`
-	Popularity int    `json:"popularity"`
-	Posts      []Post `json:"posts,omitempty"`
-	Tags       []Tag  `json:"tags,omitempty"`
+	Version    int     `json:"version,omitempty"`
+	Popularity int     `json:"popularity"`
+	Posts      []*Post `json:"posts,omitempty"`
+	Tags       []Tag   `json:"tags,omitempty"`
 }
 
 func (thread *Thread) Validate(v *validator.Validator) {

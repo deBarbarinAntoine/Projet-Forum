@@ -270,7 +270,7 @@ func (m PostModel) GetByAuthorID(id int) ([]Post, error) {
 	return posts, nil
 }
 
-func (m PostModel) GetByThread(id int) ([]Post, error) {
+func (m PostModel) GetByThread(id int) ([]*Post, error) {
 
 	query := `
 		SELECT p.Id_posts, p.Content, p.Created_at, p.Updated_at, p.Id_author, u.Username, u.Avatar_path, p.Version
@@ -293,7 +293,7 @@ func (m PostModel) GetByThread(id int) ([]Post, error) {
 	}
 	defer rows.Close()
 
-	var posts []Post
+	var posts []*Post
 
 	for rows.Next() {
 		var post Post
@@ -308,7 +308,7 @@ func (m PostModel) GetByThread(id int) ([]Post, error) {
 			&post.Version); err != nil {
 			log.Fatal(err)
 		}
-		posts = append(posts, post)
+		posts = append(posts, &post)
 	}
 
 	err = rows.Close()
@@ -415,7 +415,7 @@ func (m PostModel) GetReactions(posts []*Post) error {
 	GROUP BY p.Id_posts, e.Emoji
 	ORDER BY p.Id_posts, e.Emoji;`
 
-	var IDs []int
+	var IDs []any
 
 	for _, post := range posts {
 		IDs = append(IDs, post.ID)
@@ -431,7 +431,7 @@ func (m PostModel) GetReactions(posts []*Post) error {
 	defer stmt.Close()
 
 	results := make(map[int]map[string]int)
-	rows, err := stmt.QueryContext(ctx, IDs)
+	rows, err := stmt.QueryContext(ctx, IDs...)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):

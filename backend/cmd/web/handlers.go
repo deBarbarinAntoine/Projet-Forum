@@ -109,6 +109,9 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("Thread: %+v", tmplData.Thread))
+
 	// setting the page's title
 	tmplData.Title = fmt.Sprintf("Threadive - %s", tmplData.Thread.Title)
 

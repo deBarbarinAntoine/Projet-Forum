@@ -190,7 +190,7 @@ func newTagForm() *tagForm {
 func newReactToPostForm() *reactToPostForm {
 	return &reactToPostForm{
 		Validator:        *validator.New(),
-		AllowedReactions: []string{"emoji-neutral-icon.svg", "emoji-rigole2-icon.svg", "emoji-applause-icon.svg", "emoji-coeur-icon.svg"},
+		AllowedReactions: []string{"neutral", "laughing", "applause", "heart"},
 	}
 }
 

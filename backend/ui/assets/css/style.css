@@ -1188,9 +1188,30 @@ textarea.description {
   cursor: pointer;
   opacity: 1;
 }
-.container-inthread .container-post .third-line .emoji {
-  width: 24px;
+.container-inthread .container-post .third-line .emoji-ctn {
+  position: relative;
+  display: flex;
   height: 24px;
+  width: 65px;
+}
+.container-inthread .container-post .third-line .emoji-ctn .emoji {
+  height: 100%;
+  aspect-ratio: 1;
+  z-index: 10;
+}
+.container-inthread .container-post .third-line .emoji-ctn .reactions-nb {
+  position: absolute;
+  right: 12px;
+  top: 4px;
+  bottom: 4px;
+  width: 35px;
+  padding: 0 5px;
+  border-radius: 0 5px 5px 0;
+  background-color: rgba(216, 216, 216, 0.7);
+  text-align: right;
+  color: rgb(152, 152, 152);
+  font-size: 13px;
+  font-family: Varela-Round, sans-serif;
 }
 .container-inthread form.container-response {
   display: flex;
