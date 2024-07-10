@@ -45,6 +45,7 @@ var Overlay = overlayEnum{
 }
 
 type templateData struct {
+	Title             string
 	Overlay           string
 	CurrentYear       int
 	Message           string

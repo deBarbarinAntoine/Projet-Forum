@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"slices"
@@ -15,8 +16,8 @@ const (
 )
 
 type Validator struct {
-	NonFieldErrors []string
-	FieldErrors    map[string]string
+	NonFieldErrors []string          `json:"non_field_errors"`
+	FieldErrors    map[string]string `json:"field_errors"`
 }
 
 var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
@@ -39,6 +40,14 @@ func (v *Validator) AddFieldError(key, message string) {
 	if _, exists := v.FieldErrors[key]; !exists {
 		v.FieldErrors[key] = message
 	}
+}
+
+func (v *Validator) Errors() []byte {
+	errors, err := json.Marshal(v)
+	if err != nil {
+		panic(err) // FIXME -> maybe change that to handle errors better if necessary
+	}
+	return errors
 }
 
 func (v *Validator) Check(ok bool, key, message string) {

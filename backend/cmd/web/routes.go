@@ -89,5 +89,27 @@ func (app *application) routes() http.Handler {
 	router.HandleFunc("/post/:id/update", app.updatePostPut, http.MethodPut)         // category update treatment route
 	router.HandleFunc("/tag/:id/update", app.updateTagPut, http.MethodPut)           // thread update treatment route
 
+	/* #############################################################################
+	/*	AJAX endpoints
+	/* #############################################################################*/
+
+	// Post reactions
+	router.HandleFunc("/posts/:id/react", app.reactToPost, http.MethodPost)
+	router.HandleFunc("/posts/:id/react", app.changeReactionPost, http.MethodPatch)
+	router.HandleFunc("/posts/:id/react", app.removeReactionPost, http.MethodDelete)
+
+	// Tag follow
+	router.HandleFunc("/tags/:id/follow", app.followTag, http.MethodPost)
+	router.HandleFunc("/tags/:id/follow", app.unfollowTag, http.MethodDelete)
+
+	// Thread favorite
+	router.HandleFunc("/threads/:id/favorite", app.addToFavoritesThread, http.MethodPost)
+	router.HandleFunc("/threads/:id/favorite", app.removeFromFavoritesThread, http.MethodDelete)
+
+	// Friends
+	router.HandleFunc("/users/:id/friend", app.friendRequest, http.MethodPost)
+	router.HandleFunc("/users/:id/friend", app.friendResponse, http.MethodPut)
+	router.HandleFunc("/users/:id/friend", app.friendDelete, http.MethodDelete)
+
 	return router
 }

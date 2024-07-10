@@ -169,9 +169,6 @@ func (m *CategoryModel) Get(token string, query url.Values, v *validator.Validat
 
 func (m *CategoryModel) GetByID(token string, id int, v *validator.Validator) (*Category, error) {
 
-	// DEBUG
-	fmt.Printf("id: %d\n", id)
-
 	// building the endpoint's specific URL
 	endpoint := fmt.Sprintf("%s/%d\n", m.endpoint, id)
 
@@ -180,17 +177,11 @@ func (m *CategoryModel) GetByID(token string, id int, v *validator.Validator) (*
 		"includes[]": {"categories", "threads"},
 	}
 
-	// DEBUG
-	fmt.Printf("endpoint: %s\n", endpoint)
-
 	// making the request
 	res, status, err := m.api().Get(token, endpoint, query)
 	if err != nil {
 		return nil, err
 	}
-
-	// DEBUG
-	fmt.Printf("API status response: %d\n", status)
 
 	// checking for errors
 	err = api.GetErr(status, res, v)
@@ -211,7 +202,9 @@ func (m *CategoryModel) GetByID(token string, id int, v *validator.Validator) (*
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		err = fmt.Errorf(strings.Join(v.NonFieldErrors, ", "))
 	}
 
-	return category, fmt.Errorf(strings.Join(v.NonFieldErrors, ", "))
+	return category, err
 }

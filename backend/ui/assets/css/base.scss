@@ -488,7 +488,7 @@ header {
             align-items: center;
             gap: 12px;
             padding-left: 30px;
-            font-family: Varela-Round;
+            font-family: Varela-Round, sans-serif;
             transition: .3s;
 
             .footer-icon {
@@ -509,7 +509,7 @@ header {
             font-size: 9px;
             opacity: 0.5;
             margin-bottom: 10px;
-            font-family: Varela-Round;
+            font-family: Varela-Round, sans-serif;
         }
     }
 }

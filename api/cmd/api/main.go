@@ -66,6 +66,7 @@ type application struct {
 }
 
 func main() {
+	// Creating the config struct and retreiving the flags
 	var cfg config
 
 	flag.Int64Var(&cfg.port, "port", 4000, "API server port")
@@ -96,12 +97,16 @@ func main() {
 
 	displayVersion := flag.Bool("version", false, "Display version and exit")
 
+	// parsing the flags
 	flag.Parse()
 
+	// displaying the version and exit (if flag version found)
 	if *displayVersion {
 		fmt.Printf("Threadive API current version:\t%s\n", version)
 		os.Exit(0)
 	}
+
+	// checking the SMTP info & retreive info from .env file if OS => Windows
 	if cfg.smtp.username == "" || cfg.smtp.password == "" || cfg.smtp.host == "" {
 		if runtime.GOOS == "windows" {
 			err := cfg.loadEnv()
@@ -115,8 +120,15 @@ func main() {
 		}
 	}
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.Level(-4)}))
+	// creating the logger with level corresponding to the environment (development|staging|production)
+	var logger *slog.Logger
+	if cfg.env == "development" {
+		logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	} else {
+		logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	}
 
+	// opening the database connection pool
 	db, err := openDB(cfg)
 	if err != nil {
 		logger.Error(err.Error())
@@ -136,6 +148,7 @@ func main() {
 		return time.Now().Unix()
 	}))
 
+	// creating the application
 	app := &application{
 		config:      cfg,
 		logger:      logger,
@@ -157,6 +170,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Running the server
 	err = app.serve()
 	if err != nil {
 		logger.Error(err.Error())

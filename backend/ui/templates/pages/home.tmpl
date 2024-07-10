@@ -12,10 +12,11 @@
         <div class="container-hottopic borders borders-hover">
             {{/* folder vert si ouvert, jaune si terminé et rouge si fermé */}}
             <img src="/static/img/icons/greenfolder.svg">
-            <div class="container-thread-text">
+            <div class="container-thread-text relative">
                 <h3> {{.Title}} </h3>
                 <h5> {{.Author.Name}} </h5>
                 <p> {{humanDate .CreatedAt}} </p>
+                <a href="/thread/{{.ID}}" class="thread-link abs full on-top"></a>
             </div>
         </div>
         {{ end }}
@@ -26,9 +27,10 @@
         <div class="container-category">
             {{/* Categories qui vont être affichés sur l'accueil du site */}}
             {{range .CategoryList.List}}
-            <div class="rectangle-category borders borders-hover">
+            <div class="rectangle-category borders borders-hover relative">
                 <img src="/static/img/icons/tech-icon.svg">
                 <h5> {{.Name}} </h5>
+                <a href="/category/{{.ID}}" class="category-link abs full on-top"></a>
             </div>
             {{end}}
             {{/* fin des categories */}}
@@ -42,11 +44,12 @@
             {{range .User.FavoriteThreads}}
             <div class="container-hottopic borders borders-hover">
                 <img src="/static/img/icons/greenfolder.svg">
-                <div class="container-thread-text">
+                <div class="container-thread-text relative">
                     <a href="/thread/{{.ID}}" class="thread-link"></a>
                     <h3> {{.Title}} </h3>
                     <h5>  </h5> {{/* auteur */}}
                     <p> 09:27:56</p> {{/* date de création */}}
+                    <a href="/thread/{{.ID}}" class="thread-link abs full on-top"></a>
                 </div>
             </div>
             {{end}}
@@ -57,8 +60,9 @@
             <div class="container-favtag">
 
                 {{range .User.FollowingTags}}
-                <div class="favtag borders borders-hover">
+                <div class="favtag borders borders-hover relative">
                     <h5> {{.Name}} </h5>
+                    <a href="/tag/{{.ID}}" class="tag-link abs full on-top"></a>
                 </div>
                 {{end}}
 

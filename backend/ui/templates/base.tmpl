@@ -8,7 +8,7 @@
     <meta name="keywords" content="HTML, CSS, JavaScript, Golang, Programming, Linux, Dev, Hardware, Software, Forum, C++, Java, SCSS, C#, Ynov, Rust, Lua, CPP, Go, PHP, MySQL, PostGreSQL, Electronique, Cyber, Godot, Unreal, Security, API, Computer, SBC, Server, Token, Authentification, Console, Terminal, Bash, Powershell, Ubuntu, Error, Help, Tips, Tuto, Tutos">
     <meta name="author" content="Antoine de Barbarin, Marin Harel, Roméo Sanchez">
 
-    <title> Threadive </title>
+    <title> {{.Title}} </title>
 
     <link rel="icon" type="image/png" href="/static/img/logo/logo_icon.png">
     <link rel="stylesheet" href="/static/css/style.css">
@@ -123,29 +123,32 @@
 
             <div id="list-of-categories-1" class="category-list">
                 {{range .CategoriesNavLeft}}
-                <div class="category relative">
-                    <img class="category-icon" src="/static/img/icons/tech-icon.svg">
-                    <p class="category-text"> {{.Name}} </p>
-                    <a href="/category/{{.ID}}" class="category-link abs full on-top"></a>
-                </div>
+                    <div class="category relative">
+                        <img class="category-icon" src="/static/img/icons/tech-icon.svg">
+                        <p class="category-text"> {{.Name}} </p>
+                        <a href="/category/{{.ID}}" class="category-link abs full on-top"></a>
+                    </div>
                 {{end}}
             </div>
         </div>
 
         <div class="footer borders">
-            <div class="footer-link">
+            <div class="footer-link relative">
                 <img class="footer-icon" src="/static/img/icons/legal-notice-icon.svg">
                 <p class="footer-text"> Legal Notice </p>
+                <a href="/about#legal-notice" class="link abs full on-top"></a>
             </div>
 
-            <div class="footer-link">
+            <div class="footer-link relative">
                 <img class="footer-icon" src="/static/img/icons/privacy-policy-icon.svg">
                 <p class="footer-text"> Privacy Policy </p>
+                <a href="/about#privacy-policy" class="link abs full on-top"></a>
             </div>
 
-            <div class="footer-link">
+            <div class="footer-link relative">
                 <img class="footer-icon" src="/static/img/icons/rules-icon.svg">
                 <p class="footer-text"> Rules </p>
+                <a href="/about#rules" class="link abs full on-top"></a>
             </div>
 
             <p class="rights"> Threadive, inc © {{.CurrentYear}} - All rights reserved. </p>
@@ -163,9 +166,9 @@
             <p class="nav-right-title"> Popular tags </p>
             <div class="all-tags">
                 {{range .PopularTags}}
-                <div class="tag">
-                    <a href="/tag/{{.ID}}" class="tag-link"> {{.Name}} </a>
-                </div>
+                    <div class="tag">
+                        <a href="/tag/{{.ID}}" class="tag-link"> {{.Name}} </a>
+                    </div>
                 {{end}}
             </div>
         </div>
@@ -182,7 +185,7 @@
         <!--########## FLASH ##########-->
 
         {{with .Flash}}
-        <div class="flash borders">{{.}}</div>
+            <div class="flash borders">{{.}}</div>
         {{end}}
 
 

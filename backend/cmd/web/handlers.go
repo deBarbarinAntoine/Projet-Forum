@@ -19,6 +19,7 @@ func (app *application) notFound(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Not Found"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "error.tmpl", tmplData)
@@ -28,6 +29,7 @@ func (app *application) index(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, true, Overlay.Default)
+	tmplData.Title = "Threadive - Home"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
@@ -37,6 +39,7 @@ func (app *application) about(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - About"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "policies.tmpl", tmplData)
@@ -57,7 +60,7 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 	// fetching the category
 	v := validator.New()
 	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
-	if err != nil && err.Error() != "" { // FIXME!!!
+	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
@@ -67,6 +70,9 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
+
+	// setting the page's title
+	tmplData.Title = fmt.Sprintf("Threadive - %s", tmplData.Category.Name)
 
 	// render the template
 	app.render(w, r, http.StatusOK, "category.tmpl", tmplData)
@@ -103,6 +109,9 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// setting the page's title
+	tmplData.Title = fmt.Sprintf("Threadive - %s", tmplData.Thread.Title)
+
 	// render the template
 	app.render(w, r, http.StatusOK, "thread.tmpl", tmplData)
 }
@@ -133,6 +142,9 @@ func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// setting the page's title
+	tmplData.Title = fmt.Sprintf("Threadive - %s", tmplData.Tag.Name)
+
 	// render the template
 	app.render(w, r, http.StatusOK, "tag.tmpl", tmplData)
 }
@@ -141,6 +153,7 @@ func (app *application) TagsGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Tags"
 
 	// fetching the tags
 	v := validator.New()
@@ -165,6 +178,7 @@ func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Categories"
 
 	// fetching the categories
 	v := validator.New()
@@ -189,6 +203,7 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Search"
 
 	// fetching the categories
 	v := validator.New()
@@ -231,6 +246,7 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Register)
+	tmplData.Title = "Threadive - Register"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
@@ -311,6 +327,7 @@ func (app *application) confirm(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Confirm"
 
 	// retrieving the activation token from the URL
 	tmplData.ActivationToken = flow.Param(r.Context(), "token")
@@ -380,6 +397,7 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Login)
+	tmplData.Title = "Threadive - Login"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
@@ -468,6 +486,7 @@ func (app *application) forgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.ForgotPassword)
+	tmplData.Title = "Threadive - Forgot password"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
@@ -534,6 +553,7 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.ResetPassword)
+	tmplData.Title = "Threadive - Reset password"
 
 	// retrieving the reset token from the URL
 	tmplData.ResetToken = flow.Param(r.Context(), "token")
@@ -615,6 +635,7 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, true, Overlay.Default)
+	tmplData.Title = "Threadive - Dashboard"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "dashboard.tmpl", tmplData)
@@ -638,6 +659,7 @@ func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Update user"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "user-update.tmpl", tmplData)
@@ -739,6 +761,7 @@ func (app *application) createCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Create category"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "category-create.tmpl", tmplData)
@@ -812,6 +835,7 @@ func (app *application) createThread(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Create thread"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "thread-create.tmpl", tmplData)
@@ -898,6 +922,7 @@ func (app *application) createPost(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Create Post"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "post-create.tmpl", tmplData)
@@ -981,6 +1006,7 @@ func (app *application) createTag(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Create tag"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "tag-create.tmpl", tmplData)
@@ -1050,6 +1076,7 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Update post"
 
 	// retrieving the post id from the path
 	id, err := getPathID(r)
@@ -1077,6 +1104,7 @@ func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Update tag"
 
 	// retrieving the tag id from the path
 	id, err := getPathID(r)
@@ -1107,6 +1135,7 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Update category"
 
 	// retrieving the category id from the path
 	id, err := getPathID(r)
@@ -1134,6 +1163,7 @@ func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Update thread"
 
 	// retrieving the thread id from the path
 	id, err := getPathID(r)
@@ -1449,4 +1479,508 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 
 	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("Tag %s updated successfully!", tag.Name))
 	http.Redirect(w, r, fmt.Sprintf("/tag/%d", tag.ID), http.StatusSeeOther)
+}
+
+/* #############################################################################
+/*	AJAX HANDLERS
+/* #############################################################################*/
+
+func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) changeReactionPost(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) removeReactionPost(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) followTag(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) unfollowTag(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) addToFavoritesThread(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) removeFromFavoritesThread(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) friendRequest(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) friendResponse(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
+func (app *application) friendDelete(w http.ResponseWriter, r *http.Request) {
+
+	// getting the id from the path
+	id, err := getPathID(r)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("id: %d", id))
+
+	// sending the request to the API
+	v := validator.New()
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// setting the header for json response
+	w.Header().Set("Content-Type", "application/json")
+
+	// looking for errors from the API
+	if !v.Valid() {
+
+		// sending the errors
+		_, err = w.Write(v.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
+	// setting the response
+	message := map[string]string{
+		"message": fmt.Sprintf("user %d successfully added to friends", id),
+	}
+	response, err := json.Marshal(message)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
 }
