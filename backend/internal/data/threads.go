@@ -194,7 +194,7 @@ func (m *ThreadModel) GetByID(token string, id int, query url.Values, v *validat
 	return thread, nil
 }
 
-func (m *TagModel) AddToFavorite(token string, id int, v *validator.Validator) error {
+func (m *ThreadModel) AddToFavorite(token string, id int, v *validator.Validator) error {
 
 	// building the endpoint's specific URL
 	endpoint := fmt.Sprintf("%s/%d/favorite", m.endpoint, id)
@@ -214,7 +214,7 @@ func (m *TagModel) AddToFavorite(token string, id int, v *validator.Validator) e
 	return nil
 }
 
-func (m *TagModel) RemoveFromFavorite(token string, id int, v *validator.Validator) error {
+func (m *ThreadModel) RemoveFromFavorite(token string, id int, v *validator.Validator) error {
 
 	// building the endpoint's specific URL
 	endpoint := fmt.Sprintf("%s/%d/favorite", m.endpoint, id)

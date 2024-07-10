@@ -187,6 +187,20 @@ func newTagForm() *tagForm {
 	}
 }
 
+func newReactToPostForm() *reactToPostForm {
+	return &reactToPostForm{
+		Validator:        *validator.New(),
+		AllowedReactions: []string{"emoji-neutral-icon.svg", "emoji-rigole2-icon.svg", "emoji-applause-icon.svg", "emoji-coeur-icon.svg"},
+	}
+}
+
+func newFriendResponseForm() *friendResponseForm {
+	return &friendResponseForm{
+		Validator:      *validator.New(),
+		FriendStatuses: []string{"pending", "accepted", "rejected"},
+	}
+}
+
 func (app *application) newTemplateData(r *http.Request, allUser bool, overlay string) templateData {
 
 	// checking is the user is authenticated

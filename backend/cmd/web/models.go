@@ -153,3 +153,15 @@ type tagForm struct {
 	RemoveThreads       []int   `form:"remove_threads,omitempty"`
 	validator.Validator `form:"-"`
 }
+
+type reactToPostForm struct {
+	Reaction            string   `form:"reaction"`
+	AllowedReactions    []string `form:"-"`
+	validator.Validator `form:"-"`
+}
+
+type friendResponseForm struct {
+	Status              string   `form:"status"`
+	FriendStatuses      []string `form:"-"`
+	validator.Validator `form:"-"`
+}

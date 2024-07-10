@@ -439,7 +439,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   align-items: center;
   gap: 12px;
   padding-left: 30px;
-  font-family: Varela-Round;
+  font-family: Varela-Round, sans-serif;
   transition: 0.3s;
 }
 .nav-left .footer .footer-link .footer-icon {
@@ -456,7 +456,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   font-size: 9px;
   opacity: 0.5;
   margin-bottom: 10px;
-  font-family: Varela-Round;
+  font-family: Varela-Round, sans-serif;
 }
 
 .nav-right {

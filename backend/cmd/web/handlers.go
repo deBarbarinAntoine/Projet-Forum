@@ -1494,12 +1494,36 @@ func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// getting the reaction from the form
+	form := newReactToPostForm()
+	err = app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// checking the values
+	form.Check(form.Reaction != "", "reaction", "must be provided")
+	form.Check(validator.PermittedValue(form.Reaction, form.AllowedReactions...), "reaction", "must be a permitted value")
+
+	// looking for possible errors
+	if !form.Valid() {
+
+		// sending the errors
+		_, err = w.Write(form.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
 	// DEBUG
-	app.logger.Debug(fmt.Sprintf("id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Post id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Reaction: %s", form.Reaction))
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.PostModel.React(app.getToken(r, authTokenSessionManager), form.Reaction, id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1521,7 +1545,7 @@ func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("reaction %s successfully added to post %d", form.Reaction, id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1544,12 +1568,36 @@ func (app *application) changeReactionPost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// getting the reaction from the form
+	form := newReactToPostForm()
+	err = app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// checking the values
+	form.Check(form.Reaction != "", "reaction", "must be provided")
+	form.Check(validator.PermittedValue(form.Reaction, form.AllowedReactions...), "reaction", "must be a permitted value")
+
+	// looking for possible errors
+	if !form.Valid() {
+
+		// sending the errors
+		_, err = w.Write(form.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
 	// DEBUG
-	app.logger.Debug(fmt.Sprintf("id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Post id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Reaction: %s", form.Reaction))
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.PostModel.UpdateReaction(app.getToken(r, authTokenSessionManager), form.Reaction, id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1571,7 +1619,7 @@ func (app *application) changeReactionPost(w http.ResponseWriter, r *http.Reques
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("reaction %s successfully updated on post %d", form.Reaction, id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1595,11 +1643,11 @@ func (app *application) removeReactionPost(w http.ResponseWriter, r *http.Reques
 	}
 
 	// DEBUG
-	app.logger.Debug(fmt.Sprintf("id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Post id: %d", id))
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.PostModel.DeleteReaction(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1621,7 +1669,7 @@ func (app *application) removeReactionPost(w http.ResponseWriter, r *http.Reques
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("reaction successfully deleted from post %d", id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1645,11 +1693,11 @@ func (app *application) followTag(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// DEBUG
-	app.logger.Debug(fmt.Sprintf("id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Tag id: %d", id))
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.TagModel.Follow(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1671,7 +1719,7 @@ func (app *application) followTag(w http.ResponseWriter, r *http.Request) {
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("tag %d successfully added to followed tags", id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1699,7 +1747,7 @@ func (app *application) unfollowTag(w http.ResponseWriter, r *http.Request) {
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.TagModel.Unfollow(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1721,7 +1769,7 @@ func (app *application) unfollowTag(w http.ResponseWriter, r *http.Request) {
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("tag %d successfully removed from followed tags", id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1745,11 +1793,11 @@ func (app *application) addToFavoritesThread(w http.ResponseWriter, r *http.Requ
 	}
 
 	// DEBUG
-	app.logger.Debug(fmt.Sprintf("id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Thread id: %d", id))
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.ThreadModel.AddToFavorite(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1771,7 +1819,7 @@ func (app *application) addToFavoritesThread(w http.ResponseWriter, r *http.Requ
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("thread %d successfully added to favorites", id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1799,7 +1847,7 @@ func (app *application) removeFromFavoritesThread(w http.ResponseWriter, r *http
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.ThreadModel.RemoveFromFavorite(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1821,7 +1869,7 @@ func (app *application) removeFromFavoritesThread(w http.ResponseWriter, r *http
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("thread %d successfully removed from favorites", id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1845,11 +1893,11 @@ func (app *application) friendRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// DEBUG
-	app.logger.Debug(fmt.Sprintf("id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Friend id: %d", id))
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1894,12 +1942,43 @@ func (app *application) friendResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// getting the reaction from the form
+	form := newFriendResponseForm()
+	err = app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// checking the values
+	form.Check(form.Status != "", "status", "must be provided")
+	form.Check(validator.PermittedValue(form.Status, form.FriendStatuses...), "status", "must be a permitted value")
+
+	// looking for possible errors
+	if !form.Valid() {
+
+		// sending the errors
+		_, err = w.Write(form.Errors())
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+	}
+
 	// DEBUG
-	app.logger.Debug(fmt.Sprintf("id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Friend id: %d", id))
+	app.logger.Debug(fmt.Sprintf("Status: %s", form.Status))
+
+	// creating the body of the request
+	body, err := json.Marshal(form)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.UserModel.FriendResponse(app.getToken(r, authTokenSessionManager), id, body, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1921,7 +2000,7 @@ func (app *application) friendResponse(w http.ResponseWriter, r *http.Request) {
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("successfully answered to user %d's friend request with status %s", id, form.Status),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
@@ -1949,7 +2028,7 @@ func (app *application) friendDelete(w http.ResponseWriter, r *http.Request) {
 
 	// sending the request to the API
 	v := validator.New()
-	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v) // FIXME -> change the function called according to the handler
+	err = app.models.UserModel.FriendDelete(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -1971,7 +2050,7 @@ func (app *application) friendDelete(w http.ResponseWriter, r *http.Request) {
 
 	// setting the response
 	message := map[string]string{
-		"message": fmt.Sprintf("user %d successfully added to friends", id),
+		"message": fmt.Sprintf("user %d successfully removed from friends", id),
 	}
 	response, err := json.Marshal(message)
 	if err != nil {
