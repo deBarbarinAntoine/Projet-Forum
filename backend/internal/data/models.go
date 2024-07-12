@@ -73,31 +73,26 @@ type Token struct {
 }
 
 type User struct {
-	ID            int       `json:"id"`
-	CreatedAt     time.Time `json:"created_at"`
-	Name          string    `json:"name"`
-	Email         string    `json:"email"`
-	Password      string    `json:"-"`
-	Role          string    `json:"role"`
-	BirthDate     time.Time `json:"birth_date"`
-	Bio           string    `json:"bio,omitempty"`
-	Signature     string    `json:"signature,omitempty"`
-	Avatar        string    `json:"avatar,omitempty"`
-	Status        string    `json:"status"`
-	Version       int       `json:"-"`
-	FollowingTags []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"following_tags,omitempty"`
-	FavoriteThreads []struct {
-		ID    int    `json:"id"`
-		Title string `json:"title"`
-	} `json:"favorite_threads,omitempty"`
-	CategoriesOwned []Category `json:"categories_owned,omitempty"`
-	TagsOwned       []Tag      `json:"tags_owned,omitempty"`
-	ThreadsOwned    []Thread   `json:"threads_owned,omitempty"`
-	Posts           []Post     `json:"posts,omitempty"`
-	Friends         []Friend   `json:"friends,omitempty"`
+	ID              int            `json:"id"`
+	CreatedAt       time.Time      `json:"created_at"`
+	Name            string         `json:"name"`
+	Email           string         `json:"email"`
+	Password        string         `json:"-"`
+	Role            string         `json:"role"`
+	BirthDate       time.Time      `json:"birth_date"`
+	Bio             string         `json:"bio,omitempty"`
+	Signature       string         `json:"signature,omitempty"`
+	Avatar          string         `json:"avatar,omitempty"`
+	Status          string         `json:"status"`
+	Version         int            `json:"-"`
+	FollowingTags   []Tag          `json:"following_tags,omitempty"`
+	FavoriteThreads []Thread       `json:"favorite_threads,omitempty"`
+	Reactions       map[int]string `json:"reactions,omitempty"`
+	CategoriesOwned []Category     `json:"categories_owned,omitempty"`
+	TagsOwned       []Tag          `json:"tags_owned,omitempty"`
+	ThreadsOwned    []Thread       `json:"threads_owned,omitempty"`
+	Posts           []Post         `json:"posts,omitempty"`
+	Friends         []Friend       `json:"friends,omitempty"`
 	Invitations     struct {
 		Received []Friend `json:"received,omitempty"`
 		Sent     []Friend `json:"sent,omitempty"`
@@ -165,17 +160,14 @@ type Thread struct {
 }
 
 type Post struct {
-	ID           int       `json:"id"`
-	Content      string    `json:"content"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	Author       User      `json:"author"`
-	IDParentPost int       `json:"id_parent_post,omitempty"`
-	Thread       struct {
-		ID    int    `json:"id"`
-		Title string `json:"title"`
-	} `json:"thread"`
-	Reactions  map[string]int `json:"reactions,omitempty"`
-	Popularity int            `json:"popularity,omitempty"`
-	Version    int            `json:"version,omitempty"`
+	ID           int            `json:"id"`
+	Content      string         `json:"content"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	Author       User           `json:"author"`
+	IDParentPost int            `json:"id_parent_post,omitempty"`
+	Thread       Thread         `json:"thread"`
+	Reactions    map[string]int `json:"reactions,omitempty"`
+	Popularity   int            `json:"popularity,omitempty"`
+	Version      int            `json:"version,omitempty"`
 }

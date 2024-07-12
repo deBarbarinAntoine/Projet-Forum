@@ -94,7 +94,7 @@ func (m *TokenModel) Refresh(token string, tokens *Tokens, v *validator.Validato
 func (m *TokenModel) Logout(token string, v *validator.Validator) error {
 
 	// building the endpoint's specific URL
-	endpoint := fmt.Sprintf("%s/revoke", m.endpoint)
+	endpoint := fmt.Sprintf("%s/revoke/me", m.endpoint)
 
 	// making the request
 	res, status, err := m.api().Request(token, http.MethodPost, endpoint, nil, false)

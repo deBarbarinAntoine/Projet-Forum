@@ -8,23 +8,21 @@ import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
 	"log"
+	"strings"
 	"time"
 )
 
 type Post struct {
-	ID           int       `json:"id"`
-	Content      string    `json:"content"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	Author       User      `json:"author"`
-	IDParentPost int       `json:"id_parent_post,omitempty"`
-	Thread       struct {
-		ID    int    `json:"id"`
-		Title string `json:"title"`
-	} `json:"thread"`
-	Reactions  map[string]int `json:"reactions,omitempty"`
-	Popularity int            `json:"popularity,omitempty"`
-	Version    int            `json:"version,omitempty"`
+	ID           int            `json:"id"`
+	Content      string         `json:"content"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	Author       User           `json:"author"`
+	IDParentPost int            `json:"id_parent_post,omitempty"`
+	Thread       Thread         `json:"thread"`
+	Reactions    map[string]int `json:"reactions,omitempty"`
+	Popularity   int            `json:"popularity,omitempty"`
+	Version      int            `json:"version,omitempty"`
 }
 
 func (post *Post) Validate(v *validator.Validator) {
@@ -403,7 +401,10 @@ func (m PostModel) Delete(id int) error {
 
 func (m PostModel) GetReactions(posts []*Post) error {
 
-	query := `
+	placeholder := strings.Repeat("?, ", len(posts))
+	placeholder = strings.TrimSuffix(placeholder, ", ")
+
+	query := fmt.Sprintf(`
 	SELECT p.Id_posts, e.Emoji, COUNT(*) AS Count
 	FROM posts_users pu
 	INNER JOIN posts p ON pu.Id_posts = p.Id_posts
@@ -411,9 +412,9 @@ func (m PostModel) GetReactions(posts []*Post) error {
 		SELECT DISTINCT Emoji
 		FROM posts_users
 	) AS e ON pu.Emoji = e.Emoji
-	WHERE p.Id_posts IN (?)
+	WHERE p.Id_posts IN (%s)
 	GROUP BY p.Id_posts, e.Emoji
-	ORDER BY p.Id_posts, e.Emoji;`
+	ORDER BY p.Id_posts, e.Emoji;`, placeholder)
 
 	var IDs []any
 
@@ -463,6 +464,52 @@ func (m PostModel) GetReactions(posts []*Post) error {
 		for _, i := range results[post.ID] {
 			post.Popularity += i
 		}
+	}
+
+	return nil
+}
+
+func (m PostModel) GetReactionsByUser(user *User) error {
+
+	query := `
+	SELECT pu.Id_posts, pu.Emoji
+	FROM posts_users pu
+	INNER JOIN users u ON pu.Id_users = u.Id_users
+	WHERE pu.Id_users = ?;`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	if user.Reactions == nil {
+		user.Reactions = make(map[int]string)
+	}
+
+	rows, err := stmt.QueryContext(ctx, user.ID)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var postID int
+		var emoji string
+		err := rows.Scan(&postID, &emoji)
+		if err != nil {
+			return err
+		}
+
+		user.Reactions[postID] = emoji
 	}
 
 	return nil

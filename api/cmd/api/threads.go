@@ -165,6 +165,10 @@ func (app *application) getSingleThreadHandler(w http.ResponseWriter, r *http.Re
 			app.notFoundResponse(w, r)
 			return
 		}
+
+		// DEBUG
+		app.logger.Debug("app.models.Threads.GetByID(form.ID)")
+
 		app.serverErrorResponse(w, r, err)
 		return
 	}
@@ -176,12 +180,20 @@ func (app *application) getSingleThreadHandler(w http.ResponseWriter, r *http.Re
 			case errors.Is(err, data.ErrRecordNotFound):
 				break
 			default:
+
+				// DEBUG
+				app.logger.Debug("app.models.Posts.GetByThread(thread.ID)")
+
 				app.serverErrorResponse(w, r, err)
 				return
 			}
 		}
 		err = app.models.Posts.GetReactions(thread.Posts)
 		if err != nil {
+
+			// DEBUG
+			app.logger.Debug("app.models.Posts.GetReactions(thread.Posts)")
+
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -196,6 +208,10 @@ func (app *application) getSingleThreadHandler(w http.ResponseWriter, r *http.Re
 			case errors.Is(err, data.ErrRecordNotFound):
 				break
 			default:
+
+				// DEBUG
+				app.logger.Debug("app.models.Tags.GetByThread(thread.ID)")
+
 				app.serverErrorResponse(w, r, err)
 				return
 			}
@@ -204,6 +220,10 @@ func (app *application) getSingleThreadHandler(w http.ResponseWriter, r *http.Re
 	if slices.Contains(form.Includes, "popularity") {
 		thread.Popularity, err = app.models.Threads.GetPopularity(thread.ID)
 		if err != nil {
+
+			// DEBUG
+			app.logger.Debug("app.models.Threads.GetPopularity(thread.ID)")
+
 			app.serverErrorResponse(w, r, err)
 			return
 		}

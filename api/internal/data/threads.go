@@ -382,10 +382,7 @@ func (m ThreadModel) GetOwnedThreadsByUserID(id int) ([]Thread, error) {
 	return threadsOwned, nil
 }
 
-func (m ThreadModel) GetFavoriteThreadsByUserID(id int) ([]struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-}, error) {
+func (m ThreadModel) GetFavoriteThreadsByUserID(id int) ([]Thread, error) {
 
 	query := `
 		SELECT tu.Id_threads, t.Title
@@ -408,16 +405,10 @@ func (m ThreadModel) GetFavoriteThreadsByUserID(id int) ([]struct {
 	}
 	defer rows.Close()
 
-	var favoriteThreads []struct {
-		ID    int    `json:"id"`
-		Title string `json:"title"`
-	}
+	var favoriteThreads []Thread
 
 	for rows.Next() {
-		var favoriteThread struct {
-			ID    int    `json:"id"`
-			Title string `json:"title"`
-		}
+		var favoriteThread Thread
 		if err := rows.Scan(&favoriteThread.ID, &favoriteThread.Title); err != nil {
 			log.Fatal(err)
 		}
@@ -637,10 +628,7 @@ func (m ThreadModel) AddToFavorites(user *User, id int) error {
 		}
 	}
 
-	var favoriteThread struct {
-		ID    int    `json:"id"`
-		Title string `json:"title"`
-	}
+	var favoriteThread Thread
 	favoriteThread.ID = id
 
 	query = `
@@ -658,10 +646,7 @@ func (m ThreadModel) AddToFavorites(user *User, id int) error {
 	}
 
 	if user.FavoriteThreads == nil {
-		user.FavoriteThreads = make([]struct {
-			ID    int    `json:"id"`
-			Title string `json:"title"`
-		}, 0)
+		user.FavoriteThreads = make([]Thread, 0)
 	}
 
 	user.FavoriteThreads = append(user.FavoriteThreads, favoriteThread)

@@ -81,7 +81,10 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 
 	// retrieving basic template data
-	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData := app.newTemplateData(r, true, Overlay.Default)
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("user reactions: %+v", tmplData.User.Reactions))
 
 	// fetching the thread id in the path
 	id, err := getPathID(r)
@@ -105,6 +108,7 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 
 	// checking API request errors
 	if !v.Valid() {
+		app.logger.Error(fmt.Sprintf("errors: %+v", string(v.Errors())))
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
@@ -646,9 +650,28 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) logoutPost(w http.ResponseWriter, r *http.Request) {
 
-	// logging the user out
-	err := app.logout(r)
+	// revoking the user's tokens
+	v := validator.New()
+	err := app.models.TokenModel.Logout(app.getToken(r, authTokenSessionManager), v)
 	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// looking for errors from the API
+	if !v.Valid() {
+		app.logger.Error(fmt.Sprintf("errors: %s", string(v.Errors())))
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// logging the user out
+	err = app.logout(r)
+	if err != nil {
+
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("error: %s", err.Error()))
+
 		app.serverError(w, r, err)
 		return
 	}
@@ -983,6 +1006,12 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.PostModel.Create(app.getToken(r, authTokenSessionManager), post, v)
 	if err != nil {
+
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("post: %+v", *post))
+		app.logger.Debug(fmt.Sprintf("error: %s", err.Error()))
+		app.logger.Debug(fmt.Sprintf("validator: %+v", *v))
+
 		app.serverError(w, r, err)
 		return
 	}

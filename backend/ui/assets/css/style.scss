@@ -1,19 +1,5 @@
 @import 'base';
 
-    /*   Flash Message   */
-
-    .flash {
-        display: flex;
-        justify-content: center;
-        width: calc(100% - 24px);
-        padding: 12px;
-        border: 3px solid #864879;
-        border-radius: 8px;
-        color: #1F1D36;
-        font-size: 18px;
-        font-family: Varela-Round, sans-serif;
-    }
-
     /* Mentions Légales */
 
     .bold {
@@ -519,13 +505,6 @@
                     font-size: 15px;
                     font-style: italic;
                 }
-                img {
-                    opacity: 0.7;
-                    &:hover {
-                        cursor: pointer;
-                        opacity: 1;
-                    }     
-                }
                 .emoji-ctn {
                     position: relative;
                     display: flex;
@@ -536,20 +515,38 @@
                         height: 100%;
                         aspect-ratio: 1;
                         z-index: 10;
+                        opacity: 0.7;
+
+                        &:hover {
+                            cursor: pointer;
+                            opacity: 1;
+                        }
                     }
                     .reactions-nb {
                         position: absolute;
                         right: 12px;
                         top: 4px;
                         bottom: 4px;
-                        width: 35px;
+                        width: 32px;
                         padding: 0 5px;
                         border-radius: 0 5px 5px 0;
                         background-color: rgba(216, 216, 216, 0.7);
                         text-align: right;
                         color: rgba(152, 152, 152, 1);
-                        font-size: 13px;
+                        font-size: 12.5px;
                         font-family: Varela-Round, sans-serif;
+                    }
+                    &.selected {
+                        .reactions-nb {
+                            border: #864879 solid 1.5px;
+                        }
+                        .emoji {
+                            opacity: 1;
+
+                            &:hover {
+                                cursor: default;
+                            }
+                        }
                     }
                 }
             }

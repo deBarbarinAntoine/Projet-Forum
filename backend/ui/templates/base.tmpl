@@ -43,9 +43,10 @@
                             <a class="item-link" href="/dashboard"></a>
                             <p class="item-text"> Dashboard </p>
                         </div>
-                        <form method="post" action="/logout" class="item">
-                            <img class="item-icon" src="/static/img/icons/disconnect-icon.svg">
-                            <button class="logout-link" type="submit"></button>
+                        <form method="post" action="/logout" class="item relative">
+                            <img class="item-icon" src="/static/img/icons/disconnect-icon.svg" alt="disconnect icon">
+                            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                            <button class="logout-link abs full on-top" type="submit"></button>
                             <p class="item-text"> Disconnect </p>
                         </form>
                     {{else}}

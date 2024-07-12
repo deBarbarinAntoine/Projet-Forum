@@ -57,7 +57,7 @@ type templateData struct {
 	ResetToken        string
 	FieldErrors       map[string]string
 	NonFieldErrors    []string
-	User              *data.User
+	User              data.User
 	CategoriesNavLeft []*data.Category
 	PopularTags       []*data.Tag
 	PopularThreads    []*data.Thread

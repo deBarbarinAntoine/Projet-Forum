@@ -5,7 +5,9 @@
         <input class="search-liste" placeholder="Search in the category"> <img class="search-icon" src="/static/img/icons/search-icon.svg">
         <p> Filter </p>
     </div>
+    {{$user := .User}}
     {{range .Thread.Posts}}
+        {{$emoji := getUserReaction $user .ID}}
         <div class="container-post">
             <div class="first-line">
                 <img src="{{.Author.Avatar}}" class="author-avatar">
@@ -18,29 +20,29 @@
                 <p>  {{.Content}} </p>
             </div>
             <div class="third-line">
-                <!-- Emojis possibilité d'en choisir 1  -->
-                <div class="emoji-ctn">
+            {{/* Emojis possibilité d'en choisir 1  */}}
+                <div class="emoji-ctn{{if eq $emoji "neutral"}} selected{{end}}">
                     <img  class="emoji" src="/static/img/icons/emoji-neutral-icon.svg" alt="neutral emoji" data-value="neutral">
                     {{with .Reactions.neutral}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
-                <div class="emoji-ctn">
+                <div class="emoji-ctn{{if eq $emoji "laughing"}} selected{{end}}">
                     <img  class="emoji" src="/static/img/icons/emoji-rigole2-icon.svg" alt="laughing emoji" data-value="laughing">
                     {{with .Reactions.laughing}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
-                <div class="emoji-ctn">
+                <div class="emoji-ctn{{if eq $emoji "applause"}} selected{{end}}">
                     <img  class="emoji" src="/static/img/icons/emoji-applause-icon.svg" alt="applause emoji" data-value="applause">
                     {{with .Reactions.applause}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
-                <div class="emoji-ctn">
+                <div class="emoji-ctn{{if eq $emoji "heart"}} selected{{end}}">
                     <img class="emoji" src="/static/img/icons/emoji-coeur-icon.svg" alt="heart emoji" data-value="heart">
                     {{with .Reactions.heart}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
-                <!-- Fin des emojis -->
+                {{/*  Fin des emojis  */}}
             </div>
         </div>
     {{end}}
     <form method="post" action="/post" class="container-response">
-         <!-- Répondre à la suite -->
+         {{/* Répondre à la suite */}}
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <input type="hidden" name="thread_id" value="{{.Thread.ID}}">
         <label for="content"></label>
@@ -49,7 +51,7 @@
     </form>
     <div class="pagination-container">
         <div class="pagination">
-             <!-- Pagination -->
+             {{/* Pagination */}}
             <img src="/static/img/icons/arrow-left-icon.svg">
             <p> 1 2 3 4 5 </p>
             <img src="/static/img/icons/arrow-right-icon.svg">

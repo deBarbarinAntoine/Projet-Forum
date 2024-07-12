@@ -92,7 +92,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
-	v.StringCheck(*input.Content, 2, 125, true, "title")
+	v.StringCheck(*input.Content, 1, 1_020, true, "content")
 
 	if input.ThreadID == nil {
 		v.AddError("thread", "must be provided")
@@ -118,10 +118,9 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 			ID:   user.ID,
 			Name: user.Name,
 		},
-		Thread: struct {
-			ID    int    `json:"id"`
-			Title string `json:"title"`
-		}{ID: *input.ThreadID},
+		Thread: data.Thread{
+			ID: *input.ThreadID,
+		},
 	}
 
 	if input.ParentPostID != nil {
@@ -138,6 +137,9 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		}
 		return
 	}
+
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("created post: %+v", post))
 
 	err = app.writeJSON(w, http.StatusCreated, envelope{"post": post}, nil)
 	if err != nil {

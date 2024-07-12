@@ -68,7 +68,7 @@ func (app *application) routes() http.Handler {
 	router.Group(func(group *flow.Mux) {
 		group.Use(app.requireActivatedUser, app.guardUserHandlers)
 
-		group.HandleFunc("/v1/tokens/revoke", app.revokeTokensHandler, http.MethodPost)
+		group.HandleFunc("/v1/tokens/revoke/:id", app.revokeTokensHandler, http.MethodPost)
 	})
 
 	/* #############################################################################

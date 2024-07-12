@@ -395,10 +395,7 @@ func (m TagModel) GetByThread(id int) ([]Tag, error) {
 	return tags, nil
 }
 
-func (m TagModel) GetByFollowingUserID(id int) ([]struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}, error) {
+func (m TagModel) GetByFollowingUserID(id int) ([]Tag, error) {
 
 	query := `
 		SELECT tu.Id_tags, t.Name
@@ -421,16 +418,10 @@ func (m TagModel) GetByFollowingUserID(id int) ([]struct {
 	}
 	defer rows.Close()
 
-	var followingTags []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	}
+	var followingTags []Tag
 
 	for rows.Next() {
-		var followingTag struct {
-			ID   int    `json:"id"`
-			Name string `json:"name"`
-		}
+		var followingTag Tag
 		if err := rows.Scan(&followingTag.ID, &followingTag.Name); err != nil {
 			log.Fatal(err)
 		}
@@ -612,10 +603,7 @@ func (m TagModel) Follow(user *User, id int) error {
 		}
 	}
 
-	var followingTag struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	}
+	var followingTag Tag
 	followingTag.ID = id
 
 	query = `
@@ -633,10 +621,7 @@ func (m TagModel) Follow(user *User, id int) error {
 	}
 
 	if user.FollowingTags == nil {
-		user.FollowingTags = make([]struct {
-			ID   int    `json:"id"`
-			Name string `json:"name"`
-		}, 0)
+		user.FollowingTags = make([]Tag, 0)
 	}
 
 	user.FollowingTags = append(user.FollowingTags, followingTag)

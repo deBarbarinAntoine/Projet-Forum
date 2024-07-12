@@ -8,7 +8,7 @@ import (
 
 var (
 	EmailRX        = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	UserByIDValues = []string{"following_tags", "favorite_threads", "categories_owned", "tags_owned", "threads_owned", "posts", "friends"}
+	UserByIDValues = []string{"following_tags", "favorite_threads", "categories_owned", "tags_owned", "threads_owned", "posts", "reactions", "friends"}
 )
 
 type Validator struct {

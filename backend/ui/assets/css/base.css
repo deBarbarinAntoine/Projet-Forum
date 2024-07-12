@@ -54,6 +54,20 @@
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
 }
 
+/*   Flash Message   */
+.flash {
+  z-index: 9000;
+  display: flex;
+  justify-content: center;
+  width: calc(100% - 24px);
+  padding: 12px;
+  border: 3px solid #864879;
+  border-radius: 8px;
+  color: #1F1D36;
+  font-size: 18px;
+  font-family: Varela-Round, sans-serif;
+}
+
 body {
   background-color: var(--background-color);
 }
@@ -198,15 +212,10 @@ header .notification-profile .profile .dropdown .item .item-link {
   bottom: 0;
 }
 header .notification-profile .profile .dropdown .item button.logout-link {
-  z-index: 4;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   appearance: none;
   border: none;
   background-color: transparent;
+  cursor: pointer;
 }
 header .notification-profile .profile .dropdown .item button.logout-link:hover {
   appearance: none;

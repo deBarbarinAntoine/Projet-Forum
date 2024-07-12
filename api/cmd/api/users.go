@@ -283,6 +283,17 @@ func (app *application) getSingleUserHandler(w http.ResponseWriter, r *http.Requ
 			return
 		}
 	}
+	if slices.Contains(form.Includes, "reactions") {
+		err = app.models.Posts.GetReactionsByUser(user)
+		if err != nil {
+			if errors.Is(err, data.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+	}
 	if slices.Contains(form.Includes, "friends") {
 		err = app.getFriendsByUser(user)
 		if err != nil {

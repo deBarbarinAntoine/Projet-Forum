@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Projet-Forum/internal/data"
 	"Projet-Forum/ui"
 	"html/template"
 	"io/fs"
@@ -9,11 +10,22 @@ import (
 )
 
 var functions = template.FuncMap{
-	"humanDate": humanDate,
+	"humanDate":       humanDate,
+	"getUserReaction": getUserReaction,
 }
 
 func humanDate(t time.Time) string {
 	return t.Format("02 Jan 2006 at 15:04")
+}
+
+func getUserReaction(user data.User, postID int) string {
+	if user.Reactions != nil {
+		emoji, ok := user.Reactions[postID]
+		if ok {
+			return emoji
+		}
+	}
+	return ""
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

@@ -113,7 +113,7 @@ func (app *application) getTokens(r *http.Request) (*data.Tokens, error) {
 func (app *application) getToken(r *http.Request, key string) string {
 	token, ok := app.sessionManager.Get(r.Context(), key).(string)
 	if !ok {
-		fmt.Println("could not get token from session manager")
+		app.logger.Debug("could not get token from session manager")
 		return ""
 	}
 	return token
@@ -207,7 +207,7 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 	isAuthenticated := app.isAuthenticated(r)
 	token := app.getToken(r, authTokenSessionManager)
 	// retrieving the user data
-	var user *data.User
+	user := &data.User{}
 	v := validator.New()
 	if isAuthenticated {
 		var query url.Values
@@ -217,10 +217,13 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 			}
 		} else {
 			query = url.Values{
-				"includes[]": {"following_tags", "favorite_threads", "categories_owned", "tags_owned", "threads_owned", "friends", "posts"},
+				"includes[]": {"following_tags", "favorite_threads", "categories_owned", "tags_owned", "threads_owned", "friends", "posts", "reactions"},
 			}
 		}
 		user, _ = app.models.UserModel.GetByID(token, "me", query, v)
+
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("user: %+v", user))
 	}
 	categories, metadata, err := app.models.CategoryModel.Get(token, nil, v)
 	if err != nil {
@@ -238,7 +241,7 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 		Flash:             app.sessionManager.PopString(r.Context(), "flash"),
 		IsAuthenticated:   isAuthenticated,
 		CSRFToken:         nosurf.Token(r),
-		User:              user,
+		User:              *user,
 		PopularTags:       tags,
 		PopularThreads:    threads,
 		CategoriesNavLeft: categories,
