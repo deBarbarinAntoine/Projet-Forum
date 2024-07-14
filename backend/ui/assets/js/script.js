@@ -1,7 +1,3 @@
-// ######################################################################################
-// # NAV-LEFT: CATEGORY LIST
-// ######################################################################################
-
 const has_list = document.querySelectorAll('.has-list');
 
 function refresh_height() {
@@ -10,8 +6,8 @@ function refresh_height() {
     category_list.forEach((list) => {
         list.style.maxHeight = `${list.children.length * 42}px`; 
 
-        console.log(list.offsetHeight);
-        console.log(list.children.length * 42);
+        // console.log(list.offsetHeight);
+        // console.log(list.children.length * 42);
     });
 }
 
@@ -25,41 +21,3 @@ has_list.forEach((item) => {
 });
 
 refresh_height();
-
-// ######################################################################################
-// # AJAX: FRIENDS
-// ######################################################################################
-
-// Friend requests
-
-// Friend response
-
-// Friend remove
-
-// ######################################################################################
-// # AJAX: POST REACTIONS
-// ######################################################################################
-
-const emojis = document.querySelectorAll('.emoji-ctn .emoji');
-
-emojis.forEach(emoji => {
-    emoji.addEventListener('click', () => {
-        // send request to server
-    })
-})
-
-// ######################################################################################
-// # AJAX: TAG FOLLOW/UNFOLLOW
-// ######################################################################################
-
-// Tag follow
-
-// Tag unfollow
-
-// ######################################################################################
-// # AJAX: THREAD FAVORITE
-// ######################################################################################
-
-// Thread add to favorites
-
-// Thread remove from favorites

@@ -52,8 +52,22 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 	return nil
 }
 
-func (app *application) clientError(w http.ResponseWriter, status int) {
-	http.Error(w, http.StatusText(status), status)
+func (app *application) clientError(r *http.Request, w http.ResponseWriter, status int) {
+
+	// setting the templateData
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
+
+	// setting the error title and message
+	tmplData.Error.Title = fmt.Sprintf("Error %d", status)
+
+	if status == http.StatusNotFound {
+		tmplData.Error.Message = "We didn't find what you were looking for :("
+	} else {
+		tmplData.Error.Message = "Something went wrong!"
+	}
+
+	// rendering the error page
+	app.render(w, r, status, "error.tmpl", tmplData)
 }
 
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
@@ -64,8 +78,18 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 		trace  = string(debug.Stack())
 	)
 
+	// logging the error
 	app.logger.Error(err.Error(), slog.String("method", method), slog.String("URI", uri), slog.String("trace", trace))
-	http.Error(w, http.StatusText(status), status)
+
+	// setting the templateData
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
+
+	// setting the error title and message
+	tmplData.Error.Title = fmt.Sprintf("Error %d", status)
+	tmplData.Error.Message = "Something went wrong!"
+
+	// rendering the error page
+	app.render(w, r, status, "error.tmpl", tmplData)
 }
 
 func (app *application) isAuthenticated(r *http.Request) bool {
@@ -236,11 +260,18 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 
 	// returning the templateData with all information
 	return templateData{
-		Overlay:           overlay,
-		CurrentYear:       time.Now().Year(),
-		Flash:             app.sessionManager.PopString(r.Context(), "flash"),
-		IsAuthenticated:   isAuthenticated,
-		CSRFToken:         nosurf.Token(r),
+		Overlay:         overlay,
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: isAuthenticated,
+		CSRFToken:       nosurf.Token(r),
+		Error: struct {
+			Title   string
+			Message string
+		}{
+			Title:   "Error 404",
+			Message: "We didn't find what you were looking for :(",
+		},
 		User:              *user,
 		PopularTags:       tags,
 		PopularThreads:    threads,

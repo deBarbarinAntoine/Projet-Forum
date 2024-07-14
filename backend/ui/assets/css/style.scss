@@ -14,7 +14,7 @@
         width: 100%;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-        font-family: Varela-Round;
+        font-family: "Varela-Round", sans-serif;
         
         h2 {
             font-size: 50px;
@@ -42,7 +42,7 @@
         width: 100%;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-        font-family: Varela-Round;
+        font-family: "Varela-Round", sans-serif;
         display: flex;
         flex-direction: column;
         padding-bottom: 20px;
@@ -170,7 +170,7 @@
     padding-top: 20px;
     margin-left: 5px;
     width: 100%;
-    font-family: Varela-Round;
+    font-family: "Varela-Round", sans-serif;
     display: flex;
     flex-direction: column;
     padding-bottom: 20px;
@@ -194,7 +194,7 @@
         margin-left: 50px; 
         margin-right: 50px;   
         padding-top: 20px;
-        font-family: Varela-Round;
+        font-family: "Varela-Round", sans-serif;
         display: flex;
         flex-direction: column;
         padding-bottom: 30px;
@@ -306,7 +306,7 @@
         width: calc(100% - 55px);
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-        font-family: Varela-Round;
+        font-family: "Varela-Round", sans-serif;
         display: flex;
         flex-direction: column;
         padding-bottom: 20px;
@@ -411,7 +411,7 @@
         width: 100%;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-        font-family: Varela-Round;
+        font-family: "Varela-Round", sans-serif;
         display: flex;
         flex-direction: column;
         padding-bottom: 20px;
@@ -533,7 +533,7 @@
                         text-align: right;
                         color: rgba(152, 152, 152, 1);
                         font-size: 12.5px;
-                        font-family: Varela-Round, sans-serif;
+                        font-family: "Varela-Round", sans-serif;
                     }
                     &.selected {
                         .reactions-nb {
@@ -618,7 +618,7 @@
     height: 100%;
     margin-left: 5px;
     width: 100%;
-    font-family: Varela-Round;
+    font-family: "Varela-Round", sans-serif;
     display: flex;
     flex-direction: column;
     padding-bottom: 20px;
@@ -879,7 +879,6 @@
     height: auto;
     width: auto;
     margin-top: 150px;
-    font-family: Varela-Round;
     display: flex;
     align-items: center;
     justify-content: center;

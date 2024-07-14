@@ -4,12 +4,13 @@
 }
 
 @font-face {
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   src: url(../font/VarelaRound-Regular.ttf);
 }
 * {
   margin: 0;
   padding: 0;
+  font-family: "Varela-Round", sans-serif;
 }
 * a {
   text-decoration: none;
@@ -34,6 +35,10 @@
 
 .on-top {
   z-index: 100;
+}
+
+.display-none {
+  display: none;
 }
 
 .borders {
@@ -66,7 +71,7 @@
   border-radius: 8px;
   color: #1F1D36;
   font-size: 18px;
-  font-family: Varela-Round, sans-serif;
+  font-family: "Varela-Round", sans-serif;
 }
 
 body {
@@ -100,10 +105,8 @@ header .logo-searchbar a {
   cursor: pointer;
 }
 header .logo-searchbar a .logo {
-  -o-object-fit: contain;
-     object-fit: contain;
-  -o-object-position: center;
-     object-position: center;
+  object-fit: contain;
+  object-position: center;
   height: 100%;
   width: 100%;
 }
@@ -156,6 +159,12 @@ header .notification-profile .profile .profile-picture {
   height: 40px;
   border-radius: 50%;
 }
+header .notification-profile .profile .profile-picture img {
+  object-position: center;
+  object-fit: fill;
+  height: 100%;
+  width: 100%;
+}
 header .notification-profile .profile .profile-icon-box {
   width: 50px;
   height: 70px;
@@ -167,10 +176,12 @@ header .notification-profile .profile .profile-icon {
   width: 30px;
   height: 30px;
   opacity: 0.5;
-  background-color: black;
 }
-header .notification-profile .profile .profile-icon-box:hover ~ .dropdown,
-header .notification-profile .profile .dropdown:hover {
+header .notification-profile .profile:hover {
+  cursor: pointer;
+}
+header .notification-profile .profile:hover .dropdown,
+header .notification-profile .profile:hover .dropdown:hover {
   display: flex;
 }
 header .notification-profile .profile .dropdown {
@@ -215,17 +226,13 @@ header .notification-profile .profile .dropdown .item .item-link {
   bottom: 0;
 }
 header .notification-profile .profile .dropdown .item button.logout-link {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   border: none;
   background-color: transparent;
   cursor: pointer;
 }
 header .notification-profile .profile .dropdown .item button.logout-link:hover {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   border: none;
   background-color: transparent;
 }
@@ -238,7 +245,7 @@ header .notification-profile .profile .dropdown .item .item-icon {
 }
 header .notification-profile .profile .dropdown .item .item-text {
   font-size: 15px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
 }
 
 .nav-left {
@@ -293,10 +300,8 @@ header .notification-profile .profile .dropdown .item .item-text {
   top: 0;
 }
 .nav-left .profile .personal-info .profile-picture .avatar {
-  -o-object-fit: cover;
-     object-fit: cover;
-  -o-object-position: center;
-     object-position: center;
+  object-fit: cover;
+  object-position: center;
   height: 100%;
   width: 100%;
 }
@@ -305,7 +310,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   flex-flow: column nowrap;
   justify-content: center;
   align-items: flex-start;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
 }
 .nav-left .profile .personal-info .name-rank p:nth-child(1) {
   font-size: 17px;
@@ -331,7 +336,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   justify-content: center;
   align-items: flex-start;
   gap: 5px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
 }
 .nav-left .profile .stats .member-since p:nth-child(1) {
   font-size: 15px;
@@ -346,7 +351,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   justify-content: center;
   align-items: flex-start;
   gap: 5px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
 }
 .nav-left .profile .stats .posts p:nth-child(1) {
   font-size: 15px;
@@ -377,7 +382,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   gap: 12px;
   padding-left: 30px;
   transition: 0.3s;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   margin-bottom: 12px;
 }
 .nav-left .page-link .link:hover {
@@ -406,12 +411,11 @@ header .notification-profile .profile .dropdown .item .item-text {
   align-items: center;
   margin-bottom: 10px;
   transition: 0.3s;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   top: 0;
 }
 .nav-left .page-link .category-list .category {
   width: 100%;
-  height: -moz-fit-content;
   height: fit-content;
   display: flex;
   flex-flow: row nowrap;
@@ -458,7 +462,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   align-items: center;
   gap: 12px;
   padding-left: 30px;
-  font-family: Varela-Round, sans-serif;
+  font-family: "Varela-Round", sans-serif;
   transition: 0.3s;
 }
 .nav-left .footer .footer-link .footer-icon {
@@ -475,7 +479,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   font-size: 9px;
   opacity: 0.5;
   margin-bottom: 10px;
-  font-family: Varela-Round, sans-serif;
+  font-family: "Varela-Round", sans-serif;
 }
 
 .nav-right {
@@ -505,7 +509,7 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 .nav-right .nav-right-title {
   font-size: 20px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   opacity: 0.5;
 }
 .nav-right .all-tags {
@@ -532,7 +536,7 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 .nav-right .all-tags .tag .tag-link {
   font-size: 15px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
 }
 .nav-right .all-tags .tag:hover {
   cursor: pointer;
@@ -549,6 +553,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-top: 120px;
   left: 270px;
   padding: 20px;
+  z-index: 1;
 }
 
 .center-page {
@@ -562,28 +567,20 @@ header .notification-profile .profile .dropdown .item .item-text {
   align-items: center;
   position: absolute;
 }
-
-.blur-underlay {
-  z-index: 2;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+.center-page:hover {
+  cursor: pointer;
 }
-
-.container {
+.center-page .container {
   width: 425px;
   height: auto;
   display: flex;
   flex-direction: column;
   justify-content: start;
   align-items: center;
+  cursor: default;
   box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.5);
 }
-.container .login {
+.center-page .container .login {
   width: 100%;
   height: auto;
   display: flex;
@@ -592,12 +589,12 @@ header .notification-profile .profile .dropdown .item .item-text {
   align-items: center;
   margin: 20px;
 }
-.container .login .login-title {
+.center-page .container .login .login-title {
   font-size: 30px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   margin-bottom: 20px;
 }
-.container .login .input-fields {
+.center-page .container .login .input-fields {
   width: 100%;
   height: auto;
   display: flex;
@@ -605,24 +602,22 @@ header .notification-profile .profile .dropdown .item .item-text {
   justify-content: start;
   align-items: center;
 }
-.container .login .input-fields label {
+.center-page .container .login .input-fields label {
   display: none;
 }
-.container .login .input-fields .input {
+.center-page .container .login .input-fields .input {
   width: calc(75% - 20px);
   height: 20px;
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  font-family: Varela-Round;
+  appearance: none;
+  font-family: "Varela-Round", sans-serif;
 }
-.container .login .input-fields .input:focus {
+.center-page .container .login .input-fields .input:focus {
   box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
 }
-.container .login .submit {
+.center-page .container .login .submit {
   width: 75%;
   height: auto;
   display: flex;
@@ -631,48 +626,48 @@ header .notification-profile .profile .dropdown .item .item-text {
   align-items: center;
   gap: 10px;
 }
-.container .login .submit .classic-link {
-  font-family: Varela-Round;
+.center-page .container .login .submit .classic-link {
+  font-family: "Varela-Round", sans-serif;
   font-size: 10px;
   margin-top: 20px;
   align-self: flex-start;
   font-style: italic;
 }
-.container .login .submit .classic-link:hover {
+.center-page .container .login .submit .classic-link:hover {
   cursor: pointer;
   text-decoration: underline;
 }
-.container .login .submit .button {
+.center-page .container .login .submit .button {
   width: 100%;
   height: 40px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   font-weight: 500;
   font-size: 17px;
 }
-.container .login .submit .button:hover {
+.center-page .container .login .submit .button:hover {
   cursor: pointer;
   box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
 }
-.container .separation {
+.center-page .container .separation {
   width: 100%;
   height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.container .separation .line {
+.center-page .container .separation .line {
   width: 40%;
   height: 1px;
   background-color: rgba(0, 0, 0, 0.2);
 }
-.container .separation .or {
-  font-family: Varela-Round;
+.center-page .container .separation .or {
+  font-family: "Varela-Round", sans-serif;
   font-size: 15px;
   margin-left: 10px;
   margin-right: 10px;
   opacity: 0.5;
 }
-.container .switch {
+.center-page .container .switch {
   width: 75%;
   height: 40px;
   margin-top: 25px;
@@ -680,13 +675,23 @@ header .notification-profile .profile .dropdown .item .item-text {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   font-weight: 500;
   font-size: 17px;
 }
-.container .switch:hover {
+.center-page .container .switch:hover {
   cursor: pointer;
   box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.3);
+}
+
+.blur-underlay {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(2px);
 }
 
 .bottom-outset {
@@ -716,7 +721,7 @@ textarea.description {
   width: 100%;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
 }
 .container-mentions h2 {
   font-size: 50px;
@@ -741,7 +746,7 @@ textarea.description {
   width: 100%;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -865,7 +870,7 @@ textarea.description {
   padding-top: 20px;
   margin-left: 5px;
   width: 100%;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -890,7 +895,7 @@ textarea.description {
   margin-left: 50px;
   margin-right: 50px;
   padding-top: 20px;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   display: flex;
   flex-direction: column;
   padding-bottom: 30px;
@@ -994,7 +999,7 @@ textarea.description {
   width: calc(100% - 55px);
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -1080,7 +1085,6 @@ textarea.description {
 .container-liste .container-liste-thread .container-thread .container-thread-text-liste p {
   width: 20%;
   text-align: right;
-  min-width: -moz-max-content;
   min-width: max-content;
   font-size: 15px;
 }
@@ -1088,7 +1092,6 @@ textarea.description {
 /* THREAD */
 .container-inthread {
   background-color: var(--background-color);
-  height: -moz-fit-content;
   height: fit-content;
   padding-top: 30px;
   margin-left: 5px;
@@ -1096,7 +1099,7 @@ textarea.description {
   width: 100%;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -1163,7 +1166,6 @@ textarea.description {
 }
 .container-inthread .container-post .first-line p {
   font-size: 14px;
-  width: -moz-max-content;
   width: max-content;
   font-style: italic;
   margin-right: 1.5vw;
@@ -1220,7 +1222,7 @@ textarea.description {
   text-align: right;
   color: rgb(152, 152, 152);
   font-size: 12.5px;
-  font-family: Varela-Round, sans-serif;
+  font-family: "Varela-Round", sans-serif;
 }
 .container-inthread .container-post .third-line .emoji-ctn.selected .reactions-nb {
   border: #864879 solid 1.5px;
@@ -1295,7 +1297,7 @@ textarea.description {
   height: 100%;
   margin-left: 5px;
   width: 100%;
-  font-family: Varela-Round;
+  font-family: "Varela-Round", sans-serif;
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
@@ -1329,10 +1331,8 @@ textarea.description {
   height: 87px;
 }
 .container-dashboard .container-profile-friendsrequest .container-profile .profilte-picture-name .pic img.avatar {
-  -o-object-fit: cover;
-     object-fit: cover;
-  -o-object-position: center;
-     object-position: center;
+  object-fit: cover;
+  object-position: center;
   width: 100%;
   height: 100%;
 }
@@ -1554,7 +1554,6 @@ textarea.description {
   height: auto;
   width: auto;
   margin-top: 150px;
-  font-family: Varela-Round;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1566,4 +1565,6 @@ textarea.description {
 .container-error p {
   margin-top: 40px;
   font-size: 20px;
-}/*# sourceMappingURL=style.css.map */
+}
+
+/*# sourceMappingURL=style.css.map */

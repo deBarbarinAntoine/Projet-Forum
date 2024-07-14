@@ -17,7 +17,8 @@ func (app *application) routes() http.Handler {
 
 	router := flow.New()
 
-	router.NotFound = http.HandlerFunc(app.notFound) // error 404 page
+	router.NotFound = http.HandlerFunc(app.notFound)                 // error 404 page
+	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowed) // error 405 page
 
 	router.Handle("/static/...", http.StripPrefix("/static/", http.FileServerFS(staticFs)), http.MethodGet) // static files
 

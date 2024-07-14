@@ -3,13 +3,14 @@
 }
 
 @font-face {
-    font-family: Varela-Round;
+    font-family: "Varela-Round", sans-serif;
     src: url(../font/VarelaRound-Regular.ttf);
 }
 
 * {
     margin: 0;
     padding: 0;
+    font-family: "Varela-Round", sans-serif;
 
     a {
         text-decoration: none;
@@ -32,6 +33,9 @@
 }
 .on-top {
     z-index: 100;
+}
+.display-none {
+    display: none;
 }
 
 .borders {
@@ -64,7 +68,7 @@
     border-radius: 8px;
     color: #1F1D36;
     font-size: 18px;
-    font-family: Varela-Round, sans-serif;
+    font-family: "Varela-Round", sans-serif;
 }
 
 
@@ -160,6 +164,13 @@ header {
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
+
+                img {
+                    object-position: center;
+                    object-fit: fill;
+                    height: 100%;
+                    width: 100%;
+                }
             }
 
             .profile-icon-box {
@@ -174,12 +185,15 @@ header {
                 width: 30px;
                 height: 30px;
                 opacity: 0.5;
-                background-color: black;
             }
 
-            .profile-icon-box:hover~.dropdown,
-            .dropdown:hover {
-                display: flex;
+            &:hover {
+                cursor: pointer;
+
+                .dropdown,
+                .dropdown:hover {
+                    display: flex;
+                }
             }
 
             .dropdown {
@@ -248,7 +262,7 @@ header {
 
                     .item-text {
                         font-size: 15px;
-                        font-family: Varela-Round;
+                        font-family: "Varela-Round", sans-serif;
                     }
 
                 }
@@ -321,7 +335,7 @@ header {
                 flex-flow: column nowrap;
                 justify-content: center;
                 align-items: flex-start;
-                font-family: Varela-Round;
+                font-family: "Varela-Round", sans-serif;
 
                 p:nth-child(1) {
                     font-size: 17px;
@@ -351,7 +365,7 @@ header {
                 justify-content: center;
                 align-items: flex-start;
                 gap: 5px;
-                font-family: Varela-Round;
+                font-family: "Varela-Round", sans-serif;
 
                 p:nth-child(1) {
                     font-size: 15px;
@@ -369,7 +383,7 @@ header {
                 justify-content: center;
                 align-items: flex-start;
                 gap: 5px;
-                font-family: Varela-Round;
+                font-family: "Varela-Round", sans-serif;
 
                 p:nth-child(1) {
                     font-size: 15px;
@@ -405,7 +419,7 @@ header {
             gap: 12px;
             padding-left: 30px;
             transition: .3s;
-            font-family: Varela-Round;
+            font-family: "Varela-Round", sans-serif;
             margin-bottom: 12px;
 
             &:hover {
@@ -439,7 +453,7 @@ header {
             align-items: center;
             margin-bottom: 10px;
             transition: 0.3s;
-            font-family: Varela-Round;
+            font-family: "Varela-Round", sans-serif;
             top: 0;
 
 
@@ -498,7 +512,7 @@ header {
             align-items: center;
             gap: 12px;
             padding-left: 30px;
-            font-family: Varela-Round, sans-serif;
+            font-family: "Varela-Round", sans-serif;
             transition: .3s;
 
             .footer-icon {
@@ -519,7 +533,7 @@ header {
             font-size: 9px;
             opacity: 0.5;
             margin-bottom: 10px;
-            font-family: Varela-Round, sans-serif;
+            font-family: "Varela-Round", sans-serif;
         }
     }
 }
@@ -552,7 +566,7 @@ header {
 
     .nav-right-title {
         font-size: 20px;
-        font-family: Varela-Round;
+        font-family: "Varela-Round", sans-serif;
         opacity: 0.5;
     }
 
@@ -580,7 +594,7 @@ header {
 
             .tag-link {
                 font-size: 15px;
-                font-family: Varela-Round;
+                font-family: "Varela-Round", sans-serif;
             }
 
             &:hover {
@@ -601,6 +615,7 @@ header {
     margin-top: 120px;
     left: 270px;
     padding: 20px;
+    z-index: 1;
 }
 
 
@@ -616,6 +631,150 @@ header {
     justify-content: center;
     align-items: center;
     position: absolute;
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    .container {
+        width: 425px;
+        height: auto;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        cursor: default;
+
+        box-shadow: 0px 8px 8px rgba($color: #000000, $alpha: 0.5);
+
+        .login {
+            width: 100%;
+            height: auto;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: center;
+
+            margin: 20px;
+
+            .login-title {
+                font-size: 30px;
+                font-family: "Varela-Round", sans-serif;
+                margin-bottom: 20px;
+            }
+
+            .input-fields {
+                width: 100%;
+                height: auto;
+
+                display: flex;
+                flex-direction: column;
+                justify-content: start;
+                align-items: center;
+
+                label {
+                    display: none;
+                }
+
+                .input {
+                    width: calc(75% - 20px);
+                    height: 20px;
+                    margin-bottom: 20px;
+                    padding: 10px;
+                    outline: none;
+                    appearance: none;
+                    font-family: "Varela-Round", sans-serif;
+
+                    &:focus {
+                        box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
+                    }
+                }
+            }
+
+            .submit {
+                width: 75%;
+                height: auto;
+
+                display: flex;
+                flex-direction: column;
+                justify-content: start;
+                align-items: center;
+                gap: 10px;
+
+                .classic-link {
+                    font-family: "Varela-Round", sans-serif;
+                    font-size: 10px;
+                    margin-top: 20px;
+                    align-self: flex-start;
+                    font-style: italic;
+
+                    &:hover {
+                        cursor: pointer;
+                        text-decoration: underline;
+                    }
+                }
+
+                .button {
+                    width: 100%;
+                    height: 40px;
+
+                    font-family: "Varela-Round", sans-serif;
+                    font-weight: 500;
+                    font-size: 17px;
+
+                    &:hover {
+                        cursor: pointer;
+                        box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
+                    }
+                }
+            }
+        }
+
+        .separation {
+            width: 100%;
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .line {
+                width: 40%;
+                height: 1px;
+                background-color: rgba($color: #000000, $alpha: 0.2);
+            }
+
+            .or {
+                font-family: "Varela-Round", sans-serif;
+                font-size: 15px;
+                margin-left: 10px;
+                margin-right: 10px;
+                opacity: 0.5;
+            }
+        }
+
+        .switch {
+            width: 75%;
+            height: 40px;
+
+            margin-top: 25px;
+            margin-bottom: 25px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: "Varela-Round", sans-serif;
+            font-weight: 500;
+            font-size: 17px;
+
+            &:hover {
+                cursor: pointer;
+                box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
+            }
+        }
+    }
 }
 
 .blur-underlay {
@@ -626,145 +785,6 @@ header {
     left: 0;
     right: 0;
     backdrop-filter: blur(2px) ;
-}
-
-.container {
-    width: 425px;
-    height: auto;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
-
-    box-shadow: 0px 8px 8px rgba($color: #000000, $alpha: 0.5);
-
-    .login {
-        width: 100%;
-        height: auto;
-
-        display: flex;
-        flex-direction: column;
-        justify-content: start;
-        align-items: center;
-
-        margin: 20px;
-
-        .login-title {
-            font-size: 30px;
-            font-family: Varela-Round;
-            margin-bottom: 20px;
-        }
-
-        .input-fields {
-            width: 100%;
-            height: auto;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: start;
-            align-items: center;
-
-            label {
-                display: none;
-            }
-
-            .input {
-                width: calc(75% - 20px);
-                height: 20px;
-                margin-bottom: 20px;
-                padding: 10px;
-                outline: none;
-                appearance: none;
-                font-family: Varela-Round;
-
-                &:focus {
-                    box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
-                }
-            }
-        }
-
-        .submit {
-            width: 75%;
-            height: auto;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: start;
-            align-items: center;
-            gap: 10px;
-
-            .classic-link {
-                font-family: Varela-Round;
-                font-size: 10px;
-                margin-top: 20px;
-                align-self: flex-start;
-                font-style: italic;
-
-                &:hover {
-                    cursor: pointer;
-                    text-decoration: underline;
-                }
-            }
-
-            .button {
-                width: 100%;
-                height: 40px;
-
-                font-family: Varela-Round;
-                font-weight: 500;
-                font-size: 17px;
-
-                &:hover {
-                    cursor: pointer;
-                    box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
-                }
-            }
-        }
-    }
-
-    .separation {
-        width: 100%;
-        height: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .line {
-            width: 40%;
-            height: 1px;
-            background-color: rgba($color: #000000, $alpha: 0.2);
-        }
-
-        .or {
-            font-family: Varela-Round;
-            font-size: 15px;
-            margin-left: 10px;
-            margin-right: 10px;
-            opacity: 0.5;
-        }
-    }
-
-    .switch {
-        width: 75%;
-        height: 40px;
-
-        margin-top: 25px;
-        margin-bottom: 25px;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        font-family: Varela-Round;
-        font-weight: 500;
-        font-size: 17px;
-
-        &:hover {
-            cursor: pointer;
-            box-shadow: 0px 3px 3px rgba($color: #000000, $alpha: 0.3);
-        }
-    }
 }
 
 .bottom-outset {

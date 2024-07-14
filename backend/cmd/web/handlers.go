@@ -1,9 +1,11 @@
 package main
 
 import (
+	"Projet-Forum/internal/api"
 	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/validator"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/alexedwards/flow"
 	"net/http"
@@ -20,6 +22,20 @@ func (app *application) notFound(w http.ResponseWriter, r *http.Request) {
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
 	tmplData.Title = "Threadive - Not Found"
+
+	// render the template
+	app.render(w, r, http.StatusOK, "error.tmpl", tmplData)
+}
+
+func (app *application) methodNotAllowed(w http.ResponseWriter, r *http.Request) {
+
+	// retrieving basic template data
+	tmplData := app.newTemplateData(r, false, Overlay.Default)
+	tmplData.Title = "Threadive - Not Found"
+
+	// setting the error title and message
+	tmplData.Error.Title = "Error 405"
+	tmplData.Error.Message = "Something went wrong!"
 
 	// render the template
 	app.render(w, r, http.StatusOK, "error.tmpl", tmplData)
@@ -53,7 +69,7 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 	// fetching the category id in the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -61,13 +77,18 @@ func (app *application) categoryGet(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	tmplData.Category, err = app.models.CategoryModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
 	// checking API request errors
 	if !v.Valid() {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -89,7 +110,7 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 	// fetching the thread id in the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -102,14 +123,19 @@ func (app *application) threadGet(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	tmplData.Thread, err = app.models.ThreadModel.GetByID(app.getToken(r, authTokenSessionManager), id, query, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
 	// checking API request errors
 	if !v.Valid() {
 		app.logger.Error(fmt.Sprintf("errors: %+v", string(v.Errors())))
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -131,7 +157,7 @@ func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 	// fetching the tag id in the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -139,13 +165,18 @@ func (app *application) tagGet(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	tmplData.Tag, err = app.models.TagModel.GetByID(app.getToken(r, authTokenSessionManager), id, r.URL.Query(), v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
 	// checking API request errors
 	if !v.Valid() {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -167,13 +198,18 @@ func (app *application) TagsGet(w http.ResponseWriter, r *http.Request) {
 	var err error
 	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
 	// checking API request errors
 	if !v.Valid() {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -192,13 +228,18 @@ func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 	var err error
 	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
 	// checking API request errors
 	if !v.Valid() {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -216,28 +257,28 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	var err error
 	tmplData.CategoryList.List, tmplData.CategoryList.Metadata, err = app.models.CategoryModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
-	if err != nil {
+	if err != nil && !errors.Is(err, api.ErrRecordNotFound) {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// fetching the threads
 	tmplData.ThreadList.List, tmplData.ThreadList.Metadata, err = app.models.ThreadModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
-	if err != nil {
+	if err != nil && !errors.Is(err, api.ErrRecordNotFound) {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// fetching the tags
 	tmplData.TagList.List, tmplData.TagList.Metadata, err = app.models.TagModel.Get(app.getToken(r, authTokenSessionManager), r.URL.Query(), v)
-	if err != nil {
+	if err != nil && !errors.Is(err, api.ErrRecordNotFound) {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// checking API request errors
 	if !v.Valid() {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -266,7 +307,7 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.logger.Error(err.Error())
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -302,7 +343,12 @@ func (app *application) registerPost(w http.ResponseWriter, r *http.Request) {
 	}
 	err = app.models.UserModel.Create(app.getToken(r, authTokenSessionManager), user, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -339,7 +385,7 @@ func (app *application) confirm(w http.ResponseWriter, r *http.Request) {
 	// retrieving the activation token from the URL
 	tmplData.ActivationToken = flow.Param(r.Context(), "token")
 	if tmplData.ActivationToken == "" {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -353,7 +399,7 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 	form := newUserConfirmForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -378,7 +424,12 @@ func (app *application) confirmPost(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.UserModel.Activate(form.Token, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -416,7 +467,7 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	form := newUserLoginForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -448,7 +499,12 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	tokens, err := app.models.TokenModel.Authenticate(body, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -478,7 +534,12 @@ func (app *application) loginPost(w http.ResponseWriter, r *http.Request) {
 	// fetching the user id from the API
 	user, err := app.models.UserModel.GetByID(tokens.Authentication.Token, "me", nil, v)
 	if err != nil || !v.Valid() {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -505,7 +566,7 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 	form := newForgotPasswordForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -532,7 +593,12 @@ func (app *application) forgotPasswordPost(w http.ResponseWriter, r *http.Reques
 	v := validator.New()
 	err = app.models.UserModel.ForgotPassword(form.Email, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -565,7 +631,7 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 	// retrieving the reset token from the URL
 	tmplData.ResetToken = flow.Param(r.Context(), "token")
 	if tmplData.ResetToken == "" {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -579,7 +645,7 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 	form := newResetPasswordForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -612,7 +678,12 @@ func (app *application) resetPasswordPost(w http.ResponseWriter, r *http.Request
 	v := validator.New()
 	err = app.models.UserModel.ResetPassword(body, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -654,14 +725,19 @@ func (app *application) logoutPost(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err := app.models.TokenModel.Logout(app.getToken(r, authTokenSessionManager), v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
 	// looking for errors from the API
 	if !v.Valid() {
 		app.logger.Error(fmt.Sprintf("errors: %s", string(v.Errors())))
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -697,7 +773,7 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 	form := newUserUpdateForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -761,7 +837,12 @@ func (app *application) updateUserPut(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.UserModel.Update(app.getToken(r, authTokenSessionManager), *form.Password, user, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -799,7 +880,7 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 	form := newCategoryForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -835,7 +916,12 @@ func (app *application) createCategoryPost(w http.ResponseWriter, r *http.Reques
 	v := validator.New()
 	err = app.models.CategoryModel.Create(app.getToken(r, authTokenSessionManager), category, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -873,7 +959,7 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 	form := newThreadForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -922,7 +1008,12 @@ func (app *application) createThreadPost(w http.ResponseWriter, r *http.Request)
 	v := validator.New()
 	err = app.models.ThreadModel.Create(app.getToken(r, authTokenSessionManager), thread, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -960,7 +1051,7 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 	form := newPostForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1005,17 +1096,6 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 	// API request to create a category
 	v := validator.New()
 	err = app.models.PostModel.Create(app.getToken(r, authTokenSessionManager), post, v)
-	if err != nil {
-
-		// DEBUG
-		app.logger.Debug(fmt.Sprintf("post: %+v", *post))
-		app.logger.Debug(fmt.Sprintf("error: %s", err.Error()))
-		app.logger.Debug(fmt.Sprintf("validator: %+v", *v))
-
-		app.serverError(w, r, err)
-		return
-	}
-
 	// looking for errors from the API
 	if !v.Valid() {
 
@@ -1050,7 +1130,7 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 	form := newTagForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1082,7 +1162,12 @@ func (app *application) createTagPost(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.TagModel.Create(app.getToken(r, authTokenSessionManager), tag, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1113,7 +1198,7 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 	// retrieving the post id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1121,7 +1206,12 @@ func (app *application) updatePost(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	post, err := app.models.PostModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1141,7 +1231,7 @@ func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 	// retrieving the tag id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1152,7 +1242,12 @@ func (app *application) updateTag(w http.ResponseWriter, r *http.Request) {
 	}
 	tag, err := app.models.TagModel.GetByID(app.getToken(r, authTokenSessionManager), id, query, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1172,7 +1267,7 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 	// retrieving the category id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1180,7 +1275,12 @@ func (app *application) updateCategory(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	category, err := app.models.CategoryModel.GetByID(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1200,7 +1300,7 @@ func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 	// retrieving the thread id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1208,7 +1308,12 @@ func (app *application) updateThread(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	thread, err := app.models.ThreadModel.GetByID(app.getToken(r, authTokenSessionManager), id, nil, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1225,7 +1330,7 @@ func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request
 	form := newCategoryForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1264,7 +1369,7 @@ func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request
 	// retrieving the category id from the path
 	category.ID, err = getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1272,7 +1377,12 @@ func (app *application) updateCategoryPut(w http.ResponseWriter, r *http.Request
 	v := validator.New()
 	err = app.models.CategoryModel.Update(app.getToken(r, authTokenSessionManager), category, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1300,7 +1410,7 @@ func (app *application) updateThreadPut(w http.ResponseWriter, r *http.Request) 
 	form := newThreadForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1340,7 +1450,7 @@ func (app *application) updateThreadPut(w http.ResponseWriter, r *http.Request) 
 	// retrieving the thread id from the path
 	thread.ID, err = getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1348,7 +1458,12 @@ func (app *application) updateThreadPut(w http.ResponseWriter, r *http.Request) 
 	v := validator.New()
 	err = app.models.ThreadModel.Update(app.getToken(r, authTokenSessionManager), thread, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1376,7 +1491,7 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 	form := newPostForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1409,7 +1524,7 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 	// retrieving the post id from the path
 	post.ID, err = getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1417,7 +1532,12 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.PostModel.Update(app.getToken(r, authTokenSessionManager), post, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1445,7 +1565,7 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 	form := newTagForm()
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1483,7 +1603,7 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 	// retrieving the tag id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1491,7 +1611,12 @@ func (app *application) updateTagPut(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	tag, err := app.models.TagModel.Update(app.getToken(r, authTokenSessionManager), id, body, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1522,7 +1647,7 @@ func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1530,7 +1655,7 @@ func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
 	form := newReactToPostForm()
 	err = app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1557,7 +1682,12 @@ func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.PostModel.React(app.getToken(r, authTokenSessionManager), form.Reaction, id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1596,7 +1726,7 @@ func (app *application) changeReactionPost(w http.ResponseWriter, r *http.Reques
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1604,7 +1734,7 @@ func (app *application) changeReactionPost(w http.ResponseWriter, r *http.Reques
 	form := newReactToPostForm()
 	err = app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1631,7 +1761,12 @@ func (app *application) changeReactionPost(w http.ResponseWriter, r *http.Reques
 	v := validator.New()
 	err = app.models.PostModel.UpdateReaction(app.getToken(r, authTokenSessionManager), form.Reaction, id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1670,7 +1805,7 @@ func (app *application) removeReactionPost(w http.ResponseWriter, r *http.Reques
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1681,7 +1816,12 @@ func (app *application) removeReactionPost(w http.ResponseWriter, r *http.Reques
 	v := validator.New()
 	err = app.models.PostModel.DeleteReaction(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1720,7 +1860,7 @@ func (app *application) followTag(w http.ResponseWriter, r *http.Request) {
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1731,7 +1871,12 @@ func (app *application) followTag(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.TagModel.Follow(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1770,7 +1915,7 @@ func (app *application) unfollowTag(w http.ResponseWriter, r *http.Request) {
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1781,7 +1926,12 @@ func (app *application) unfollowTag(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.TagModel.Unfollow(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1820,7 +1970,7 @@ func (app *application) addToFavoritesThread(w http.ResponseWriter, r *http.Requ
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1831,7 +1981,12 @@ func (app *application) addToFavoritesThread(w http.ResponseWriter, r *http.Requ
 	v := validator.New()
 	err = app.models.ThreadModel.AddToFavorite(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1870,7 +2025,7 @@ func (app *application) removeFromFavoritesThread(w http.ResponseWriter, r *http
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1881,7 +2036,12 @@ func (app *application) removeFromFavoritesThread(w http.ResponseWriter, r *http
 	v := validator.New()
 	err = app.models.ThreadModel.RemoveFromFavorite(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1920,7 +2080,7 @@ func (app *application) friendRequest(w http.ResponseWriter, r *http.Request) {
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1931,7 +2091,12 @@ func (app *application) friendRequest(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.UserModel.FriendRequest(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -1970,7 +2135,7 @@ func (app *application) friendResponse(w http.ResponseWriter, r *http.Request) {
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -1978,7 +2143,7 @@ func (app *application) friendResponse(w http.ResponseWriter, r *http.Request) {
 	form := newFriendResponseForm()
 	err = app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -2012,7 +2177,12 @@ func (app *application) friendResponse(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.UserModel.FriendResponse(app.getToken(r, authTokenSessionManager), id, body, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 
@@ -2051,7 +2221,7 @@ func (app *application) friendDelete(w http.ResponseWriter, r *http.Request) {
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
 
@@ -2062,7 +2232,12 @@ func (app *application) friendDelete(w http.ResponseWriter, r *http.Request) {
 	v := validator.New()
 	err = app.models.UserModel.FriendDelete(app.getToken(r, authTokenSessionManager), id, v)
 	if err != nil {
-		app.serverError(w, r, err)
+		switch {
+		case errors.Is(err, api.ErrRecordNotFound):
+			app.clientError(r, w, http.StatusNotFound)
+		default:
+			app.serverError(w, r, err)
+		}
 		return
 	}
 

@@ -22,19 +22,19 @@
             <div class="third-line">
             {{/* Emojis possibilité d'en choisir 1  */}}
                 <div class="emoji-ctn{{if eq $emoji "neutral"}} selected{{end}}">
-                    <img  class="emoji" src="/static/img/icons/emoji-neutral-icon.svg" alt="neutral emoji" data-value="neutral">
+                    <img  class="emoji" src="/static/img/icons/emoji-neutral-icon.svg" alt="neutral emoji" data-value="neutral" data-id="{{.ID}}" data-status="{{if eq $emoji "neutral"}}selected{{else if ne $emoji ""}}reacted{{else}}none{{end}}">
                     {{with .Reactions.neutral}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
                 <div class="emoji-ctn{{if eq $emoji "laughing"}} selected{{end}}">
-                    <img  class="emoji" src="/static/img/icons/emoji-rigole2-icon.svg" alt="laughing emoji" data-value="laughing">
+                    <img  class="emoji" src="/static/img/icons/emoji-rigole2-icon.svg" alt="laughing emoji" data-value="laughing" data-id="{{.ID}}" data-status="{{if eq $emoji "laughing"}}selected{{else if ne $emoji ""}}reacted{{else}}none{{end}}">
                     {{with .Reactions.laughing}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
                 <div class="emoji-ctn{{if eq $emoji "applause"}} selected{{end}}">
-                    <img  class="emoji" src="/static/img/icons/emoji-applause-icon.svg" alt="applause emoji" data-value="applause">
+                    <img  class="emoji" src="/static/img/icons/emoji-applause-icon.svg" alt="applause emoji" data-value="applause" data-id="{{.ID}}" data-status="{{if eq $emoji "applause"}}selected{{else if ne $emoji ""}}reacted{{else}}none{{end}}">
                     {{with .Reactions.applause}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
                 <div class="emoji-ctn{{if eq $emoji "heart"}} selected{{end}}">
-                    <img class="emoji" src="/static/img/icons/emoji-coeur-icon.svg" alt="heart emoji" data-value="heart">
+                    <img class="emoji" src="/static/img/icons/emoji-coeur-icon.svg" alt="heart emoji" data-value="heart" data-id="{{.ID}}" data-status="{{if eq $emoji "heart"}}selected{{else if ne $emoji ""}}reacted{{else}}none{{end}}">
                     {{with .Reactions.heart}}<div class="reactions-nb">{{.}}</div>{{end}}
                 </div>
                 {{/*  Fin des emojis  */}}

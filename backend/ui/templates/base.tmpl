@@ -25,14 +25,22 @@
         <div class="logo-searchbar">
             <a href="/"><img class="logo" src="/static/img/logo/logo_transparent.png" alt="logo"></a>
             <form class="search">
-                <input class="searchbar" type="searchbar" placeholder="Search for a category, a thread ...">
+                <label for="searchbar" class="abs display-none"></label>
+                <input class="searchbar" id="searchbar" type="text" placeholder="Search for a category, a thread ...">
                 <img class="search-icon" src="/static/img/icons/search-icon.svg">
             </form>
         </div>
         <div class="notification-profile">
-            <img class="notification-icon" src="/static/img/icons/notification-icon.svg">
+            <img class="notification-icon" src="/static/img/icons/notification-icon.svg" alt="notification icon">
             <div class="profile">
-                <div class="profile-picture"></div>
+                <div class="profile-picture relative">
+                    {{if .IsAuthenticated}}
+                        <img src="{{.User.Avatar}}" alt="profile icon">
+                        <a href="/dashboard" class="abs full on-top"></a>
+                    {{else}}
+                        <img src="/static/img/icons/menu-dots-icon.svg" alt="menu dots icon">
+                    {{end}}
+                </div>
                 <div class="profile-icon-box">
                     <img class="profile-icon" src="/static/img/icons/down-arrow-icon.svg">
                 </div>
@@ -51,7 +59,7 @@
                         </form>
                     {{else}}
                         <div class="item">
-                            <img class="item-icon" src="/static/img/icons/categories-icon.svg">
+                            <img class="item-icon" src="/static/img/icons/login-icon.svg">
                             <a class="item-link" href="/login"></a>
                             <p class="item-text"> Login </p>
                         </div>
@@ -213,8 +221,170 @@
         {{block "reset-password" .}}{{end}}
     {{end}}
 
-
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/static/js/script.js"></script>
+    <script>
+
+
+        {{/* ######################################################################################*/}}
+        {{/* # HIDE OVERLAY                                                                        */}}
+        {{/* ######################################################################################*/}}
+
+        {{if ne .Overlay ""}}
+            const overlay = document.querySelector('.blur-underlay');
+            const centerPage = document.querySelector('.center-page');
+
+            centerPage.addEventListener('click', (event) => {
+                if (event.target === centerPage) {
+                    centerPage.style.display = 'none';
+                    overlay.style.display = 'none';
+                }
+            })
+        {{end}}
+
+        {{if .IsAuthenticated}}
+
+            {{/* ######################################################################################*/}}
+            {{/* # AJAX: FRIENDS                                                                       */}}
+            {{/* ######################################################################################*/}}
+
+            // Friend requests
+
+            // Friend response
+
+            // Friend remove
+
+            {{/* ######################################################################################*/}}
+            {{/* # AJAX: POST REACTIONS                                                                */}}
+            {{/* ######################################################################################*/}}
+
+            const emojis = document.querySelectorAll('.emoji-ctn .emoji');
+
+            // DEBUG
+            console.log(emojis);
+
+            function addReaction(emojiCtn) {
+                emojiCtn.classList.toggle('selected');
+                emojiCtn.querySelector('.emoji').dataset.status = 'selected';
+                let reactionNb = emojiCtn.querySelector('.reactions-nb');
+                if (!!reactionNb) {
+                    const nb = parseInt(reactionNb.innerText);
+                    reactionNb.innerText = nb + 1;
+                } else {
+                    reactionNb = `<div class="reactions-nb">1</div>`
+                    emojiCtn.appendChild(reactionNb);
+                }
+            }
+
+            function removeReaction(emojiCtn, status = 'reacted') {
+                emojiCtn.classList.toggle('selected');
+                let reactionNb = emojiCtn.querySelector('.reactions-nb');
+                const nb = parseInt(reactionNb.innerText);
+                if (nb === 1) {
+                    emojiCtn.removeChild(reactionNb);
+                } else {
+                    reactionNb.innerText = nb - 1;
+                }
+                if (status === 'selected') {
+                    emojiCtn.parentNode.querySelectorAll('.emoji').forEach(emoji => {
+                        emoji.dataset.status = 'none';
+                    });
+                }
+            }
+
+            function updateReaction(emojiCtn, status) {
+                switch (status) {
+                    case "reacted":
+                        removeReaction(emojiCtn.parentNode.querySelector('.selected'));
+                        addReaction(emojiCtn);
+                        break;
+                    case "selected":
+                        removeReaction(emojiCtn, status)
+                        break;
+                    case "none":
+                        addReaction(emojiCtn);
+                        break;
+                }
+            }
+
+            emojis.forEach(emoji => {
+                emoji.addEventListener('click', () => {
+
+                    // DEBUG
+                    console.log(emoji);
+
+                    // getting the user's reaction's status on this post
+                    const status = emoji.dataset.status;
+
+                    // getting the post ID
+                    const id = emoji.dataset.id;
+
+                    // choose the ajax request according to the reaction's status
+                    switch (status) {
+
+                        // the user reacted to this post, but not with this emoji
+                        case "reacted":
+                            // send ajax request to update the reaction
+                            axios.patch(`/post/${id}/react`, {reaction: emoji.dataset.value})
+                                .then(function (response) {
+                                    updateReaction(emoji.parentNode, status)
+                                    console.log(response);
+                                })
+                                .catch(function (error) {
+                                    // handle error
+                                    console.log(error);
+                                });
+                            break;
+
+                        // the user reacted to this post with this emoji
+                        case "selected":
+                            // send ajax request to remove the reaction
+                            axios.delete(`/post/${id}/react`)
+                                .then(function (response) {
+                                    updateReaction(emoji.parentNode, status)
+                                    console.log(response);
+                                })
+                                .catch(function (error) {
+                                    // handle error
+                                    console.log(error);
+                                });
+                            break;
+
+                        // the user didn't react to this post
+                        case "none":
+                            // send ajax request to update the reaction
+                            axios.post(`/post/${id}/react`, {reaction: emoji.dataset.value})
+                                .then(function (response) {
+                                    updateReaction(emoji.parentNode, status)
+                                    console.log(response);
+                                })
+                                .catch(function (error) {
+                                    // handle error
+                                    console.log(error);
+                                });
+                            break;
+                    }
+                })
+            })
+
+            {{/* ######################################################################################*/}}
+            {{/* # AJAX: TAG FOLLOW/UNFOLLOW                                                           */}}
+            {{/* ######################################################################################*/}}
+
+            // Tag follow
+
+            // Tag unfollow
+
+            {{/* ######################################################################################*/}}
+            {{/* # AJAX: THREAD FAVORITE                                                               */}}
+            {{/* ######################################################################################*/}}
+
+            // Thread add to favorites
+
+            // Thread remove from favorites
+
+        {{end}}
+    </script>
 </body>
 </html>
 {{end}}

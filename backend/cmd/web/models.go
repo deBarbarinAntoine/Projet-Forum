@@ -45,16 +45,20 @@ var Overlay = overlayEnum{
 }
 
 type templateData struct {
-	Title             string
-	Overlay           string
-	CurrentYear       int
-	Message           string
-	Form              any
-	Flash             string
-	IsAuthenticated   bool
-	CSRFToken         string
-	ActivationToken   string
-	ResetToken        string
+	Title           string
+	Overlay         string
+	CurrentYear     int
+	Message         string
+	Form            any
+	Flash           string
+	IsAuthenticated bool
+	CSRFToken       string
+	ActivationToken string
+	ResetToken      string
+	Error           struct {
+		Title   string
+		Message string
+	}
 	FieldErrors       map[string]string
 	NonFieldErrors    []string
 	User              data.User

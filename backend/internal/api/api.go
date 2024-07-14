@@ -26,6 +26,7 @@ var (
 	permittedMethods      = []string{http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete}
 	lock                  = &sync.Mutex{}
 	ErrUnmarshallAPIError = errors.New("error unmarshalling API error response")
+	ErrRecordNotFound     = errors.New("record not found")
 )
 
 type API struct {
@@ -180,14 +181,16 @@ func (api *API) Get(userToken, endpoint string, query url.Values) ([]byte, int, 
 	}
 	defer res.Body.Close()
 
+	// checking for error 404
+	if res.StatusCode == http.StatusNotFound {
+		return nil, res.StatusCode, ErrRecordNotFound
+	}
+
 	// reading the body of the response
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, StatusFailedRequest, err
 	}
-
-	// DEBUG -> REMOVE WHEN SENDING TO PRODUCTION
-	//fmt.Printf("body %s\n", string(body)) // FIXME
 
 	return body, res.StatusCode, nil
 }
@@ -207,9 +210,6 @@ func (api *API) Request(userToken, method, endpoint string, body []byte, isEncry
 		var err error
 		body, err = api.encryptPEM(body)
 		if err != nil {
-
-			// DEBUG
-			fmt.Printf("error encrypting body: %v", err)
 			return nil, StatusFailedRequest, err
 		}
 	}
@@ -217,9 +217,6 @@ func (api *API) Request(userToken, method, endpoint string, body []byte, isEncry
 	// creating the request
 	req, err := http.NewRequest(method, urlRequest, bytes.NewBuffer(body))
 	if err != nil {
-
-		// DEBUG
-		fmt.Printf("error creating request: %v", err)
 		return nil, StatusFailedRequest, err
 	}
 
@@ -248,6 +245,11 @@ func (api *API) Request(userToken, method, endpoint string, body []byte, isEncry
 		return nil, StatusFailedRequest, err
 	}
 	defer res.Body.Close()
+
+	// checking for error 404
+	if res.StatusCode == http.StatusNotFound {
+		return nil, res.StatusCode, ErrRecordNotFound
+	}
 
 	// reading the body of the response
 	body, err = io.ReadAll(res.Body)
