@@ -22,7 +22,7 @@
 ### Introduction
 
 This API is used to power up an online tech oriented forum named **Threadive**.
-It handles all data, logics and manipulations of the actual forum: the website is only like an HTTP interface.
+It handles all data, logics and manipulations of the actual forum: the website is only like an HTML/CSS interface.
 
 ### Authentication
 
