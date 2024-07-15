@@ -104,8 +104,10 @@ header .logo-searchbar a {
   cursor: pointer;
 }
 header .logo-searchbar a .logo {
-  object-fit: contain;
-  object-position: center;
+  -o-object-fit: contain;
+     object-fit: contain;
+  -o-object-position: center;
+     object-position: center;
   height: 100%;
   width: 100%;
 }
@@ -159,8 +161,10 @@ header .notification-profile .profile .profile-picture {
   border-radius: 50%;
 }
 header .notification-profile .profile .profile-picture img {
-  object-position: center;
-  object-fit: fill;
+  -o-object-position: center;
+     object-position: center;
+  -o-object-fit: fill;
+     object-fit: fill;
   height: 100%;
   width: 100%;
 }
@@ -225,13 +229,17 @@ header .notification-profile .profile .dropdown .item .item-link {
   bottom: 0;
 }
 header .notification-profile .profile .dropdown .item button.logout-link {
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   border: none;
   background-color: transparent;
   cursor: pointer;
 }
 header .notification-profile .profile .dropdown .item button.logout-link:hover {
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   border: none;
   background-color: transparent;
 }
@@ -299,8 +307,10 @@ header .notification-profile .profile .dropdown .item .item-text {
   top: 0;
 }
 .nav-left .profile .personal-info .profile-picture .avatar {
-  object-fit: cover;
-  object-position: center;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center;
+     object-position: center;
   height: 100%;
   width: 100%;
 }
@@ -415,6 +425,7 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 .nav-left .page-link .category-list .category {
   width: 100%;
+  height: -moz-fit-content;
   height: fit-content;
   display: flex;
   flex-flow: row nowrap;
@@ -610,7 +621,9 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   font-family: "Varela-Round", sans-serif;
 }
 .center-page .container .login .input-fields .input:focus {
@@ -690,7 +703,8 @@ header .notification-profile .profile .dropdown .item .item-text {
   bottom: 0;
   left: 0;
   right: 0;
-  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
 }
 
 .bottom-outset {
@@ -705,6 +719,4 @@ textarea.description {
   height: 200px !important;
   resize: none;
   scrollbar-width: thin;
-}
-
-/*# sourceMappingURL=base.css.map */
+}/*# sourceMappingURL=base.css.map */

@@ -97,7 +97,6 @@ header {
         flex-flow: row nowrap;
         justify-content: space-between;
         align-items: center;
-
         a {
             width: 250px;
             aspect-ratio: 5/1;
@@ -287,6 +286,7 @@ header {
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
+
 
     .profile {
         width: 80%;
