@@ -4,6 +4,8 @@ import (
 	"Projet-Forum/internal/data"
 	"Projet-Forum/internal/validator"
 	"bytes"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/alexedwards/flow"
@@ -29,6 +31,24 @@ func (app *application) logout(r *http.Request) error {
 	}
 
 	return nil
+}
+
+func newNonce() (string, error) {
+	nonceBytes := make([]byte, 16)
+	_, err := rand.Read(nonceBytes)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(nonceBytes), nil
+}
+
+func (app *application) getNonce(r *http.Request) string {
+	nonce, ok := r.Context().Value(nonceContextKey).(string)
+	if !ok {
+		app.logger.Error("no nonce in request context")
+		return ""
+	}
+	return nonce
 }
 
 func (app *application) decodePostForm(r *http.Request, dst any) error {
@@ -230,6 +250,9 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 	// checking is the user is authenticated
 	isAuthenticated := app.isAuthenticated(r)
 	token := app.getToken(r, authTokenSessionManager)
+
+	// retrieving the nonce
+	nonce := app.getNonce(r)
 	// retrieving the user data
 	user := &data.User{}
 	v := validator.New()
@@ -264,6 +287,7 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 		CurrentYear:     time.Now().Year(),
 		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
 		IsAuthenticated: isAuthenticated,
+		Nonce:           nonce,
 		CSRFToken:       nosurf.Token(r),
 		Error: struct {
 			Title   string

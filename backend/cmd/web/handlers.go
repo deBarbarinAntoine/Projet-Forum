@@ -31,7 +31,7 @@ func (app *application) methodNotAllowed(w http.ResponseWriter, r *http.Request)
 
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
-	tmplData.Title = "Threadive - Not Found"
+	tmplData.Title = "Threadive - Oooops"
 
 	// setting the error title and message
 	tmplData.Error.Title = "Error 405"
@@ -1647,6 +1647,10 @@ func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
 	// getting the id from the path
 	id, err := getPathID(r)
 	if err != nil {
+
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("error getting the id from the path: %s", err))
+
 		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}
@@ -1655,6 +1659,10 @@ func (app *application) reactToPost(w http.ResponseWriter, r *http.Request) {
 	form := newReactToPostForm()
 	err = app.decodePostForm(r, &form)
 	if err != nil {
+
+		// DEBUG
+		app.logger.Debug(fmt.Sprintf("error decoding the form: %s", err))
+
 		app.clientError(r, w, http.StatusBadRequest)
 		return
 	}

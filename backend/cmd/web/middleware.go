@@ -21,7 +21,19 @@ const (
 func commonHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Set("Content-Security-Policy", "default-src 'self' ui-avatars.com; script-src 'self' fonts.googleapis.com fonts.gstatic.com cdn.jsdelivr.net")
+		// generating a nonce for the script embedded in the templates
+		nonce, err := newNonce()
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		// putting the nonce in the context
+		ctx := context.WithValue(r.Context(), nonceContextKey, nonce)
+		r = r.WithContext(ctx)
+
+		// setting the common headers
+		w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src 'self' https://ui-avatars.com; script-src 'self' 'nonce-%s' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net", nonce))
 		w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "deny")

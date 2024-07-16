@@ -258,7 +258,7 @@ func (m *PostModel) DeleteReaction(token string, id int, v *validator.Validator)
 	endpoint := fmt.Sprintf("%s/%d/react", m.endpoint, id)
 
 	// making the request
-	res, status, err := m.api().Request(token, http.MethodPut, endpoint, nil, false)
+	res, status, err := m.api().Request(token, http.MethodDelete, endpoint, nil, false)
 	if err != nil {
 		return err
 	}

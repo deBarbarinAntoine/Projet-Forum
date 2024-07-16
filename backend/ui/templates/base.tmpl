@@ -224,14 +224,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/static/js/script.js"></script>
-    <script>
+    <script nonce="{{.Nonce}}">
 
 
         {{/* ######################################################################################*/}}
         {{/* # HIDE OVERLAY                                                                        */}}
         {{/* ######################################################################################*/}}
 
-        {{if ne .Overlay ""}}
+        {{if ne .Overlay "default"}}
             const overlay = document.querySelector('.blur-underlay');
             const centerPage = document.querySelector('.center-page');
 
@@ -249,20 +249,17 @@
             {{/* # AJAX: FRIENDS                                                                       */}}
             {{/* ######################################################################################*/}}
 
-            // Friend requests
+            {{/*Friend requests*/}}
 
-            // Friend response
+            {{/*Friend response*/}}
 
-            // Friend remove
+            {{/*Friend remove*/}}
 
             {{/* ######################################################################################*/}}
             {{/* # AJAX: POST REACTIONS                                                                */}}
             {{/* ######################################################################################*/}}
 
             const emojis = document.querySelectorAll('.emoji-ctn .emoji');
-
-            // DEBUG
-            console.log(emojis);
 
             function addReaction(emojiCtn) {
                 emojiCtn.classList.toggle('selected');
@@ -272,7 +269,9 @@
                     const nb = parseInt(reactionNb.innerText);
                     reactionNb.innerText = nb + 1;
                 } else {
-                    reactionNb = `<div class="reactions-nb">1</div>`
+                    reactionNb = document.createElement('div');
+                    reactionNb.classList.add('reactions-nb');
+                    reactionNb.innerText = '1';
                     emojiCtn.appendChild(reactionNb);
                 }
             }
@@ -311,56 +310,58 @@
             emojis.forEach(emoji => {
                 emoji.addEventListener('click', () => {
 
-                    // DEBUG
-                    console.log(emoji);
-
-                    // getting the user's reaction's status on this post
+                    {{/*getting the user's reaction's status on this post*/}}
                     const status = emoji.dataset.status;
 
-                    // getting the post ID
+                    {{/*getting the post ID*/}}
                     const id = emoji.dataset.id;
 
-                    // choose the ajax request according to the reaction's status
+                    {{/*including the CSRF token in the axios requests*/}}
+                    axios.defaults.headers.common['X-CSRF-TOKEN'] = {{.CSRFToken}};
+
+                    {{/*choose the ajax request according to the reaction's status*/}}
                     switch (status) {
 
-                        // the user reacted to this post, but not with this emoji
+                        {{/*the user reacted to this post, but not with this emoji*/}}
                         case "reacted":
-                            // send ajax request to update the reaction
-                            axios.patch(`/post/${id}/react`, {reaction: emoji.dataset.value})
+                            {{/*send ajax request to update the reaction*/}}
+                            axios.patch(`/posts/${id}/react`, {reaction: emoji.dataset.value},
+                                {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
                                 .then(function (response) {
                                     updateReaction(emoji.parentNode, status)
                                     console.log(response);
                                 })
                                 .catch(function (error) {
-                                    // handle error
+                                    {{/*handle error*/}}
                                     console.log(error);
                                 });
                             break;
 
-                        // the user reacted to this post with this emoji
+                        {{/*the user reacted to this post with this emoji*/}}
                         case "selected":
-                            // send ajax request to remove the reaction
-                            axios.delete(`/post/${id}/react`)
+                            {{/*send ajax request to remove the reaction*/}}
+                            axios.delete(`/posts/${id}/react`)
                                 .then(function (response) {
                                     updateReaction(emoji.parentNode, status)
                                     console.log(response);
                                 })
                                 .catch(function (error) {
-                                    // handle error
+                                    {{/*handle error*/}}
                                     console.log(error);
                                 });
                             break;
 
-                        // the user didn't react to this post
+                        {{/*the user didn't react to this post*/}}
                         case "none":
-                            // send ajax request to update the reaction
-                            axios.post(`/post/${id}/react`, {reaction: emoji.dataset.value})
+                            {{/*send ajax request to update the reaction*/}}
+                            axios.post(`/posts/${id}/react`, {reaction: emoji.dataset.value},
+                                {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
                                 .then(function (response) {
                                     updateReaction(emoji.parentNode, status)
                                     console.log(response);
                                 })
                                 .catch(function (error) {
-                                    // handle error
+                                    {{/*handle error*/}}
                                     console.log(error);
                                 });
                             break;
@@ -372,17 +373,17 @@
             {{/* # AJAX: TAG FOLLOW/UNFOLLOW                                                           */}}
             {{/* ######################################################################################*/}}
 
-            // Tag follow
+            {{/*Tag follow*/}}
 
-            // Tag unfollow
+            {{/*Tag unfollow*/}}
 
             {{/* ######################################################################################*/}}
             {{/* # AJAX: THREAD FAVORITE                                                               */}}
             {{/* ######################################################################################*/}}
 
-            // Thread add to favorites
+            {{/*Thread add to favorites*/}}
 
-            // Thread remove from favorites
+            {{/*Thread remove from favorites*/}}
 
         {{end}}
     </script>

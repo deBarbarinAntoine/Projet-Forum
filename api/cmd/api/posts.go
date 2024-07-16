@@ -416,6 +416,9 @@ func (app *application) removeReactionPostHandler(w http.ResponseWriter, r *http
 		return
 	}
 
+	// DEBUG
+	app.logger.Debug(fmt.Sprintf("asking to remove reaction to post with id %d", id))
+
 	user := app.contextGetUser(r)
 
 	err = app.models.Posts.RemoveReaction(user, id)
