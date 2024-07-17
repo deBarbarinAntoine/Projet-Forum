@@ -153,6 +153,7 @@ func ValidateEmail(v *validator.Validator, email string) {
 
 func ValidatePasswordPlaintext(v *validator.Validator, password string) {
 	v.StringCheck(password, MinPasswordLength, MaxPasswordLength, true, "password")
+	v.CheckPassword(password)
 }
 
 func ValidateNewPassword(v *validator.Validator, newPassword, confirmationPassword string) {

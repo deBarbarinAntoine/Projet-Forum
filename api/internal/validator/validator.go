@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"slices"
+	"unicode"
 )
 
 var (
@@ -41,6 +42,37 @@ func (v *Validator) StringCheck(str string, min, max int, isMandatory bool, key 
 	}
 	v.Check(len(str) >= min, key, fmt.Sprintf("must be minimum %d bytes long", min))
 	v.Check(len(str) <= max, key, fmt.Sprintf("must not be more than %d bytes long", max))
+}
+
+func (v *Validator) CheckPassword(password string) {
+
+	// setting booleans to check the criteria
+	var (
+		hasUpper   = false
+		hasLower   = false
+		hasNumber  = false
+		hasSpecial = false
+	)
+
+	// checking every character
+	for _, char := range password {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsNumber(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+
+	// adding errors if needed
+	v.Check(hasUpper, "password", "must contain an uppercase character")
+	v.Check(hasLower, "password", "must contain a lowercase character")
+	v.Check(hasNumber, "password", "must contain a numeric character")
+	v.Check(hasSpecial, "password", "must contain a special character")
 }
 
 func PermittedValue[T comparable](value T, permittedValues ...T) bool {

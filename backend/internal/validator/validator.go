@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 	"time"
-	"unicode/utf8"
+	"unicode"
 )
 
 const (
@@ -80,18 +80,52 @@ func (v *Validator) StringCheck(str string, min, max int, isMandatory bool, key 
 	v.Check(len(str) <= max, key, fmt.Sprintf("must not be more than %d bytes long", max))
 }
 
+func (v *Validator) CheckPassword(password, key string) {
+
+	// setting booleans to check the criteria
+	var (
+		hasUpper   = false
+		hasLower   = false
+		hasNumber  = false
+		hasSpecial = false
+	)
+
+	// checking every character
+	for _, char := range password {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsNumber(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+
+	// adding errors if needed
+	v.Check(hasUpper, key, "must contain an uppercase character")
+	v.Check(hasLower, key, "must contain a lowercase character")
+	v.Check(hasNumber, key, "must contain a numeric character")
+	v.Check(hasSpecial, key, "must contain a special character")
+}
+
 func (v *Validator) ValidatePassword(password string) {
 	v.StringCheck(password, MinPasswordLength, MaxPasswordLength, true, "password")
+	v.CheckPassword(password, "password")
 }
 
 func (v *Validator) ValidateRegisterPassword(password, confirmationPassword string) {
 	v.StringCheck(password, MinPasswordLength, MaxPasswordLength, true, "password")
+	v.CheckPassword(password, "password")
 	v.Check(confirmationPassword != "", "confirmation_password", "must be provided")
 	v.Check(password == confirmationPassword, "confirmation_password", "must be the same")
 }
 
 func (v *Validator) ValidateNewPassword(newPassword, confirmationPassword string) {
 	v.StringCheck(newPassword, MinPasswordLength, MaxPasswordLength, true, "new_password")
+	v.CheckPassword(newPassword, "new_password")
 	v.Check(confirmationPassword != "", "confirmation_password", "must be provided")
 	v.Check(newPassword == confirmationPassword, "confirmation_password", "must be the same")
 }
@@ -103,14 +137,6 @@ func (v *Validator) ValidateToken(token string) {
 
 func NotBlank(fieldName string) bool {
 	return strings.TrimSpace(fieldName) != ""
-}
-
-func MinChars(value string, n int) bool {
-	return utf8.RuneCountInString(value) >= n
-}
-
-func MaxChars(value string, n int) bool {
-	return utf8.RuneCountInString(value) <= n
 }
 
 func Matches(value string, rx *regexp.Regexp) bool {
