@@ -1,0 +1,31 @@
+{{define "page"}}
+<div class="container-inthread">
+          <!--{{ Toutes les catégories}}-->
+        <h4> All the categories </h4>  
+        <div class="container-search-filter">
+            <input class="search-liste" placeholder="Search in all the categories"> <img class="search-icon" src="../assets/img/icons/search-icon.svg">   
+    </div>
+    <img class="newfolder"src="../assets/img/icons/add-icon.svg">
+    <div class="container-category">
+          <!--{{ Static pour test }}-->
+          <div class="rectangle-category borders borders-hover">
+            <a href=""><h5> Languages </h5> <!--{{ categorie }}--></a> 
+        </div>
+        
+        
+          <!--{{ Range à remplacer avec toutes les catégories }}-->
+          {{range .CategoriesNavLeft}}
+          <div class="rectangle-category borders borders-hover">
+            <a href="/category/{{.ID}}"><h5> {{.Name}} </h5></a> 
+          </div>
+      {{end}}
+    </div>
+</div>
+{{end}}
+
+
+ 
+ 
+ 
+ 
+ 

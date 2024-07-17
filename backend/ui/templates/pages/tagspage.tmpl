@@ -1,0 +1,24 @@
+{{define "page"}}
+<div class="container-inthread">
+          <!--{{ Tous les tags }}-->
+        <h4> All the tags</h4>  
+        <div class="container-search-filter">
+            <input class="search-liste" placeholder="Search in all the tags"> <img class="search-icon" src="../assets/img/icons/search-icon.svg">   
+    </div>
+    <img class="newfolder"src="../assets/img/icons/add-icon.svg"> 
+    <div class="alltag">
+          <!--{{ Static pour exemple }}-->
+        <div class="tag">
+            <a class="tag-link"> apple </a>
+        </div>
+        
+          <!--{{ Range à remplacer avec tous les tags }}-->
+        {{range .PopularTags}}
+        <div class="tag">
+            <a href="/tag/{{.ID}}" class="tag-link"> {{.Name}} </a>
+        </div>
+    {{end}}
+    </div>
+    </div>
+{{end}}
+
