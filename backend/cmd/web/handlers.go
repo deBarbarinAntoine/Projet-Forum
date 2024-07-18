@@ -244,7 +244,7 @@ func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the template
-	app.render(w, r, http.StatusOK, "tag.tmpl", tmplData)
+	app.render(w, r, http.StatusOK, "categories.tmpl", tmplData)
 }
 
 func (app *application) search(w http.ResponseWriter, r *http.Request) {

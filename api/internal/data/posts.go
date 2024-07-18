@@ -123,7 +123,7 @@ func (m PostModel) Get(search string, filters Filters) ([]*Post, Metadata, error
 		ORDER BY %s %s, Id_posts ASC
 		LIMIT ? OFFSET ?;`, filters.sortColumn(), filters.sortDirection())
 
-	args := []any{search, filters.limit, filters.offset}
+	args := []any{search, filters.limit(), filters.offset()}
 
 	var posts []*Post
 

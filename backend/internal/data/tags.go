@@ -138,12 +138,13 @@ func (m *TagModel) Get(token string, query url.Values, v *validator.Validator) (
 		if err != nil {
 			return nil, Metadata{}, err
 		}
-		var ok bool
-		if tags, ok = response["tags"].([]*Tag); !ok {
-			return nil, Metadata{}, errors.New("invalid response from Tags")
+		err = api.UnmarshallSlice(response["tags"], &tags)
+		if err != nil {
+			return nil, Metadata{}, err
 		}
-		if metadata, ok = response["_metadata"].(Metadata); !ok {
-			return nil, Metadata{}, errors.New("invalid response from Metadata")
+		err = api.Unmarshall(response["_metadata"], &metadata)
+		if err != nil {
+			return nil, Metadata{}, err
 		}
 	}
 

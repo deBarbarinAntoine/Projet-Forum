@@ -1,0 +1,19 @@
+{{define "page"}}
+    <div class="container-inthread">
+        <h4> All the tags</h4>
+        <div class="container-search-filter">
+            <label for="search-liste" class="abs display-none"></label>
+            <input class="search-liste" id="search-liste" type="text" placeholder="Search in all the tags">
+            <img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon">
+        </div>
+        <img class="newfolder" src="/static/img/icons/add-icon.svg" alt="add tag icon">
+        <div class="alltag">
+            {{range .TagList.List}}
+                <div class="tag">
+                    <a href="/tag/{{.ID}}" class="tag-link"> {{.Name}} </a>
+                </div>
+            {{end}}
+        </div>
+    </div>
+{{end}}
+

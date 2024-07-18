@@ -303,7 +303,7 @@ func (m TagModel) Get(search string, filters Filters) ([]*Tag, Metadata, error) 
 		ORDER BY %s %s, Id_tags ASC
 		LIMIT ? OFFSET ?;`, filters.sortColumn(), filters.sortDirection())
 
-	args := []any{search, filters.limit, filters.offset}
+	args := []any{search, filters.limit(), filters.offset()}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

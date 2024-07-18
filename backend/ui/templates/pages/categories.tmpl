@@ -1,0 +1,25 @@
+{{define "page"}}
+<div class="container-inthread">
+        <h4> All the categories </h4>  
+        <div class="container-search-filter">
+            <label for="search-liste" class="abs display-none"></label>
+            <input class="search-liste" id="search-liste" placeholder="Search in all the categories">
+            <img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon">
+    </div>
+    <img class="newfolder" src="/static/img/icons/add-icon.svg" alt="add category icon">
+    <div class="container-category">
+          {{range .CategoryList.List}}
+          <div class="rectangle-category borders borders-hover">
+            <a href="/category/{{.ID}}"><h5> {{.Name}} </h5></a> 
+          </div>
+      {{end}}
+    </div>
+</div>
+{{end}}
+
+
+ 
+ 
+ 
+ 
+ 
