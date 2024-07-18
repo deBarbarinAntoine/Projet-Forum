@@ -2,7 +2,9 @@
 <div class="container-inthread">
     <h4> {{.Thread.Title}} </h4>
     <div class="container-search-filter">
-        <input class="search-liste" placeholder="Search in the category"> <img class="search-icon" src="/static/img/icons/search-icon.svg">
+        <label for="search-liste" class="abs display-none"></label>
+        <input class="search-liste" id="search-liste" type="text" placeholder="Search in the category">
+        <img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon">
         <p> Filter </p>
     </div>
     {{$user := .User}}
@@ -10,11 +12,11 @@
         {{$emoji := getUserReaction $user .ID}}
         <div class="container-post">
             <div class="first-line">
-                <img src="{{.Author.Avatar}}" class="author-avatar">
+                <img src="{{.Author.Avatar}}" class="author-avatar" alt="author avatar image">
                 <h3> {{.Author.Name}} </h3>
                 <p> {{humanDate .CreatedAt}} </p>
-                <img class="img-inthread" src="/static/img/icons/fav-icon.svg">
-                <img class="img-inthread"src="/static/img/icons/réponse-icon.svg">
+                <img class="img-inthread" src="/static/img/icons/fav-icon.svg" alt="favorite icon">
+                <img class="img-inthread"src="/static/img/icons/réponse-icon.svg" alt="response icon">
             </div>
             <div class="second-line">
                 <p>  {{.Content}} </p>
@@ -45,16 +47,16 @@
          {{/* Répondre à la suite */}}
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <input type="hidden" name="thread_id" value="{{.Thread.ID}}">
-        <label for="content"></label>
-       <input name="content" id="content" placeholder="Type your response here ...">
-       <img src="/static/img/icons/response-icon.svg">
+        <label for="content" class="abs display-none"></label>
+       <input name="content" id="content" type="text" placeholder="Type your response here ...">
+       <img src="/static/img/icons/response-icon.svg" alt="response icon">
     </form>
     <div class="pagination-container">
         <div class="pagination">
              {{/* Pagination */}}
-            <img src="/static/img/icons/arrow-left-icon.svg">
+            <img src="/static/img/icons/arrow-left-icon.svg" alt="arrow left icon">
             <p> 1 2 3 4 5 </p>
-            <img src="/static/img/icons/arrow-right-icon.svg">
+            <img src="/static/img/icons/arrow-right-icon.svg" alt="arrow right icon">
         </div>
     </div>
     </div>

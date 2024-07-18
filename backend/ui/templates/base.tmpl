@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Your online tech forum">
-    <meta name="keywords" content="HTML, CSS, JavaScript, Golang, Programming, Linux, Dev, Hardware, Software, Forum, C++, Java, SCSS, C#, Ynov, Rust, Lua, CPP, Go, PHP, MySQL, PostGreSQL, Electronique, Cyber, Godot, Unreal, Security, API, Computer, SBC, Server, Token, Authentification, Console, Terminal, Bash, Powershell, Ubuntu, Error, Help, Tips, Tuto, Tutos">
+    <meta name="description" content="Threadive - Your online tech forum">
+    <meta name="keywords" content="Threadive, Thread, HTML, CSS, JavaScript, JS, NodeJS, Express, TypeScript, ECMAScript, ES, Golang, Go, Angular, React, Vue, Programming, Linux, Dev, Hardware, Software, Forum, C++, Java, SCSS, C#, Ynov, Rust, Lua, CPP, Go, PHP, MySQL, PostGreSQL, Electronique, Cyber, Godot, Unreal, Unity, Security, API, Computer, SBC, Server, Token, Cookie, Authentification, Console, Terminal, Bash, Powershell, Ubuntu, Debian, Kali, VMWare, GNS3, PacketTracer, Proxmox, Error, Help, Tips, Tuto, Tutos">
     <meta name="author" content="Antoine de Barbarin, Marin Harel, Roméo Sanchez">
 
     <title> {{.Title}} </title>
@@ -23,11 +23,11 @@
 
     <header>
         <div class="logo-searchbar">
-            <a href="/"><img class="logo" src="/static/img/logo/logo_transparent.png" alt="logo"></a>
+            <a href="/home"><img class="logo" src="/static/img/logo/logo_transparent.png" alt="logo"></a>
             <form class="search">
                 <label for="searchbar" class="abs display-none"></label>
                 <input class="searchbar" id="searchbar" type="text" placeholder="Search for a category, a thread ...">
-                <img class="search-icon" src="/static/img/icons/search-icon.svg">
+                <img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon">
             </form>
         </div>
         <div class="notification-profile">
@@ -42,12 +42,12 @@
                     {{end}}
                 </div>
                 <div class="profile-icon-box">
-                    <img class="profile-icon" src="/static/img/icons/down-arrow-icon.svg">
+                    <img class="profile-icon" src="/static/img/icons/down-arrow-icon.svg" alt="arrow icon">
                 </div>
-                <div class="dropdown">
+                <nav class="dropdown">
                     {{if .IsAuthenticated}}
                         <div class="item">
-                            <img class="item-icon" src="/static/img/icons/dashboard-icon.svg">
+                            <img class="item-icon" src="/static/img/icons/dashboard-icon.svg" alt="dashboard icon">
                             <a class="item-link" href="/dashboard"></a>
                             <p class="item-text"> Dashboard </p>
                         </div>
@@ -59,17 +59,17 @@
                         </form>
                     {{else}}
                         <div class="item">
-                            <img class="item-icon" src="/static/img/icons/login-icon.svg">
+                            <img class="item-icon" src="/static/img/icons/login-icon.svg" alt="login icon">
                             <a class="item-link" href="/login"></a>
                             <p class="item-text"> Login </p>
                         </div>
                         <div class="item">
-                            <img class="item-icon" src="/static/img/icons/register-icon.svg">
+                            <img class="item-icon" src="/static/img/icons/register-icon.svg" alt="register icon">
                             <a class="item-link" href="/register"></a>
                             <p class="item-text"> Register </p>
                         </div>
                     {{end}}
-                </div>
+                </nav>
             </div>
         </div>
     </header>
@@ -108,55 +108,55 @@
             </div>
         {{end}}
 
-        <div class="page-link borders">
-            <div class="link">
-                <img class="link-icon" src="/static/img/icons/home-icon.svg">
-                <a href="/"> 
-                <p class="link-text"> Home </p> </a>
+        <nav class="page-link borders">
+            <div class="link relative">
+                <img class="link-icon" src="/static/img/icons/home-icon.svg" alt="home icon">
+                <a href="/home" class="abs full on-top"></a>
+                <p class="link-text"> Home </p>
             </div>
 
             <div class="link">
-                <img class="link-icon" src="/static/img/icons/discover-icon.svg">
+                <img class="link-icon" src="/static/img/icons/discover-icon.svg" alt="discover icon">
                 <p class="link-text"> Discover </p>
             </div>
 
             <div class="link">
-                <img class="link-icon" src="/static/img/icons/friends-icon.svg">
+                <img class="link-icon" src="/static/img/icons/friends-icon.svg" alt="friends icon">
                 <p class="link-text"> Friends </p>
             </div>
 
             <div data-list="list-of-categories-1" class="link has-list">
-                <img class="link-icon" src="/static/img/icons/categories-icon.svg">
+                <img class="link-icon" src="/static/img/icons/categories-icon.svg" alt="categories icon">
                 <p class="link-text"> Categories </p>
-                <img class="link-icon" src="/static/img/icons/down-arrow-icon.svg">
+                <img class="link-icon" src="/static/img/icons/down-arrow-icon.svg" alt="arrow icon">
             </div>
 
             <div id="list-of-categories-1" class="category-list">
                 {{range .CategoriesNavLeft}}
                     <div class="category relative">
-                        <img class="category-icon" src="/static/img/icons/tech-icon.svg">
+                        <img class="category-icon" src="/static/img/icons/tech-icon.svg" alt="tech icon">
                         <p class="category-text"> {{.Name}} </p>
                         <a href="/category/{{.ID}}" class="category-link abs full on-top"></a>
                     </div>
                 {{end}}
             </div>
-        </div>
+        </nav>
 
         <div class="footer borders">
             <div class="footer-link relative">
-                <img class="footer-icon" src="/static/img/icons/legal-notice-icon.svg">
+                <img class="footer-icon" src="/static/img/icons/legal-notice-icon.svg" alt="notice icon">
                 <p class="footer-text"> Legal Notice </p>
                 <a href="/about#legal-notice" class="link abs full on-top"></a>
             </div>
 
             <div class="footer-link relative">
-                <img class="footer-icon" src="/static/img/icons/privacy-policy-icon.svg">
+                <img class="footer-icon" src="/static/img/icons/privacy-policy-icon.svg" alt="policy icon">
                 <p class="footer-text"> Privacy Policy </p>
                 <a href="/about#privacy-policy" class="link abs full on-top"></a>
             </div>
 
             <div class="footer-link relative">
-                <img class="footer-icon" src="/static/img/icons/rules-icon.svg">
+                <img class="footer-icon" src="/static/img/icons/rules-icon.svg" alt="rules icon">
                 <p class="footer-text"> Rules </p>
                 <a href="/about#rules" class="link abs full on-top"></a>
             </div>

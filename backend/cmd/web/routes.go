@@ -29,6 +29,7 @@ func (app *application) routes() http.Handler {
 	/* #############################################################################*/
 
 	router.HandleFunc("/", app.index, http.MethodGet)      // landing page
+	router.HandleFunc("/home", app.index, http.MethodGet)  // landing page
 	router.HandleFunc("/about", app.about, http.MethodGet) // about page
 
 	router.HandleFunc("/thread/:id", app.threadGet, http.MethodGet)     // thread page
