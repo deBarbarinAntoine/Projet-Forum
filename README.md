@@ -228,12 +228,10 @@ For now only version 1 exists, but later versions will be available changing the
 ## Setting up the project for contributors
 
 
-Run the `create-db.sql` script to create the database, and then run the `insert-data.sql` to insert fake data.
+Run the `data/cmd/main.go` program to set the whole environment.
 
 > [!WARNING]
-> **You need to create a `.env` file** to hold the server's basic configuration!
->
-> Just look at the `.env.example` file, copy it to `.env` and fill it with your environment's information (especially the **MySQL database**).
+> **You need MySQL and an administrator account** to properly follow the script!
 > 
 
 After that, you're ready to go.
