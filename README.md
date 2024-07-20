@@ -225,15 +225,67 @@ For now only version 1 exists, but later versions will be available changing the
 
 ---
 
-## Setting up the project for contributors
-
-
-Run the `data/cmd/main.go` program to set the whole environment.
+## Setting up the project
 
 > [!WARNING]
 > **You need MySQL and an administrator account** to properly follow the script!
 > 
 
-After that, you're ready to go.
+<details>
+<summary> Compiling the source code </summary>
 
-Good programming everyone!
+Run the `data` program to set the whole environment:
+
+: using Windows:
+: 1. open a terminal in `/data` directory
+: 2. type `go run ./cmd/` to run the setup wizard
+
+: using Linux:
+: 1. open a terminal in `/data` directory
+: 2. type `make run/data` to run the setup wizard
+
+The program will guide you through the whole process and create the database, the users, the API _secret token_ and the environment files.
+
+> [!IMPORTANT]
+> **Move the environment files where they belong**, that is:
+> - the `.env` or `.envrc` in the `/api` directory
+> - the `backend.env` or `backend.envrc` in the `/backend` directory
+>
+
+Once it is done, you can:
+
+: using Windows:
+: 1. open a terminal in `/api` directory
+: 2. type `go run ./cmd/api` to run the `API`
+: 3. open another terminal in `/backend` directory
+: 4. type `go run ./cmd/backend` to run the `backend`
+
+: using Linux:
+: 1. open a terminal in `/api` directory
+: 2. type `make run/api` to run the `API`
+: 3. open another terminal in `/backend` directory
+: 4. type `make run/backend` to run the `backend`
+
+</details>
+
+
+<details>
+<summary> Using the binaries </summary>
+
+If you're using the binaries directly, you just need to `double click` on `data.exe` (or `data` if using linux).
+
+The program will guide you through the whole process and create the database, the users, the API _secret token_ and the environment files.
+
+Once the setup is done, `double click` on `api.exe` (or `api` if using linux), and then the same with `backend.exe` (or `backend` if using linux).
+
+> [!IMPORTANT]
+> It's important to follow the order: **FIRST** the `data` program to set the application up, **THEN** the `API`, and **FINALLY** the `backend`.
+> 
+> If the order is not respected, it may not work properly.
+> 
+
+</details>
+
+After that, you're ready to open your browser and test the online forum :)
+
+Enjoy yourselves everyone!

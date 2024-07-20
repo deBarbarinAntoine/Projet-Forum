@@ -45,25 +45,21 @@ type application struct {
 		sender   string
 	}
 	mysql struct {
-		dsn   string
-		host  string
-		name  string
-		admin struct {
-			username string
-			password []byte
-		}
-		api struct {
-			username string
-			password []byte
-		}
-		backend struct {
-			username string
-			password []byte
-		}
+		dsn     string
+		host    string
+		name    string
+		admin   user
+		api     user
+		backend user
 	}
 	backend struct {
 		port string
 	}
+}
+
+type user struct {
+	username string
+	password []byte
 }
 
 func main() {
@@ -74,6 +70,8 @@ func main() {
 		s := <-quit
 
 		fmt.Println("Caught signal:", s.String())
+		fmt.Println("Please remove manually what may have been created by this application in your MySQL environment!")
+		fmt.Println("\t-> users, database")
 		fmt.Println("Shutting down...")
 
 		os.Exit(0)
@@ -86,7 +84,7 @@ func main() {
 	var err error
 
 	fmt.Println("###########################################")
-	fmt.Printf("# Welcome to the Threadive migration tool!\n")
+	fmt.Println("# Welcome to the Threadive Setup Wizard!")
 	fmt.Println("###########################################")
 	fmt.Println()
 
@@ -97,12 +95,19 @@ func main() {
 	fmt.Println("Let's connect to MySQL with an admin account (enough to create user, grant privileges and create a database)")
 	fmt.Println()
 	app.mysql.admin.username = app.readLine("Admin username:")
-	fmt.Println()
-	fmt.Print("Password: ")
-	app.mysql.admin.password, err = term.ReadPassword(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Printf("Error reading password: %v\n", err)
-		os.Exit(1)
+
+	for {
+		fmt.Println()
+		fmt.Print("Password: ")
+		app.mysql.admin.password, err = term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			fmt.Printf("Error reading password: %v\n", err)
+			fmt.Println()
+			fmt.Println("Please try again.")
+			continue
+		} else {
+			break
+		}
 	}
 	fmt.Println()
 
@@ -147,7 +152,7 @@ func main() {
 	fmt.Println()
 
 	fmt.Println("Creating MySQL user for API...")
-	err = app.createUser()
+	err = app.createUser(app.mysql.api, "api")
 	if err != nil {
 		fmt.Printf("Error creating user: %v\n", err)
 		os.Exit(1)
@@ -169,13 +174,20 @@ func main() {
 	app.smtp.sender = app.readLine("SMTP Sender:")
 	fmt.Println()
 	app.smtp.username = app.readLine("SMTP Username:")
-	fmt.Println()
-	fmt.Print("SMTP Password: ")
-	app.smtp.password, err = term.ReadPassword(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Printf("Error reading password: %v\n", err)
-		os.Exit(1)
+	for {
+		fmt.Println()
+		fmt.Print("SMTP Password: ")
+		app.smtp.password, err = term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			fmt.Printf("Error reading password: %v\n", err)
+			fmt.Println()
+			fmt.Println("Please try again.")
+			continue
+		} else {
+			break
+		}
 	}
+
 	fmt.Println()
 
 	fmt.Println("###########################################")
@@ -222,7 +234,11 @@ func main() {
 	app.mysql.backend.password = base62.StdEncoding.Encode(randomPassword)
 	fmt.Println()
 
-	// FIXME -> create backend user!!!
+	err = app.createUser(app.mysql.backend, "backend")
+	if err != nil {
+		fmt.Println("Error creating backend user")
+		os.Exit(1)
+	}
 
 	fmt.Println("Writing configurations to environment file...")
 
@@ -354,13 +370,22 @@ func (app *application) genEnvrcFile() {
 
 func (app *application) readLine(prompt string) string {
 
-	fmt.Println(prompt)
-	fmt.Print(">>> ")
+	var input string
+	var err error
 
-	input, err := app.reader.ReadString('\n')
-	if err != nil {
-		fmt.Printf("An error occurred: %v\n", err)
-		os.Exit(1)
+	for {
+		fmt.Println(prompt)
+		fmt.Print(">>> ")
+
+		input, err = app.reader.ReadString('\n')
+		if err != nil {
+			fmt.Printf("Error reading user input: %v\n", err)
+			fmt.Println()
+			fmt.Println("Please try again.")
+			continue
+		} else {
+			break
+		}
 	}
 
 	input = strings.TrimSpace(input)
@@ -416,10 +441,10 @@ func (app *application) createDB() error {
 	return err
 }
 
-func (app *application) createUser() error {
+func (app *application) createUser(newUser user, useCase string) error {
 
 	query := fmt.Sprintf(`
-		CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';`, app.mysql.api.username, string(app.mysql.api.password))
+		CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';`, newUser.username, string(newUser.password))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -435,62 +460,21 @@ func (app *application) createUser() error {
 		return err
 	}
 
-	query = fmt.Sprintf(`
-		GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost';`, app.mysql.name, app.mysql.api.username)
-
-	_, err = tx.ExecContext(ctx, query)
-	if err != nil {
-		return err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (app *application) createBackendUser() error {
-
-	query := fmt.Sprintf(`
-		CREATE USER '%s'@'localhost'
-    	IDENTIFIED BY '%s';`, app.mysql.backend.username, string(app.mysql.backend.password))
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	tx, err := app.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	stmt, err := tx.PrepareContext(ctx, query)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.ExecContext(ctx)
-	if err != nil {
-		return err
-	}
-
-	query = fmt.Sprintf(`
+	if useCase == "backend" {
+		query = fmt.Sprintf(`
 		GRANT SELECT, INSERT, UPDATE, DELETE
     	ON %s.sessions
-    	TO '%s'@'localhost';`, app.mysql.name, app.mysql.backend.username)
+    	TO '%s'@'localhost';`, app.mysql.name, newUser.username)
+	} else {
+		query = fmt.Sprintf(`
+		GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost';`, app.mysql.name, newUser.username)
+	}
 
-	stmt, err = tx.PrepareContext(ctx, query)
+	_, err = tx.ExecContext(ctx, query)
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx)
-	if err != nil {
-		return err
-	}
 	if err := tx.Commit(); err != nil {
 		return err
 	}
