@@ -1,6 +1,8 @@
-INSERT INTO users (Id_users, Username, Email, Hashed_password, Avatar_path, Birth_date, Status)
-VALUES (1, 'deleted user', 'no-reply@adebarbarin.com', 'no-login', 'https://ui-avatars.com/api/?name=Deleted&background=random&size=256&rounded=true', '2024-07-01', 'activated'),
-       (2, 'Threadive API', 'mail@adebarbarin.com', 'no-login', 'https://ui-avatars.com/api/?name=/&background=random&size=256&rounded=true', '2024-07-01', 'activated'),
-       (3, 'Thorgan', 'thorgan@example.com', 'to-update', 'https://ui-avatars.com/api/?name=Thorgan&background=random&size=256&rounded=true', '1990-01-06', 'activated'),
-       (4, 'Plcuf', 'plcuf@example.com', 'to-update', 'https://ui-avatars.com/api/?name=Plcuf&background=random&size=256&rounded=true', NULL, 'activated'),
-       (5, 'Marin', 'marin@example.com', 'to-update', 'https://ui-avatars.com/api/?name=Marin&background=random&size=256&rounded=true', NULL, 'activated');
+INSERT INTO users (Id_users, Username, Email, Hashed_password, Avatar_path, Birth_date, Status, Role)
+VALUES (1, 'deleted user', 'no-reply@adebarbarin.com', 'no-login', 'https://ui-avatars.com/api/?name=Deleted&background=random&size=256&rounded=true', '2024-07-01', 'activated', 'normal'),
+       (2, 'Threadive API', 'mail@adebarbarin.com', 'no-login', 'https://ui-avatars.com/api/?name=/&background=random&size=256&rounded=true', '2024-07-01', 'activated', 'normal'),
+       (3, 'Thorgan', 'thorgan@example.com', '$2y$10$bb8fRHmPpZ.clDoc39V8aew4aITlIitt/5IvBj/FlpB0y0IE2LjLi', 'https://ui-avatars.com/api/?name=Thorgan&background=random&size=256&rounded=true', '1990-01-06', 'activated', 'normal'),
+       (4, 'Plcuf', 'plcuf@example.com', '$2y$10$UsPMKMPjuUz8cucwQhAj4OStWlMxeM/tguQ7yM4zPYvizCQG6rJKq', 'https://ui-avatars.com/api/?name=Plcuf&background=random&size=256&rounded=true', NULL, 'activated', 'normal'),
+       (5, 'Marin', 'marin@example.com', '$2y$10$dSXTRButMD.JP5jDfqdWcuHjt/uNgtuaEi07WSi88OassiYljLSyW', 'https://ui-avatars.com/api/?name=Marin&background=random&size=256&rounded=true', NULL, 'activated', 'normal'),
+       (6, 'Admin', 'admin@example.com', '$2y$10$g6Ow8xNIqLRZIoMPk2AQ3erLzjUZA6HsVULhmChK3.lNwq9ilxw5.', 'https://ui-avatars.com/api/?name=Admin&background=random&size=256&rounded=true', NULL, 'activated', 'admin'),
+       (7, 'Modo', 'modo@example.com', '$2y$10$b/8POhA.C.iJA.XSwfeWwuSkLNX1UC6lOlPWld4CRYxgFGeVghmrO', 'https://ui-avatars.com/api/?name=Modo&background=random&size=256&rounded=true', NULL, 'activated', 'moderator');

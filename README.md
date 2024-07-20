@@ -306,4 +306,21 @@ Once the setup is done, `double click` on `api.exe` (or `api` if using linux), a
 
 After that, you're ready to open your browser and test the online forum :)
 
+The users already registered are the following:
+- Thorgan
+  - email: `thorgan@example.com`
+  - password: `Pa55word!`
+- Plcuf
+    - email: `plcuf@example.com`
+    - password: `Pa55word!`
+- Marin
+    - email: `marin@example.com`
+    - password: `Pa55word!`
+- Admin
+    - email: `admin@example.com`
+    - password: `Pa55word!`
+- Modo
+    - email: `modo@example.com`
+    - password: `Pa55word!`
+
 Enjoy yourselves everyone!
