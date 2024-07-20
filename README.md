@@ -13,6 +13,8 @@
     * [Error Handling](#error-handling)
     * [Versioning](#versioning)
   * [Setting up the project](#setting-up-the-project)
+    * [Compiling from the source code](#compiling-from-the-source-code)
+    * [Using the binaries](#using-the-binaries)
 <!-- TOC -->
 
 ---
