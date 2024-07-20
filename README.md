@@ -12,7 +12,7 @@
     * [Rate Limiting](#rate-limiting)
     * [Error Handling](#error-handling)
     * [Versioning](#versioning)
-  * [Setting up the project for contributors](#setting-up-the-project-for-contributors)
+  * [Setting up the project](#setting-up-the-project)
 <!-- TOC -->
 
 ---
@@ -236,17 +236,18 @@ For now only version 1 exists, but later versions will be available changing the
 
 Run the `data` program to set the whole environment:
 
-: using Windows:
-: 1. open a terminal in `/data` directory
-: 2. type `go run ./cmd/` to run the setup wizard
+- using Windows:
+    1. open a terminal in `/data` directory
+    2. type `go run ./cmd/` to run the setup wizard
 
-: using Linux:
-: 1. open a terminal in `/data` directory
-: 2. type `make run/data` to run the setup wizard
+
+- using Linux:
+  1. open a terminal in `/data` directory
+  2. type `make run/data` to run the setup wizard
 
 The program will guide you through the whole process and create the database, the users, the API _secret token_ and the environment files.
 
-> [!IMPORTANT]
+> [!WARNING]
 > **Move the environment files where they belong**, that is:
 > - the `.env` or `.envrc` in the `/api` directory
 > - the `backend.env` or `backend.envrc` in the `/backend` directory
@@ -254,17 +255,17 @@ The program will guide you through the whole process and create the database, th
 
 Once it is done, you can:
 
-: using Windows:
-: 1. open a terminal in `/api` directory
-: 2. type `go run ./cmd/api` to run the `API`
-: 3. open another terminal in `/backend` directory
-: 4. type `go run ./cmd/backend` to run the `backend`
+- using Windows:
+  1. open a terminal in `/api` directory
+  2. type `go run ./cmd/api` to run the `API`
+  3. open another terminal in `/backend` directory
+  4. type `go run ./cmd/backend` to run the `backend`
 
-: using Linux:
-: 1. open a terminal in `/api` directory
-: 2. type `make run/api` to run the `API`
-: 3. open another terminal in `/backend` directory
-: 4. type `make run/backend` to run the `backend`
+- using Linux:
+  1. open a terminal in `/api` directory
+  2. type `make run/api` to run the `API`
+  3. open another terminal in `/backend` directory
+  4. type `make run/backend` to run the `backend`
 
 </details>
 
@@ -278,7 +279,7 @@ The program will guide you through the whole process and create the database, th
 
 Once the setup is done, `double click` on `api.exe` (or `api` if using linux), and then the same with `backend.exe` (or `backend` if using linux).
 
-> [!IMPORTANT]
+> [!WARNING]
 > It's important to follow the order: **FIRST** the `data` program to set the application up, **THEN** the `API`, and **FINALLY** the `backend`.
 > 
 > If the order is not respected, it may not work properly.
