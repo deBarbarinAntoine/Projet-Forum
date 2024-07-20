@@ -231,9 +231,11 @@ For now only version 1 exists, but later versions will be available changing the
 > **You need MySQL and an administrator account** to properly follow the script!
 > 
 
+### Compiling from the source code
+
 <details>
 
-<summary> Compiling the source code </summary>
+<summary> Steps to follow </summary>
 
 Run the `data` program to set the whole environment:
 
@@ -273,10 +275,11 @@ Once it is done, you can:
 
 </details>
 
+### Using the binaries
 
 <details>
 
-<summary> Using the binaries </summary>
+<summary> Steps to follow </summary>
 
 If you're using the binaries directly, you just need to `double click` on `data.exe` (or `data` if using linux).
 
