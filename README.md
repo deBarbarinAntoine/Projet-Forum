@@ -261,6 +261,8 @@ Once it is done, you can:
   3. open another terminal in `/backend` directory
   4. type `go run ./cmd/backend` to run the `backend`
 
+
+
 - using Linux:
   1. open a terminal in `/api` directory
   2. type `make run/api` to run the `API`
@@ -280,7 +282,13 @@ The program will guide you through the whole process and create the database, th
 Once the setup is done, `double click` on `api.exe` (or `api` if using linux), and then the same with `backend.exe` (or `backend` if using linux).
 
 > [!WARNING]
-> It's important to follow the order: **FIRST** the `data` program to set the application up, **THEN** the `API`, and **FINALLY** the `backend`.
+> It's important to follow the order:
+> 
+> **FIRST** the `data` program to set the application up,
+> 
+> **THEN** the `API`, 
+> 
+> and **FINALLY**, the `backend`.
 > 
 > If the order is not respected, it may not work properly.
 > 
