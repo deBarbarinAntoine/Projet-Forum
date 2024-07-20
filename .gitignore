@@ -11,6 +11,8 @@ api/pem
 backend/config
 backend/data
 backend/logs
+backend/backend.env
+backend/backend.envrc
 backend/.env
 backend/.envrc
 backend/pem

@@ -1,8 +1,0 @@
-# constant variables
-export PORT=4000
-export DB_DSN="user:password@/database-name?parseTime=true"
-export API_HOST_SECRET="api-host-secret"
-
-# temporary variables
-export API_CLIENT_TOKEN="api-client-token"
-export PEM_PATH="./pem/public.pem"

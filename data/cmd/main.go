@@ -359,13 +359,13 @@ func (app *application) genEnvrcFile() {
 	env.WriteString(fmt.Sprintf("export SMTP_PORT=%s\n", app.smtp.port))
 	env.WriteString(fmt.Sprintf("export API_HOST_SECRET=\"%s\"\n", app.secretAPI))
 
-	err := os.WriteFile(".envrc", []byte(env.String()), 0644)
+	err := os.WriteFile("backend.envrc", []byte(env.String()), 0644)
 	if err != nil {
-		fmt.Println("Error creating .envrc file")
+		fmt.Println("Error creating backend.envrc file")
 		os.Exit(1)
 	}
 
-	fmt.Println(".envrc file created successfully")
+	fmt.Println("backend.envrc file created successfully")
 }
 
 func (app *application) readLine(prompt string) string {

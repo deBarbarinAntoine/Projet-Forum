@@ -232,6 +232,7 @@ For now only version 1 exists, but later versions will be available changing the
 > 
 
 <details>
+
 <summary> Compiling the source code </summary>
 
 Run the `data` program to set the whole environment:
@@ -247,7 +248,8 @@ Run the `data` program to set the whole environment:
 
 The program will guide you through the whole process and create the database, the users, the API _secret token_ and the environment files.
 
-> [!WARNING]
+> **WARNING**
+>
 > **Move the environment files where they belong**, that is:
 > - the `.env` or `.envrc` in the `/api` directory
 > - the `backend.env` or `backend.envrc` in the `/backend` directory
@@ -273,6 +275,7 @@ Once it is done, you can:
 
 
 <details>
+
 <summary> Using the binaries </summary>
 
 If you're using the binaries directly, you just need to `double click` on `data.exe` (or `data` if using linux).
@@ -281,7 +284,8 @@ The program will guide you through the whole process and create the database, th
 
 Once the setup is done, `double click` on `api.exe` (or `api` if using linux), and then the same with `backend.exe` (or `backend` if using linux).
 
-> [!WARNING]
+> **WARNING**
+> 
 > It's important to follow the order:
 > 
 > **FIRST** the `data` program to set the application up,
