@@ -1,0 +1,23 @@
+{{define "post-update"}}
+ <div class="blur-underlay"></div>
+
+    <div class="center-page">
+        <div class="container borders">
+            <form class="login">
+                <p class="login-title bottom-outset"> Modify your post </p>
+                   <!--Range pour afficher le content du post dans le value de l'input-->  {{range .Thread.Posts}}
+                
+                <div class="input-fields">
+                    <label for="title"></label>
+                    <input class="input borders" type="text" placeholder="Modify your post" id="content"  value="{{.Content}}">
+
+
+                </div>
+                <!--{{end}}-->
+                
+                <button type="submit" class="switch borders"> Modify </button>
+            </form>
+    
+        </div>
+    </div>
+    {{end}}
