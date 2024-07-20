@@ -37,6 +37,25 @@
   display: none;
 }
 
+.search-submit {
+  border: none;
+  outline: none;
+  appearance: none;
+  background: none;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  right: 10px;
+  cursor: pointer;
+}
+.search-submit .search-icon {
+  object-fit: contain;
+  object-position: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+}
+
 .borders {
   border-bottom: 2px solid rgba(63, 51, 81, 0.2);
   border-right: 2px solid rgba(63, 51, 81, 0.2);
@@ -57,15 +76,11 @@
 }
 
 input:not([type=checkbox]):not([type=radio]) {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   outline: none;
 }
 input:not([type=checkbox]):not([type=radio]):focus, input:not([type=checkbox]):not([type=radio]):focus-visible, input:not([type=checkbox]):not([type=radio]):focus-within {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   outline: 2.5px solid rgba(134, 72, 121, 0.6);
 }
 
@@ -81,6 +96,12 @@ input:not([type=checkbox]):not([type=radio]):focus, input:not([type=checkbox]):n
   color: #1F1D36;
   font-size: 18px;
   font-family: "Varela-Round", sans-serif;
+}
+.flash .search-text {
+  margin: 0 1ch;
+  font-size: 18px;
+  font-style: italic;
+  color: #864879;
 }
 
 body {
@@ -114,10 +135,8 @@ header .logo-searchbar a {
   cursor: pointer;
 }
 header .logo-searchbar a .logo {
-  -o-object-fit: contain;
-     object-fit: contain;
-  -o-object-position: center;
-     object-position: center;
+  object-fit: contain;
+  object-position: center;
   height: 100%;
   width: 100%;
 }
@@ -135,13 +154,6 @@ header .logo-searchbar .search .searchbar {
   border-radius: 4px;
   box-shadow: 0px 3px 3px rgba(63, 51, 81, 0.1);
   background-color: #F1F6F9;
-}
-header .logo-searchbar .search .search-icon {
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  right: 10px;
-  opacity: 0.5;
 }
 header .notification-profile {
   height: 100%;
@@ -171,10 +183,8 @@ header .notification-profile .profile .profile-picture {
   border-radius: 50%;
 }
 header .notification-profile .profile .profile-picture img {
-  -o-object-position: center;
-     object-position: center;
-  -o-object-fit: fill;
-     object-fit: fill;
+  object-position: center;
+  object-fit: fill;
   height: 100%;
   width: 100%;
 }
@@ -239,17 +249,13 @@ header .notification-profile .profile .dropdown .item .item-link {
   bottom: 0;
 }
 header .notification-profile .profile .dropdown .item button.logout-link {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   border: none;
   background-color: transparent;
   cursor: pointer;
 }
 header .notification-profile .profile .dropdown .item button.logout-link:hover {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   border: none;
   background-color: transparent;
 }
@@ -301,6 +307,9 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-left: 10px;
   gap: 10px;
 }
+.nav-left .profile .personal-info a.abs.full.on-top {
+  cursor: pointer;
+}
 .nav-left .profile .personal-info .profile-picture {
   position: relative;
   width: 50px;
@@ -317,10 +326,8 @@ header .notification-profile .profile .dropdown .item .item-text {
   top: 0;
 }
 .nav-left .profile .personal-info .profile-picture .avatar {
-  -o-object-fit: cover;
-     object-fit: cover;
-  -o-object-position: center;
-     object-position: center;
+  object-fit: cover;
+  object-position: center;
   height: 100%;
   width: 100%;
 }
@@ -435,7 +442,6 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 .nav-left .page-link .category-list .category {
   width: 100%;
-  height: -moz-fit-content;
   height: fit-content;
   display: flex;
   flex-flow: row nowrap;
@@ -456,6 +462,10 @@ header .notification-profile .profile .dropdown .item .item-text {
 }
 .nav-left .page-link .category-list .category .category-text {
   font-size: 16px;
+}
+.nav-left .page-link .category-list .category .italic-link {
+  color: #864879;
+  font-style: italic;
 }
 .nav-left .page-link .category-list.closed {
   max-height: 0px !important;
@@ -570,7 +580,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   align-items: center;
   gap: 16px;
   width: calc(100% - 515px);
-  margin-top: 120px;
+  margin: 120px 0 10% 0;
   left: 270px;
   padding: 20px;
   z-index: 1;
@@ -631,9 +641,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   margin-bottom: 20px;
   padding: 10px;
   outline: none;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   font-family: "Varela-Round", sans-serif;
 }
 .center-page .container .login .input-fields .input:focus {
@@ -713,8 +721,7 @@ header .notification-profile .profile .dropdown .item .item-text {
   bottom: 0;
   left: 0;
   right: 0;
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 .bottom-outset {
@@ -729,4 +736,6 @@ textarea.description {
   height: 200px !important;
   resize: none;
   scrollbar-width: thin;
-}/*# sourceMappingURL=base.css.map */
+}
+
+/*# sourceMappingURL=base.css.map */

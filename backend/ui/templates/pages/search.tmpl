@@ -1,62 +1,67 @@
 {{define "page"}}
     <div class="container-search">
         <div class="container-your-search">
-            <p> Thread For </p> <div class="your-search"> GOLANG  <!--{{/* Recherche de l'utilisateur */}}--></div>
+            <p> Threads for </p> <div class="your-search"> {{with .Search}} <span class="search-text"> {{.}} </span> {{end}} </div>
         </div>
         <div class="container-search-content">
-            <!--{{/* Tous les threads via la recherche  */}}-->
-            <div class="search-thread borders borders-hover">
-                <img src="/static/img/icons/greenfolder.svg">  <!-- folder vert si ouvert, jaune si terminé et rouge si fermé -->
-                <div class="search-text">
-                    <h3> Aide Golang ! <!--{{/* Titre du thread */}}--></h3>
-                    <h4> Bruno Saltor <!--{{/* Auteur du thread */}}--></h4>
-                    <p> 09:27:56 <!--{{/* Date du thread */}}--></p>
-                </div>
-            </div>
-            <div class="search-thread borders borders-hover">
-                <img src="/static/img/icons/greenfolder.svg">
-                <div class="search-text">
-                    <h3> Aide Golang ! </h3>
-                    <h4> Bruno Saltor </h4>
-                    <p> 09:27:56</p>
-                </div>
-            </div>
-            <div class="search-thread borders borders-hover">
-                <img src="/static/img/icons/greenfolder.svg">
-                <div class="search-text">
-                    <h3> Aide Golang ! </h3>
-                    <h4> Bruno Saltor </h4>
-                    <p> 09:27:56</p>
-                </div>
-                <!--{{/* Fin des threads */}}-->
-            </div>
+
+            {{if ne (len .ThreadList.List) 0}}
+                {{range .ThreadList.List}}
+                    <div class="search-thread borders borders-hover relative">
+                        <a href="/thread/{{.ID}}" class="abs full on-top"></a>
+                        {{if eq .Status "active"}} {{/* folder vert si ouvert, jaune si terminé et rouge si fermé -> green if active and red if archived (hidden doesn't appear normally...) */}}
+                        <img src="/static/img/icons/greenfolder.svg" alt="active thread icon">
+                        {{else if eq .Status "archived"}}
+                            <img src="/static/img/icons/redfolder-icon.svg" alt="archived thread icon">
+                        {{end}}
+                        <div class="search-text">
+                            <h3> {{.Title}} </h3>
+                            <h5> {{.Author.Name}} </h5>
+                            <p> {{humanDate .CreatedAt}} </p>
+                        </div>
+                    </div>
+                {{end}}
+            {{else}}
+                <div class="flash">No thread found for {{with .Search}} <span class="search-text"> {{.}} </span> {{end}} :/</div>
+            {{end}}
+
         </div>
-        <section class="container-row">
+        <div class="container-row">
             <div class="container-search-category">
                 <div class="container-your-search">
-                    <p> Category For </p> <div class="your-search"> GOLANG  <!--{{/* recherche  */}}--></div>
+                    <p> Categories for </p> <div class="your-search"> {{with .Search}} <span class="search-text"> {{.}} </span> {{end}} </div>
                 </div>
-                <!--{{/* Toutes les catégories via recherche */}}-->
-                <div class="container-spe-category">
-                    <h5> Golang </h5> <!--{{/* Category */}}-->
+
+            {{if ne (len .CategoryList.List) 0}}
+                {{range .CategoryList.List}}
+                <div class="container-spe-category relative">
+                    <h5> {{.Name}} </h5>
+                    <a href="/category/{{.ID}}" class="abs full on-top"></a>
                 </div>
-                <div class="container-spe-category">
-                    <h5> Go </h5>
-                </div>
-                <div class="container-spe-category">
-                    <h5> Golang </h5>
-                </div>
-                <!--{{/* Fin des catégories */}}-->
+
+                {{end}}
+            {{else}}
+                <div class="flash">No category found for {{with .Search}} <span class="search-text"> {{.}} </span> {{end}} :/</div>
+            {{end}}
+
             </div>
             <div class="container-tags-search">
                 <div class="container-your-search">
-                    <p> Tags For </p> <div class="your-search"> GOLANG <!--{{/* recherche  */}}--></div>
+                    <p> Tags for </p> <div class="your-search"> {{with .Search}} <span class="search-text"> {{.}} </span> {{end}} </div>
                 </div>
-                <!--{{/* Tous les tags via recherche */}}-->
-                <div class="container-spe-category">
-                    <h5> Golang </h5> <!--{{/* Tag */}}-->
-                </div>
+
+            {{if ne (len .TagList.List) 0}}
+                {{range .TagList.List}}
+                    <div class="container-spe-category relative">
+                        <h5> {{.Name}} </h5>
+                        <a href="/tag/{{.ID}}" class="abs full on-top"></a>
+                    </div>
+                {{end}}
+            {{else}}
+                <div class="flash">No tag found for {{with .Search}} <span class="search-text"> {{.}} </span> {{end}} :/</div>
+            {{end}}
+
             </div>
-        </section>
+        </div>
     </div>
 {{end}}

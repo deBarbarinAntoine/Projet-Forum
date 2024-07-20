@@ -33,7 +33,7 @@ func commonHeaders(next http.Handler) http.Handler {
 		r = r.WithContext(ctx)
 
 		// setting the common headers
-		w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src 'self' https://ui-avatars.com; script-src 'self' 'nonce-%s' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net", nonce))
+		w.Header().Set("Content-Security-Policy", fmt.Sprintf("script-src 'self' 'nonce-%s' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net", nonce)) // maybe add "default-src 'self' https://ui-avatars.com;" as well if necessary
 		w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "deny")

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"html/template"
 	"time"
 )
 
@@ -163,7 +164,7 @@ type Thread struct {
 
 type Post struct {
 	ID           int            `json:"id"`
-	Content      string         `json:"content"`
+	Content      template.HTML  `json:"content"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	Author       User           `json:"author"`

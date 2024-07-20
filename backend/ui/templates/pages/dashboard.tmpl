@@ -4,9 +4,9 @@
     <div class="container-profile-friendsrequest">
         <div class="container-profile borders">
             <div class="profilte-picture-name">
-                <div class="pic">  
-                 <img class="avatar" src="{{.User.Avatar}}" alt="avatar image">
-                 <img class="camera" src="/static/img/icons/camera-icon.svg" alt="camera icon">
+                <div class="pic">
+                    <img class="avatar" src="{{.User.Avatar}}" alt="avatar image">
+                    {{/*<img class="camera" src="/static/img/icons/camera-icon.svg" alt="camera icon">*/}}
                 </div>
                 <div class="text-profile">
                     <h4> {{.User.Name}} </h4>
@@ -15,15 +15,15 @@
             </div>
             <div class="profil-post">
                 <div class="container-colonne">
-                    <h4> Member Since </h4>
+                    <h4> Member since </h4>
                     <h5> {{humanDate .User.CreatedAt}} </h5>
                 </div>
                 <div class="container-colonne">
-                    <h4> Post </h4>
+                    <h4> Post(s) </h4>
                     <h5> {{len .User.Posts}} </h5>
                 </div>
                 <div class="container-colonne">
-                    <h4> Friends </h4>
+                    <h4> Friend(s) </h4>
                     <h5> {{len .User.Friends}} </h5>
                 </div>
             </div>
@@ -32,17 +32,23 @@
             <h4> Friend Requests </h4>
             <div class="container-row">
 
-                {{range .User.Invitations.Received}}
-                <div class="container-requests">
-                    <div class="pic-friends"></div> <!-- Image de l'utilisateur qui a envoyé la demande -->
-                    <div class="container-colonne-amis">
-                        <h5> {{.Name}} </h5>
-                        <div class="accepte-refuse">
-                            <img src="/static/img/icons/check-icon.svg" alt="friend reject icon">
-                            <img src="/static/img/icons/close-icon.svg" alt="friend accept icon">
+                {{if ne (len .User.Invitations.Received) 0}}
+                    {{range .User.Invitations.Received}}
+                    <div class="container-requests">
+                        <div class="pic-friends">
+                            <img src="https://ui-avatars.com/api/?name={{.Name}}&background=random&size=256&rounded=true" alt="friend avatar image">
+                        </div>
+                        <div class="container-colonne-amis">
+                            <h5> {{.Name}} </h5>
+                            <div class="accepte-refuse">
+                                <img src="/static/img/icons/check-icon.svg" alt="friend reject icon">
+                                <img src="/static/img/icons/close-icon.svg" alt="friend accept icon">
+                            </div>
                         </div>
                     </div>
-                </div>
+                    {{end}}
+                {{else}}
+                    <div class="flash">No pending friend requests!</div>
                 {{end}}
 
             </div>
@@ -52,77 +58,94 @@
         <div class="container-mythread borders">
             <h4> My Threads </h4>
 
-            {{range .User.ThreadsOwned}}
-            <div class="mythread borders borders-hover">
-                <img src="/static/img/icons/greenfolder.svg">
-                <!-- folder vert si ouvert, jaune si terminé et rouge si fermé -->
-                <div class="text">
-                    <h3> {{.Title}} </h3>
+            {{if ne (len .User.ThreadsOwned) 0}}
+                {{range .User.ThreadsOwned}}
+                <div class="mythread borders borders-hover">
+                    {{if eq .Status "active"}} {{/* folder vert si ouvert, jaune si terminé et rouge si fermé -> green if active and red if archived (hidden doesn't appear normally...) */}}
+                    <img src="/static/img/icons/greenfolder.svg" alt="active thread icon">
+                    {{else if eq .Status "archived"}}
+                        <img src="/static/img/icons/redfolder-icon.svg" alt="archived thread icon">
+                    {{end}}
+                    <div class="text">
+                        <h3> {{.Title}} </h3>
+                    </div>
                 </div>
-            </div>
+                {{end}}
+            {{else}}
+                <div class="flash">No thread created yet :/</div>
             {{end}}
 
         </div>
         <div class="friends-container borders">
             <h4> Friends </h4>
-            
-            {{range .User.Friends}}
-            <div class="friends">
-                <div class="pic-friends"></div> <!-- Image de l'ami -->
-                <h5> {{.Name}} </h5>
-            </div>
+
+            {{if ne (len .User.Friends) 0}}
+                {{range .User.Friends}}
+                <div class="friends">
+                    <div class="pic-friends">
+                        <img src="https://ui-avatars.com/api/?name={{.Name}}&background=random&size=256&rounded=true" alt="friend avatar image">
+                    </div>
+                    <h5> {{.Name}} </h5>
+                </div>
+                {{end}}
+            {{else}}
+                <div class="flash">No friend yet :/</div>
             {{end}}
 
         </div>
     </section>
+
     {{if eq .User.Role "admin"}}
     <section class="container-row">
         <div class="container-last-user borders">
             <h4> Last User </h4>
 
-            <!--{{/* range derniers utilisateurs (?) */}}-->
+            {{/* range derniers utilisateurs (?) */}}
             <div class="last-user borders borders-hover">
-                <h5> Jean-Mi </h5> <!--{{/* nom de l'user inscrit */}}-->
+                <h5> Jean-Mi </h5> {{/* nom de l'user inscrit */}}
             </div>
-            <!--{{/* end range */}}-->
+            {{/* end range */}}
 
         </div>
         <div class="container-last-user borders">
             <h4> Last Categories </h4>
 
-            <!--{{/* range dernieres categories */}}-->
+            {{/* range dernieres categories */}}
             <div class="last-user borders borders-hover">
-                <h5> Golang </h5> <!--{{/* Nom de la catégorie */}}-->
+                <h5> Golang </h5> {{/* Nom de la catégorie */}}
             </div>
-            <!--{{/* end range */}}-->
+            {{/* end range */}}
             
         </div>
 
         <div class="container-last-user borders">
             <h4> Last Tags </h4>
             
-            <!--{{/* range derniers tags */}}-->
+            {{/* range derniers tags */}}
             <div class="last-user borders borders-hover">
-                <h5> Golang </h5> <!--{{/* Tags */}}-->
+                <h5> Golang </h5> {{/* Tags */}}
             </div>
-            <!--{{/* end range */}}-->
+            {{/* end range */}}
 
         </div>
     </section>
     <div class="container-last-thread borders">
         <h4> Last Threads </h4>
         
-        <!--{{/* range last threads */}}-->
+        {{/* range last threads */}}
         <div class="lastthread borders borders-hover">
-            <img src="/static/img/icons/greenfolder.svg">
-            <!-- folder vert si ouvert, jaune si terminé et rouge si fermé -->
+            {{if eq .Status "active"}} {{/* folder vert si ouvert, jaune si terminé et rouge si fermé -> green if active and red if archived (hidden doesn't appear normally...) */}}
+            <img src="/static/img/icons/greenfolder.svg" alt="active thread icon">
+            {{else if eq .Status "archived"}}
+                <img src="/static/img/icons/redfolder-icon.svg" alt="archived thread icon">
+            {{end}}
             <div class="text">
-                <h3> Aide Golang ! </h3> <!--{{/* Titre du thread */}}-->
-                <h5>  </h5> <!--{{/* Auteur du thread */}}-->
-                <p> 09:27:56</p> <!--{{/* Date de création */}}-->
+                <h3> Aide Golang ! </h3> {{/* Titre du thread */}}
+                <h5>  </h5> {{/* Auteur du thread */}}
+                <p> 09:27:56</p> {{/* Date de création */}}
             </div>
         </div>
-        <!--{{/* end range */}}-->
+        {{/* end range */}}
 
     </div>
     {{end}}

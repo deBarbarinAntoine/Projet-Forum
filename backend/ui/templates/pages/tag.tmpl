@@ -1,0 +1,30 @@
+{{define "page"}}
+<div class="container-liste">
+        <h4> {{.Tag.Name}} </h4>
+    {{/*<div class="container-search-filter">
+        <label for="search-liste" class="abs display-none"></label>
+        <input class="search-liste" id="search-liste" type="text" placeholder="Search in the tag">
+        <img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon">
+    </div>*/}}
+    <a href="/thread/create" class="create-link">
+        <img class="newfolder" src="/static/img/icons/newfolder-icon.svg" alt="new thread icon">
+    </a>
+    <div class="container-liste-thread">
+         {{range .Tag.Threads}}
+        <div class="container-thread borders borders-hover">
+            {{if eq .Status "active"}} {{/* folder vert si ouvert, jaune si terminé et rouge si fermé -> green if active and red if archived (hidden doesn't appear normally...) */}}
+                <img src="/static/img/icons/greenfolder.svg" alt="active thread icon">
+            {{else if eq .Status "archived"}}
+                <img src="/static/img/icons/redfolder-icon.svg" alt="archived thread icon">
+            {{end}}
+            <div class="container-thread-text-liste relative">
+                <h3> {{.Title}} </h3>
+                <h5> {{.Author.Name}} </h5>
+                <p> {{humanDate .CreatedAt}} </p>
+                <a href="/thread/{{.ID}}" class="thread-link abs full on-top"></a>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

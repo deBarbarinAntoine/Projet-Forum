@@ -8,8 +8,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/alexedwards/flow"
+	"html/template"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -249,9 +251,21 @@ func (app *application) categoriesGet(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) search(w http.ResponseWriter, r *http.Request) {
 
+	// checking the query
+	if r.URL.Query() == nil {
+		app.clientError(r, w, http.StatusBadRequest)
+		return
+	}
+
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r, false, Overlay.Default)
 	tmplData.Title = "Threadive - Search"
+
+	// retrieving the research text
+	tmplData.Search = r.URL.Query().Get("q")
+	if tmplData.Search == "" {
+		tmplData.Search = "*"
+	}
 
 	// fetching the categories
 	v := validator.New()
@@ -1067,7 +1081,8 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 		form.AddFieldError("content", "must be provided")
 	} else {
 		form.StringCheck(*form.Content, 2, 1_020, true, "content")
-		post.Content = *form.Content
+		content := strings.ReplaceAll(*form.Content, "\n", "<br>")
+		post.Content = template.HTML(content)
 	}
 	if form.ThreadID == nil {
 		form.AddFieldError("thread_id", "must be provided")
@@ -1082,14 +1097,14 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 
 	// return to post-create page if there is an error
 	if !form.Valid() {
-		tmplData := app.newTemplateData(r, false, Overlay.Default)
+		tmplData := app.newTemplateData(r, false, Overlay.Default) // FIXME
 		tmplData.Form = form
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", tmplData) // FIXME
+		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", tmplData)
 		return
 	}
 
@@ -1100,13 +1115,13 @@ func (app *application) createPostPost(w http.ResponseWriter, r *http.Request) {
 	if !v.Valid() {
 
 		// retrieving basic template data
-		tmplData := app.newTemplateData(r, false, Overlay.Default)
+		tmplData := app.newTemplateData(r, false, Overlay.Default) // FIXME
 
 		tmplData.NonFieldErrors = form.NonFieldErrors
 		tmplData.FieldErrors = form.FieldErrors
 
 		// render the template
-		app.render(w, r, http.StatusOK, "home.tmpl", tmplData) // FIXME
+		app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 		return
 	}
 
@@ -1501,7 +1516,7 @@ func (app *application) updatePostPut(w http.ResponseWriter, r *http.Request) {
 	// checking the data from the user
 	if form.Content != nil {
 		form.StringCheck(*form.Content, 1, 1_020, false, "content")
-		post.Content = *form.Content
+		post.Content = template.HTML(*form.Content)
 	}
 	if form.ParentPostID != nil {
 		form.CheckID(*form.ParentPostID, "parent_post_id")

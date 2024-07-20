@@ -1,12 +1,12 @@
 {{define "page"}}
 <div class="container-inthread">
     <h4> {{.Thread.Title}} </h4>
-    <div class="container-search-filter">
+    {{/*<div class="container-search-filter">
         <label for="search-liste" class="abs display-none"></label>
         <input class="search-liste" id="search-liste" type="text" placeholder="Search in the category">
         <img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon">
         <p> Filter </p>
-    </div>
+    </div>*/}}
     {{$user := .User}}
     {{range .Thread.Posts}}
         {{$emoji := getUserReaction $user .ID}}
@@ -48,16 +48,17 @@
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <input type="hidden" name="thread_id" value="{{.Thread.ID}}">
         <label for="content" class="abs display-none"></label>
-       <input name="content" id="content" type="text" placeholder="Type your response here ...">
-       <img src="/static/img/icons/response-icon.svg" alt="response icon">
+        <textarea name="content" id="content" type="text" placeholder="Type your response here ..."></textarea>
+        <button type="submit" class="post-submit"><img src="/static/img/icons/send-icon.svg" alt="send icon"></button>
+
     </form>
-    <div class="pagination-container">
+    {{/*<div class="pagination-container">
         <div class="pagination">
-             {{/* Pagination */}}
+             */}}{{/* Pagination */}}{{/*
             <img src="/static/img/icons/arrow-left-icon.svg" alt="arrow left icon">
             <p> 1 2 3 4 5 </p>
             <img src="/static/img/icons/arrow-right-icon.svg" alt="arrow right icon">
         </div>
-    </div>
+    </div>*/}}
     </div>
 {{end}}

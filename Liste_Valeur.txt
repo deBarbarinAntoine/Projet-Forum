@@ -24,7 +24,7 @@
  - Topics Populaires 
  - Les catégories
  - Les threads suivis par l'utilisateur 
- - les tags liké par l'utilisateur
+ - les tags likés par l'utilisateur
 
 
 
@@ -51,15 +51,15 @@
 
  - Tous les posts du thread 
  - Auteur du post / Date du post 
- - Nombre de like du post (emoji)
+ - Nombre de likes du post (emoji)
  
     -- Fonction -- 
 
  - Fonction de recherche dans le thread 
- - Possiblité de mettre en fav un post 
- - Possibilité de like un post 
+ - Possibilité de mettre en fav un post
+ - Possibilité de liker un post
  - Réponse à un post précis
- - Ecrire une réponse à la suite des autres posts
+ - Écrire une réponse à la suite des autres posts
  - Pagination 
 
 
@@ -111,14 +111,14 @@
 
  -- Login -- 
  
- - Addresse mail 
+ - Adresse mail
  - Mot de passe 
  - Bouton de login 
 
 
  -- Register -- 
 
- - Addresse mail 
+ - Adresse mail
  - Mot de passe 
  - Confirmation mdp 
  - Bouton de login 

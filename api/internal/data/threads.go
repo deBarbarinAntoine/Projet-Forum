@@ -146,7 +146,7 @@ func (m ThreadModel) Get(search string, filters Filters) ([]*Thread, Metadata, e
 		ORDER BY %s %s, Id_threads ASC
 		LIMIT ? OFFSET ?;`, filters.sortColumn(), filters.sortDirection())
 
-	args := []any{search, search, filters.limit, filters.offset}
+	args := []any{search, search, filters.limit(), filters.offset()}
 
 	var threads []*Thread
 

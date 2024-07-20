@@ -156,6 +156,12 @@ func (m *TagModel) GetByID(token string, id int, query url.Values, v *validator.
 	// building the endpoint's specific URL
 	endpoint := fmt.Sprintf("%s/%d", m.endpoint, id)
 
+	// adding the threads in the query string
+	if query == nil {
+		query = make(url.Values)
+	}
+	query.Add("includes[]", "threads")
+
 	// making the request
 	res, status, err := m.api().Get(token, endpoint, query)
 	if err != nil {
@@ -209,7 +215,7 @@ func (m *TagModel) GetPopular(token string, v *validator.Validator) ([]*Tag, []*
 		if err != nil {
 			return nil, nil, err
 		}
-		err = api.UnmarshallSlice(response["popular"]["threads"], &tags)
+		err = api.UnmarshallSlice(response["popular"]["threads"], &threads)
 		if err != nil {
 			return nil, nil, err
 		}

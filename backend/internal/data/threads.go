@@ -151,12 +151,13 @@ func (m *ThreadModel) Get(token string, query url.Values, v *validator.Validator
 		if err != nil {
 			return nil, Metadata{}, err
 		}
-		var ok bool
-		if threads, ok = response["threads"].([]*Thread); !ok {
-			return nil, Metadata{}, errors.New("invalid response from Threads")
+		err = api.UnmarshallSlice(response["threads"], &threads)
+		if err != nil {
+			return nil, Metadata{}, err
 		}
-		if metadata, ok = response["_metadata"].(Metadata); !ok {
-			return nil, Metadata{}, errors.New("invalid response from Metadata")
+		err = api.Unmarshall(response["_metadata"], &metadata)
+		if err != nil {
+			return nil, Metadata{}, err
 		}
 	}
 

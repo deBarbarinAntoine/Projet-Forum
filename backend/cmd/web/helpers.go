@@ -253,6 +253,7 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 
 	// retrieving the nonce
 	nonce := app.getNonce(r)
+
 	// retrieving the user data
 	user := &data.User{}
 	v := validator.New()
@@ -268,9 +269,6 @@ func (app *application) newTemplateData(r *http.Request, allUser bool, overlay s
 			}
 		}
 		user, _ = app.models.UserModel.GetByID(token, "me", query, v)
-
-		// DEBUG
-		app.logger.Debug(fmt.Sprintf("user: %+v", user))
 	}
 	categories, metadata, err := app.models.CategoryModel.Get(token, nil, v)
 	if err != nil {

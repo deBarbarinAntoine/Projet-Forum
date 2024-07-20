@@ -23,15 +23,16 @@
 
     <header>
         <div class="logo-searchbar">
-            <a href="/home"><img class="logo" src="/static/img/logo/logo_transparent.png" alt="logo"></a>
-            <form class="search">
+            <a href="/home"><img class="logo" src="/static/img/logo/logo_transparent.png" alt="Threadive logo"></a>
+            <form class="search" method="get" action="/search">
                 <label for="searchbar" class="abs display-none"></label>
-                <input class="searchbar" id="searchbar" type="text" placeholder="Search for a category, a thread ...">
-                <img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon">
+                <input class="searchbar" id="searchbar" name="q" {{with .Search}}value="{{.}}"{{end}} type="text" placeholder="Search for a category, a thread...">
+                <button type="submit" class="search-submit"><img class="search-icon" src="/static/img/icons/search-icon.svg" alt="search icon"></button>
             </form>
         </div>
         <div class="notification-profile">
-            <img class="notification-icon" src="/static/img/icons/notification-icon.svg" alt="notification icon">
+            {{/*<img class="notification-icon" src="/static/img/icons/notification-icon.svg" alt="notification icon">*/}}
+            <div>{{/*empty div instead of the notification icon: remove when activating the notification icon*/}}</div>
             <div class="profile">
                 <div class="profile-picture relative">
                     {{if .IsAuthenticated}}
@@ -83,7 +84,8 @@
     <div class="nav-left">
         {{if .IsAuthenticated}}
             <div class="profile">
-                <div class="personal-info">
+                <div class="personal-info relative">
+                    <a href="/dashboard" class="abs full on-top"></a>
                     <div class="profile-picture">
                         <img class="avatar" src="{{.User.Avatar}}" alt="avatar image">
                         <div class="activity"></div>
@@ -115,14 +117,16 @@
                 <p class="link-text"> Home </p>
             </div>
 
-            <div class="link">
+            <div class="link relative">
                 <img class="link-icon" src="/static/img/icons/discover-icon.svg" alt="discover icon">
                 <p class="link-text"> Discover </p>
+                <a href="/tag/{{(index .PopularTags 0).ID}}" class="abs full on-top"></a>
             </div>
 
-            <div class="link">
-                <img class="link-icon" src="/static/img/icons/friends-icon.svg" alt="friends icon">
-                <p class="link-text"> Friends </p>
+            <div class="link relative">
+                <img class="link-icon" src="/static/img/icons/tag.svg" alt="tags icon">
+                <p class="link-text"> Tags </p>
+                <a href="/tags" class="abs full on-top"></a>
             </div>
 
             <div data-list="list-of-categories-1" class="link has-list">
@@ -132,6 +136,16 @@
             </div>
 
             <div id="list-of-categories-1" class="category-list">
+                <div class="category relative">
+                    <p class="category-text italic-link"> All categories </p>
+                    <a href="/categories" class="category-link abs full on-top"></a>
+                </div>
+                {{if .IsAuthenticated}}
+                    <div class="category relative">
+                        <p class="category-text italic-link"> New category </p>
+                        <a href="/category/create" class="category-link abs full on-top"></a>
+                    </div>
+                {{end}}
                 {{range .CategoriesNavLeft}}
                     <div class="category relative">
                         <img class="category-icon" src="/static/img/icons/tech-icon.svg" alt="tech icon">
@@ -176,8 +190,9 @@
             <p class="nav-right-title"> Popular tags </p>
             <div class="all-tags">
                 {{range .PopularTags}}
-                    <div class="tag">
-                        <a href="/tag/{{.ID}}" class="tag-link"> {{.Name}} </a>
+                    <div class="tag relative">
+                        <span class="tag-link"> {{.Name}} </span>
+                        <a href="/tag/{{.ID}}" class="abs full on-top"></a>
                     </div>
                 {{end}}
             </div>

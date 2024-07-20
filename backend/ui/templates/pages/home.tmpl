@@ -6,12 +6,30 @@
     </div>
 
     <div class="container-accueil-content borders">
+        <h4> Category </h4>
+        <div class="container-category">
+            {{/* Categories qui vont être affichés sur l'accueil du site */}}
+            {{range .CategoryList.List}}
+                <div class="rectangle-category borders borders-hover relative">
+                    <img src="/static/img/icons/tech-icon.svg">
+                    <h5> {{.Name}} </h5>
+                    <a href="/category/{{.ID}}" class="category-link abs full on-top"></a>
+                </div>
+            {{end}}
+            {{/* fin des categories */}}
+
+        </div>
+    </div>
+    <div class="container-accueil-content borders">
         <h4> Hot topics </h4> 
 
         {{ range .PopularThreads }}
         <div class="container-hottopic borders borders-hover">
-            {{/* folder vert si ouvert, jaune si terminé et rouge si fermé */}}
-            <img src="/static/img/icons/greenfolder.svg">
+            {{if eq .Status "active"}} {{/* folder vert si ouvert, jaune si terminé et rouge si fermé -> green if active and red if archived (hidden doesn't appear normally...) */}}
+            <img src="/static/img/icons/greenfolder.svg" alt="active thread icon">
+            {{else if eq .Status "archived"}}
+                <img src="/static/img/icons/redfolder-icon.svg" alt="archived thread icon">
+            {{end}}
             <div class="container-thread-text relative">
                 <h3> {{.Title}} </h3>
                 <h5> {{.Author.Name}} </h5>
@@ -22,49 +40,48 @@
         {{ end }}
 
     </div>
-    <div class="container-accueil-content borders">
-        <h4> Category </h4>
-        <div class="container-category">
-            {{/* Categories qui vont être affichés sur l'accueil du site */}}
-            {{range .CategoryList.List}}
-            <div class="rectangle-category borders borders-hover relative">
-                <img src="/static/img/icons/tech-icon.svg">
-                <h5> {{.Name}} </h5>
-                <a href="/category/{{.ID}}" class="category-link abs full on-top"></a>
-            </div>
-            {{end}}
-            {{/* fin des categories */}}
-
-        </div>
-    </div>
     {{if .IsAuthenticated}}
         <div class="container-accueil-content borders">
-            <h4> Followed Thread </h4>
-
-            {{range .User.FavoriteThreads}}
-            <div class="container-hottopic borders borders-hover">
-                <img src="/static/img/icons/greenfolder.svg">
-                <div class="container-thread-text relative">
-                    <a href="/thread/{{.ID}}" class="thread-link"></a>
-                    <h3> {{.Title}} </h3>
-                    <h5>  </h5> {{/* auteur */}}
-                    <p> 09:27:56</p> {{/* date de création */}}
-                    <a href="/thread/{{.ID}}" class="thread-link abs full on-top"></a>
-                </div>
-            </div>
-            {{end}}
-
-        </div>
-        <div class="container-accueil-content borders">
-            <h4> Fav Tag </h4>
+            <h4> Favorite Threads </h4>
             <div class="container-favtag">
 
+            {{if ne (len .User.FavoriteThreads) 0}}
+                {{range .User.FavoriteThreads}}
+                    <div class="container-hottopic borders borders-hover">
+                        {{if eq .Status "active"}} {{/* folder vert si ouvert, jaune si terminé et rouge si fermé -> green if active and red if archived (hidden doesn't appear normally...) */}}
+                        <img src="/static/img/icons/greenfolder.svg" alt="active thread icon">
+                        {{else if eq .Status "archived"}}
+                            <img src="/static/img/icons/redfolder-icon.svg" alt="archived thread icon">
+                        {{end}}
+                        <div class="container-thread-text relative">
+                            <a href="/thread/{{.ID}}" class="thread-link"></a>
+                            <h3> {{.Title}} </h3>
+                            <h5> {{.Author.Name}} </h5>
+                            <p> {{humanDate .CreatedAt}} </p>
+                            <a href="/thread/{{.ID}}" class="thread-link abs full on-top"></a>
+                        </div>
+                    </div>
+                {{end}}
+            {{else}}
+                <div class="flash">No favorite thread yet :/</div>
+            {{end}}
+
+            </div>
+        </div>
+        <div class="container-accueil-content borders">
+            <h4> Following Tags </h4>
+            <div class="container-favtag">
+
+            {{if ne (len .User.FollowingTags) 0}}
                 {{range .User.FollowingTags}}
                 <div class="favtag borders borders-hover relative">
                     <h5> {{.Name}} </h5>
                     <a href="/tag/{{.ID}}" class="tag-link abs full on-top"></a>
                 </div>
                 {{end}}
+            {{else}}
+                <div class="flash">No following tag yet :/</div>
+            {{end}}
 
             </div>
         </div>

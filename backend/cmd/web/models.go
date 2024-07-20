@@ -63,6 +63,7 @@ type templateData struct {
 	FieldErrors       map[string]string
 	NonFieldErrors    []string
 	User              data.User
+	Search            string
 	CategoriesNavLeft []*data.Category
 	PopularTags       []*data.Tag
 	PopularThreads    []*data.Thread
